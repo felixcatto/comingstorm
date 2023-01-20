@@ -1,0 +1,288 @@
+@use "sass:math";
+
+@import '~bootstrap/dist/css/bootstrap.min.css';
+@import './fontawesome.min.css';
+@import './solid.min.css';
+@import './scssHelpers.scss';
+
+:root {
+  // --orange: #3f51b5;
+  // --orange: #673ab7;
+  --orange: #512da8;
+  // --orange-600: #673ab7;
+  --orange-600: #7e57c2;
+  // --orange-600: #311b92;
+}
+
+html {
+  font-size: 18px;
+}
+
+@font-face {
+  font-family: SSPR;
+  src: url('/font/SourceSansProR.ttf');
+}
+
+@font-face {
+  font-family: SSPL;
+  src: url('/font/SourceSansProL.ttf');
+}
+
+body {
+  font-family: SSPR, 'ubuntu', 'Comic Sans MS';
+  // background-image: url('/img/s1.jpg');
+  background-image: url('/img/ChaserSunset.webp');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  font-family: SSPL;
+}
+
+input.form-control,
+input.form-control:focus,
+textarea.form-control,
+textarea.form-control:focus,
+select.form-control,
+select.form-control:focus {
+  color: #222;
+}
+
+.btn-primary {
+  padding-top: 4px;
+  background-color: var(--orange);
+  border-color: var(--orange);
+  &:hover {
+    background-color: var(--orange-600);
+    border-color: var(--orange-600);
+  }
+  &:active,
+  &:focus {
+    background-color: var(--orange-600) !important;
+    border-color: var(--orange-600) !important;
+    box-shadow: 0 0 0 0.2rem rgba(230, 81, 0, 0.5) !important;
+  }
+}
+.btn-outline-primary {
+  color: var(--orange);
+  border-color: var(--orange);
+  &:hover {
+    color: #fff;
+    background-color: var(--orange);
+    border-color: var(--orange);
+  }
+}
+
+a {
+  color: var(--orange);
+  &:hover {
+    color: var(--orange-600);
+  }
+}
+
+.btn-link {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  color: var(--orange);
+  &:hover {
+    color: var(--orange-600);
+  }
+}
+
+.form-control {
+  &__inline {
+    width: auto;
+  }
+}
+
+.fa {
+  color: var(--orange);
+  &_big {
+    padding: 2px 5px;
+  }
+  &_link {
+    cursor: pointer;
+    user-select: none;
+    &:hover {
+      text-decoration: none;
+      color: #0056b3;
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.fake-link {
+  display: inline-block;
+  &__button {
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+}
+
+.error {
+  color: #c9302c;
+}
+
+.text-light {
+  font-size: 0.75rem;
+  color: #6e7582 !important;
+}
+
+.orange {
+  color: var(--orange);
+}
+
+// spinner START
+$offset: 187;
+$offsetBold: 180;
+$duration: 1.8s;
+
+.spinner {
+  width: 25px;
+  height: 25px;
+  animation: rotator $duration linear infinite;
+  &__path {
+    stroke-dasharray: $offset;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: dash $duration ease-in-out infinite;
+    stroke: var(--orange);
+    fill: none;
+    stroke-linecap: round;
+    r: 30;
+    stroke-width: 6;
+    &_bold {
+      r: 24;
+      stroke-width: 9;
+      animation: dashbold $duration ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: $offset;
+  }
+  50% {
+    stroke-dashoffset: math.div($offset, 4);
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: $offset;
+    transform: rotate(450deg);
+  }
+}
+
+@keyframes dashbold {
+  0% {
+    stroke-dashoffset: $offsetBold;
+  }
+  50% {
+    stroke-dashoffset: math.div($offsetBold, 4);
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: $offsetBold;
+    transform: rotate(450deg);
+  }
+}
+// spinner END
+
+.app {
+  &__header {
+    position: relative;
+    background: var(--orange);
+    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.5);
+  }
+  &__header-fg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    color: #fff;
+  }
+  &__logo {
+    height: 50px;
+  }
+  &__user-role-icon {
+    color: #fff;
+  }
+  &__sign-in {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    &:hover {
+      color: #fff;
+      text-decoration: none;
+    }
+  }
+  &__sign-in:hover &__sign-in-text {
+    text-decoration: underline;
+  }
+  &__sign-icon {
+    margin-right: -10px;
+    padding: 4px 10px;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  &__nav-link {
+    padding: 0px 6px;
+    padding-bottom: 2px;
+    margin-right: 20px;
+    border-radius: 12px;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    &:last-child {
+      margin-right: 0;
+    }
+    &:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+    &_active {
+      background: #fff;
+      color: var(--orange);
+      &:hover {
+        color: var(--orange);
+        text-decoration: none;
+        cursor: default;
+      }
+    }
+  }
+  &__body {
+    min-height: calc(100vh - 70px);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background: #fff;
+    box-shadow: inset 12px 0 25px -15px rgba(0, 0, 0, 0.9),
+      inset -12px 0 25px -15px rgba(0, 0, 0, 0.9);
+  }
+  &__splash-screen {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+  }
+}
