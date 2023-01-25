@@ -16,7 +16,7 @@ export default [
   {
     id: -3,
     name: 'fedya',
-    role: 'guest',
+    role: 'user',
     email: 'fedya@yandex.ru',
     password: '1',
   },

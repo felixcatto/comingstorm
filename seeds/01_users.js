@@ -1,5 +1,5 @@
 const { omit } = require('lodash');
-const encrypt = require('../lib/secure.ts').default;
+const { encrypt } = require('../lib/devUtils');
 const users = require('../__tests__/fixtures/users').default;
 
 exports.seed = async knex => {

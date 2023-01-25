@@ -1,23 +1,43 @@
-import Layout from '../../client/common/Layout';
 import cn from 'classnames';
 import { useStore } from 'effector-react';
 import Link from 'next/link';
+import Layout from '../../client/common/Layout';
 import { getUrl } from '../../client/lib/routes';
-import { IUser } from '../../client/lib/types';
-import { dedup, useContext, userRolesToIcons, useSWR } from '../../client/lib/utils';
+import {
+  dedup,
+  unwrap,
+  useContext,
+  useRefreshPage,
+  userRolesToIcons,
+} from '../../client/lib/utils';
+import { keygrip, objection } from '../../lib/init';
+import { getUserFromRequest } from '../../lib/utils';
+import { IUser } from '../../models/User';
+
+type IUsersProps = {
+  users: IUser[];
+};
+
+export async function getServerSideProps({ req, res }) {
+  const { User } = objection;
+  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  const users = await User.query();
+  return {
+    props: unwrap({ currentUser, users }),
+  };
+}
 
 const userIconClass = role => cn('mr-5', userRolesToIcons[role]);
 
-const Users = () => {
+const Users = ({ users }: IUsersProps) => {
   const { $session, getApiUrl, axios } = useContext();
-  const { isAdmin } = useStore<any>($session);
-  const { data: users, mutate } = useSWR<IUser[]>(getApiUrl('users'));
-  // console.log(users);
+  const { isAdmin } = useStore($session);
+  const refreshPage = useRefreshPage();
 
   const deleteUser = id =>
     dedup(async () => {
       await axios.delete(getApiUrl('user', { id }));
-      mutate();
+      refreshPage();
     });
 
   return (

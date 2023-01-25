@@ -1,22 +1,30 @@
 import { Form, Formik } from 'formik';
-import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Layout from '../../client/common/Layout';
 import { getUrl } from '../../client/lib/routes';
 import {
   ErrorMessage,
   Field,
-  WithApiErrors,
+  IApiErrors,
   SubmitBtn,
   useContext,
-  IApiErrors,
+  WithApiErrors,
 } from '../../client/lib/utils';
-import Layout from '../../client/common/Layout';
+import { keygrip, objection } from '../../lib/init';
+import { getUserFromRequest, unwrap } from '../../lib/utils';
 
-const LoginForm = (props: IApiErrors) => {
+export async function getServerSideProps({ req, res }) {
+  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);
+  return {
+    props: unwrap({ currentUser }),
+  };
+}
+
+const LoginForm = WithApiErrors(props => {
   const { actions } = useContext();
   const router = useRouter();
-  const { apiErrors, setApiErrors } = props;
+  const { setApiErrors } = props;
 
   const onSubmit = async values => {
     try {
@@ -54,6 +62,6 @@ const LoginForm = (props: IApiErrors) => {
       </Formik>
     </Layout>
   );
-};
+});
 
-export default WithApiErrors(LoginForm);
+export default LoginForm;

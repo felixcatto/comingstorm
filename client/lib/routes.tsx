@@ -1,9 +1,9 @@
-import css from 'styled-jsx/css';
 import { makeUrlFor } from './utils';
 
 export const routes = {
   home: '/',
   users: '/users',
+  user: '/users/:id',
   newUser: '/users/new',
   editUser: '/users/:id/edit',
   articles: '/articles',

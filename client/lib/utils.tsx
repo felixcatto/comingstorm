@@ -1,17 +1,16 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import cn from 'classnames';
 import { useFormikContext } from 'formik';
-import { isFunction, omit } from 'lodash';
+import { omit } from 'lodash';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { compile } from 'path-to-regexp';
-import React, { useState } from 'react';
-import Select from 'react-select';
-import useSWROriginal, { useSWRConfig } from 'swr';
+import React from 'react';
 import { roles } from '../../lib/sharedUtils';
 import Context from './context';
-import { IEmptyObject } from '../lib/types';
-import { IGetApiUrl } from './routes';
+import { IEmptyObject } from './types';
+
 import { ISessionActions, ISessionStore } from '../common/sessionSlice';
+import { IGetApiUrl } from './routes';
 
 export * from '../../lib/sharedUtils';
 export { Context };
@@ -73,18 +72,9 @@ export const userRolesToIcons = {
   [roles.guest]: 'fa fa-ghost',
 };
 
-export function useSWR<ResponseType = any>(url, config = {} as any) {
-  // const { isFirstRender } = useContext();
-  // const { fallback } = useSWRConfig();
-  // const ssrData = fallback[url];
-  // const revalidateOnMount = !ssrData || (ssrData && !isFirstRender.current);
-  // return useSWROriginal<ResponseType>(url, { ...config, revalidateOnMount });
-  return useSWROriginal<ResponseType>(url, config);
-}
-
 export const FormContext = React.createContext<IApiErrors>(null as any);
 
-export const WithApiErrors = Component => props => {
+export const WithApiErrors = (Component: React.ComponentType<IApiErrors>) => props => {
   const [apiErrors, setApiErrors] = React.useState({});
   return (
     <FormContext.Provider value={{ apiErrors, setApiErrors }}>
@@ -121,3 +111,17 @@ export const SubmitBtn = ({ children, ...props }) => {
     </button>
   );
 };
+
+export const useRefreshPage = () => {
+  const router = useRouter();
+  return () => router.replace(router.asPath);
+};
+
+export const emptyObject: IEmptyObject = new Proxy(
+  {},
+  {
+    get() {
+      return '';
+    },
+  }
+);

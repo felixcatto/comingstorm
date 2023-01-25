@@ -1,16 +1,8 @@
 import path from 'path';
-import { Model } from 'objection';
+import { Model, ModelObject } from 'objection';
 import * as y from 'yup';
 import { roles, IRole } from '../lib/utils';
-import encrypt from '../lib/secure';
-
-export type IUser = {
-  id: string;
-  name: string;
-  role: IRole;
-  email: string;
-  password_digest: string;
-};
+import { encrypt } from '../lib/secure';
 
 export type IUserLoginCreds = {
   email: string;
@@ -44,18 +36,16 @@ export class User extends Model {
     };
   }
 
+  id: string;
+  name: string;
+  role: IRole;
+  email: string;
+  password_digest: string;
+
   set password(value) {
-    (this as any).password_digest = encrypt(value);
+    this.password_digest = encrypt(value);
   }
 }
-
-export const guestUser = {
-  id: '-1',
-  name: 'Guest',
-  role: roles.guest,
-  email: '',
-  password_digest: '',
-};
 
 export const userSchema = y.object({
   name: y.string().required('required'),
@@ -68,3 +58,8 @@ export const userLoginSchema = y.object({
   email: y.string().email().required('required'),
   password: y.string().required('required'),
 });
+
+export type IUser = Omit<ModelObject<User>, 'password'>;
+export type IUserClass = typeof User;
+export type IUserSchema = y.InferType<typeof userSchema>;
+export type IUserLoginSchema = y.InferType<typeof userLoginSchema>;

@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { getUrl } from '../lib/routes';
 import { NavLink } from '../lib/utils';
 import cn from 'classnames';
+import { useContext, userRolesToIcons } from '../lib/utils';
+import { useStore } from 'effector-react';
 
 export default function Layout({ children }) {
-  const SignedLink = ({ children, to = '' }) => <div className="app__sign-in">{children}</div>;
-  const userIconClass = x => '';
-  const currentUser = {} as any;
-  const actions = {} as any;
-  const isSignedIn = false;
+  const { $session, actions } = useContext();
+  const { currentUser, isSignedIn } = useStore($session);
+  const userIconClass = role => cn('app__user-role-icon mr-5', userRolesToIcons[role]);
 
   return (
     <>
@@ -38,7 +38,7 @@ export default function Layout({ children }) {
                 <i
                   className="fa fa-sign-out-alt app__sign-icon"
                   title="Sign out"
-                  onClick={actions.signOut}
+                  onClick={() => actions.signOut()}
                 ></i>
               </div>
             ) : (

@@ -1,51 +1,28 @@
-import { switchHttpMethod, validate } from '../../../lib/utils';
-import { userLoginSchema } from '../../../models/User';
-
-// export default function handler(req: NextApiRequest, res: NextApiResponse) {
-//   if (req.method === 'POST') {
-//     console.log(req.body);
-//     res.status(200).json({ name: 'John Doe' });
-//   } else {
-//     res.status(404).json({ message: 'Not Found' });
-//   }
-// }
+import { keygrip, objection } from '../../../lib/init';
+import { encrypt } from '../../../lib/secure';
+import { guestUser, removeCookie, setCookie, switchHttpMethod, validate, IValidate } from '../../../lib/utils';
+import { IUserLoginSchema, userLoginSchema } from '../../../models/User';
 
 export default switchHttpMethod({
   post: [
     validate(userLoginSchema),
-    (req, res) => {
-      console.log(req.body);
-      res.status(200).json({ name: 'John Doe' });
+    async (req, res, ctx: IValidate<IUserLoginSchema>) => {
+      const { User } = objection;
+      const user = await User.query().findOne('email', ctx.body.email);
+      if (!user) {
+        return res.status(400).json({ errors: { email: 'User with such email not found' } });
+      }
+
+      if (user.password_digest !== encrypt(ctx.body.password)) {
+        return res.status(400).json({ errors: { password: 'Wrong password' } });
+      }
+
+      setCookie(res, keygrip, 'userId', user.id);
+      res.status(201).json(user);
     },
   ],
+  delete: (req, res) => {
+    removeCookie(res, 'userId');
+    res.status(201).json(guestUser);
+  },
 });
-
-// import { validate } from '../lib/utils';
-// import encrypt from '../lib/secure';
-
-// export default async app => {
-//   const { User } = app.objection;
-
-//   app.post(
-//     '/session',
-//     { name: 'session', preHandler: validate(User.yupLoginSchema) },
-//     async (request, reply) => {
-//       const user = await User.query().findOne('email', request.data.email);
-//       if (!user) {
-//         return reply.code(400).send({ errors: { email: 'User with such email not found' } });
-//       }
-
-//       if (user.password_digest !== encrypt(request.data.password)) {
-//         return reply.code(400).send({ errors: { password: 'Wrong password' } });
-//       }
-
-//       request.session.set('userId', user.id);
-//       return reply.send(user);
-//     }
-//   );
-
-//   app.delete('/session', async (request, reply) => {
-//     request.session.delete();
-//     reply.code(201).send(User.guestUser);
-//   });
-// };
