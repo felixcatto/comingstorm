@@ -1,10 +1,9 @@
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout';
-import { getUrl } from '../../client/lib/routes';
 import { useContext, WithApiErrors } from '../../client/lib/utils';
 import Form from '../../client/users/form';
 import { keygrip, objection } from '../../lib/init';
-import { getUserFromRequest, unwrap } from '../../lib/utils';
+import { getUrl, getUserFromRequest, unwrap } from '../../lib/utils';
 
 export async function getServerSideProps({ req, res }) {
   const { User } = objection;

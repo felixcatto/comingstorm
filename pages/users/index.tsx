@@ -2,9 +2,9 @@ import cn from 'classnames';
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout';
-import { getUrl } from '../../client/lib/routes';
 import {
   dedup,
+  getUrl,
   unwrap,
   useContext,
   useRefreshPage,

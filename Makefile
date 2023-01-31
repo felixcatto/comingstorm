@@ -1,6 +1,9 @@
 start:
 	npx next dev
 
+start-test-server:
+	INODE_ENV=test npx next dev -p 3001
+
 migrate:
 	npx knex migrate:latest
 
@@ -31,3 +34,9 @@ database-seed:
 
 database-seed-new:
 	npx knex seed:make $(arg)
+
+test:
+	npx jest --runInBand --watch
+
+test-one-file:
+	npx jest --runInBand --watch $(arg)

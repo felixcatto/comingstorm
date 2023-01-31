@@ -1,11 +1,10 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../../client/common/Layout';
-import { getUrl } from '../../../client/lib/routes';
 import { useContext, WithApiErrors } from '../../../client/lib/utils';
 import Form from '../../../client/users/form';
 import { keygrip, objection } from '../../../lib/init';
-import { getUserFromRequest, unwrap } from '../../../lib/utils';
+import { getUrl, getUserFromRequest, unwrap } from '../../../lib/utils';
 import { IUser } from '../../../models';
 
 export async function getServerSideProps({ req, res }) {

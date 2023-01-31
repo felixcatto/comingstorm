@@ -1,17 +1,18 @@
-import '../public/css/index.scss';
-import type { AppProps } from 'next/app';
 import originalAxios from 'axios';
 import React from 'react';
-import { useStore } from 'effector-react';
-import { roles, asyncStates, makeSessionInfo, useContext, Context } from '../client/lib/utils';
-import { getApiUrl } from '../client/lib/routes';
 import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
+import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils';
+import '../public/css/index.scss';
 
 function App(appProps) {
   const { Component, pageProps } = appProps;
-  const { currentUser } = pageProps;
 
   const { store } = React.useMemo(() => {
+    const currentUser = pageProps.currentUser || guestUser;
+    if (!pageProps.currentUser) {
+      console.warn('beware, no currentUser detected');
+    }
+
     const axios = originalAxios.create();
     axios.interceptors.response.use(
       response => response.data,

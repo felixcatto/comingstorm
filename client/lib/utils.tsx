@@ -3,14 +3,13 @@ import { useFormikContext } from 'formik';
 import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { compile } from 'path-to-regexp';
 import React from 'react';
 import { roles } from '../../lib/sharedUtils';
 import Context from './context';
 import { IEmptyObject } from './types';
 
+import { IGetApiUrl } from '../../lib/sharedUtils';
 import { ISessionActions, ISessionStore } from '../common/sessionSlice';
-import { IGetApiUrl } from './routes';
 
 export * from '../../lib/sharedUtils';
 export { Context };
@@ -27,18 +26,6 @@ export type IApiErrors = {
 };
 
 export const useContext = () => React.useContext<IContext>(Context);
-
-export function makeUrlFor<T extends object>(rawRoutes: T) {
-  const routes = Object.keys(rawRoutes).reduce(
-    (acc, name) => ({ ...acc, [name]: compile(rawRoutes[name]) }),
-    {} as any
-  );
-
-  return (name: keyof T, args = {}, opts = {}) => {
-    const toPath = routes[name];
-    return toPath(args, opts);
-  };
-}
 
 export const NavLink = ({ href, children }) => {
   const router = useRouter();

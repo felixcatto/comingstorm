@@ -4,13 +4,10 @@ import makeKeygrip from 'keygrip';
 import knexConfig from '../knexfile';
 import * as models from '../models';
 
-const keys = ['heavy rain', 'hedgehog'];
-const keygrip = makeKeygrip(keys);
-
-const mode = process.env.NODE_ENV || 'development';
+const mode = process.env.INODE_ENV;
+export const keys = ['heavy rain', 'hedgehog'];
+export const keygrip = makeKeygrip(keys);
 
 const knex = knexConnect(knexConfig[mode]);
 Model.knex(knex);
-const objection = { ...models, knex };
-
-export { objection, keygrip, keys };
+export const objection = { ...models, knex };

@@ -1,9 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { getUrl } from '../lib/routes';
 import { NavLink } from '../lib/utils';
 import cn from 'classnames';
-import { useContext, userRolesToIcons } from '../lib/utils';
+import { useContext, userRolesToIcons, getUrl } from '../lib/utils';
 import { useStore } from 'effector-react';
 
 export default function Layout({ children }) {

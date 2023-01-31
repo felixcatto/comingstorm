@@ -1,8 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import cookie from 'cookie';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { IUserClass } from '../models';
-import { roles } from './sharedUtils';
-import { isBelongsToUser, isAdmin, isSignedIn } from './sharedUtils';
+import { guestUser, isAdmin } from './sharedUtils';
 
 export * from './sharedUtils';
 
@@ -53,14 +52,6 @@ export const switchHttpMethod =
       }
     }
   };
-
-export const guestUser = {
-  id: '-1',
-  name: 'Guest',
-  role: roles.guest,
-  email: '',
-  password_digest: '',
-};
 
 const getYupErrors = e => {
   if (e.inner) {
