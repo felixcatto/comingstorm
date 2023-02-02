@@ -1,4 +1,4 @@
-import { IUser } from '../../models';
+import { IUser, ITag } from '../../models';
 
 export interface IEmptyObject {
   [key: string]: undefined;
@@ -14,12 +14,6 @@ export interface IArticle {
   author?: IUser;
   comments?: IComment[];
   tags?: ITag[];
-}
-
-export interface ITag {
-  id: any;
-  name: any;
-  articles?: IArticle[];
 }
 
 export interface IComment {

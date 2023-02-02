@@ -13,7 +13,8 @@ export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),
   get: async (req, res) => {
     const { id } = req.query;
-    const user = await objection.User.query().findById(id!);
+    if (!id) return res.status(400).json({});
+    const user = await objection.User.query().findById(id);
     if (!user) {
       return res.status(400).json({ message: `Entity with id '${id}' not found` });
     }

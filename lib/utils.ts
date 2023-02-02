@@ -1,7 +1,7 @@
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IUserClass } from '../models';
-import { guestUser, isAdmin } from './sharedUtils';
+import { guestUser, isAdmin, isSignedIn } from './sharedUtils';
 
 export * from './sharedUtils';
 
@@ -134,6 +134,19 @@ export const checkValueUnique = async (
 export const checkAdmin = async (req, res, ctx) => {
   if (!isAdmin(ctx.currentUser)) {
     res.status(403).json({ message: 'Forbidden' });
+  }
+};
+
+// export const checkBelongsToUser = getResourceAuthorId => async (request, reply) => {
+//   const resourceAuthorId = await getResourceAuthorId(request);
+//   if (!isBelongsToUser(request.currentUser)(resourceAuthorId)) {
+//     reply.code(403).send({ message: 'Forbidden' });
+//   }
+// };
+
+export const checkSignedIn = async (req, res, ctx) => {
+  if (!isSignedIn(ctx.currentUser)) {
+    res.status(401).json({ message: 'Unauthorized' });
   }
 };
 

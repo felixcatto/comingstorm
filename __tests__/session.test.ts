@@ -35,4 +35,8 @@ describe('session', () => {
     expect(res.status).toBe(201);
     expect(hasLoginCookies).toBeTruthy();
   });
+
+  afterAll(async () => {
+    await objection.knex.destroy();
+  });
 });

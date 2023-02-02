@@ -55,6 +55,7 @@ export const routes = {
   newArticle: '/articles/new',
   editArticle: '/articles/:id/edit',
   tags: '/tags',
+  tag: '/tags/:id',
   newTag: '/tags/new',
   editTag: '/tags/:id/edit',
   projectStructure: '/structure',

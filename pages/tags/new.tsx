@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout';
 import { useContext, WithApiErrors } from '../../client/lib/utils';
-import Form from '../../client/users/form';
+import Form from '../../client/tags/form';
 import { keygrip, objection } from '../../lib/init';
 import { getUrl, getUserFromRequest, unwrap } from '../../lib/utils';
 
@@ -13,15 +13,15 @@ export async function getServerSideProps({ req, res }) {
   };
 }
 
-const NewUser = WithApiErrors(props => {
+const Tag = WithApiErrors(props => {
   const { axios, getApiUrl } = useContext();
   const router = useRouter();
   const { setApiErrors } = props;
 
   const onSubmit = async values => {
     try {
-      await axios.post(getApiUrl('users'), values);
-      router.push(getUrl('users'));
+      await axios.post(getApiUrl('tags'), values);
+      router.push(getUrl('tags'));
     } catch (e) {
       setApiErrors(e.response.data.errors || {});
     }
@@ -29,10 +29,10 @@ const NewUser = WithApiErrors(props => {
 
   return (
     <Layout>
-      <h3>Create New User</h3>
+      <h3>Create New Tag</h3>
       <Form onSubmit={onSubmit} />
     </Layout>
   );
 });
 
-export default NewUser;
+export default Tag;

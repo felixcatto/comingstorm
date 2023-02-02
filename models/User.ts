@@ -3,6 +3,7 @@ import { Model, ModelObject } from 'objection';
 import * as y from 'yup';
 import { roles, IRole } from '../lib/utils';
 import { encrypt } from '../lib/secure';
+import { IArticle, IComment } from '../client/lib/types';
 
 export type IUserLoginCreds = {
   email: string;
@@ -10,6 +11,14 @@ export type IUserLoginCreds = {
 };
 
 export class User extends Model {
+  id: string;
+  name: string;
+  role: IRole;
+  email: string;
+  password_digest: string;
+  articles?: IArticle[];
+  comments?: IComment[];
+
   static get tableName() {
     return 'users';
   }
@@ -35,12 +44,6 @@ export class User extends Model {
       },
     };
   }
-
-  id: string;
-  name: string;
-  role: IRole;
-  email: string;
-  password_digest: string;
 
   set password(value) {
     this.password_digest = encrypt(value);

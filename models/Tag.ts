@@ -1,8 +1,13 @@
+import { Model, ModelObject } from 'objection';
 import path from 'path';
-import { Model } from 'objection';
 import * as y from 'yup';
+import { IArticle } from '../client/lib/types';
 
 export class Tag extends Model {
+  id: string;
+  name: string;
+  articles?: IArticle[];
+
   static get tableName() {
     return 'tags';
   }
@@ -23,10 +28,12 @@ export class Tag extends Model {
       },
     };
   }
-
-  static get yupSchema() {
-    return y.object({
-      name: y.string().required('required'),
-    });
-  }
 }
+
+export const tagSchema = y.object({
+  name: y.string().required('required'),
+});
+
+export type ITag = ModelObject<Tag>;
+export type ITagClass = typeof Tag;
+export type ITagSchema = y.InferType<typeof tagSchema>;

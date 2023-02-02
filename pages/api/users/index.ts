@@ -11,10 +11,6 @@ import { IUserSchema, userSchema } from '../../../models';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),
-  get: async (req, res) => {
-    const users = await objection.User.query();
-    return res.status(200).json(users);
-  },
   post: [
     checkAdmin,
     validate(userSchema),
