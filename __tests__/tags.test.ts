@@ -1,9 +1,8 @@
-import tagsFixture from './fixtures/tags';
-import originalAxios, { AxiosError } from 'axios';
-import { getApiUrl, getUrl } from '../lib/sharedUtils';
-import usersFixture from './fixtures/users';
-import { encrypt } from '../lib/secure';
+import originalAxios from 'axios';
 import { objection } from '../lib/init';
+import { getApiUrl, getUrl } from '../lib/sharedUtils';
+import tagsFixture from './fixtures/tags';
+import usersFixture from './fixtures/users';
 import { getLoginCookie } from './fixtures/utils';
 
 describe('tags', () => {
@@ -33,6 +32,13 @@ describe('tags', () => {
     const [tag] = tagsFixture;
     const res = await axios.get(getUrl('editTag', { id: tag.id }));
     expect(res.status).toBe(200);
+  });
+
+  it('GET /api/tags', async () => {
+    const res = await axios.get(getApiUrl('tags'));
+    const tagsFromDb = await Tag.query();
+    expect(res.status).toBe(200);
+    expect(tagsFromDb).toMatchObject(res.data);
   });
 
   it('GET /api/tags/:id/edit', async () => {

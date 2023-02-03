@@ -5,7 +5,7 @@ import cn from 'classnames';
 import { useContext, userRolesToIcons, getUrl } from '../lib/utils';
 import { useStore } from 'effector-react';
 
-export default function Layout({ children }) {
+export default function Layout({ children }: any) {
   const { $session, actions } = useContext();
   const { currentUser, isSignedIn } = useStore($session);
   const userIconClass = role => cn('app__user-role-icon mr-5', userRolesToIcons[role]);

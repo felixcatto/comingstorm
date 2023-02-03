@@ -1,0 +1,15 @@
+.articleTags {
+  display: flex;
+  align-items: center;
+  margin-top: -20px;
+  margin-bottom: 30px;
+}
+
+.articleTag {
+  margin-right: 10px;
+  padding: 0px 10px;
+  padding-bottom: 2px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 12px;
+}

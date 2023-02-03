@@ -10,6 +10,11 @@ import { ITagSchema, tagSchema } from '../../../models';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),
+  get: async (req, res) => {
+    const { Tag } = objection;
+    const tags = await Tag.query();
+    res.status(200).json(tags);
+  },
   post: [
     checkSignedIn,
     validate(tagSchema),

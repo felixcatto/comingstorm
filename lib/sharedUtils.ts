@@ -1,4 +1,3 @@
-// shared utils for Server and Client
 import { compile } from 'path-to-regexp';
 
 type IMakeEnumResult<T extends ReadonlyArray<string>> = { [key in T[number]]: key };
@@ -58,6 +57,8 @@ export const routes = {
   tag: '/tags/:id',
   newTag: '/tags/new',
   editTag: '/tags/:id/edit',
+  comments: '/articles/:articleId/comments',
+  comment: '/articles/:articleId/comments/:commentId',
   projectStructure: '/structure',
   session: '/session',
   newSession: '/session/new',

@@ -38,5 +38,11 @@ database-seed-new:
 test:
 	npx jest --runInBand --watch
 
-test-one-file:
+test-file:
 	npx jest --runInBand --watch $(arg)
+
+test-once:
+	npx jest --runInBand
+
+lint:
+	npx tsc

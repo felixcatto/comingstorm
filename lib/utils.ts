@@ -1,6 +1,7 @@
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IUserClass } from '../models';
+import { IObjection } from './init';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils';
 
 export * from './sharedUtils';
@@ -137,20 +138,13 @@ export const checkAdmin = async (req, res, ctx) => {
   }
 };
 
-// export const checkBelongsToUser = getResourceAuthorId => async (request, reply) => {
-//   const resourceAuthorId = await getResourceAuthorId(request);
-//   if (!isBelongsToUser(request.currentUser)(resourceAuthorId)) {
-//     reply.code(403).send({ message: 'Forbidden' });
-//   }
-// };
-
 export const checkSignedIn = async (req, res, ctx) => {
   if (!isSignedIn(ctx.currentUser)) {
     res.status(401).json({ message: 'Unauthorized' });
   }
 };
 
-export const getCurrentUser = (objection, keygrip) => async (req, res) => {
+export const getCurrentUser = (objection: IObjection, keygrip) => async (req, res) => {
   const { User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   return { currentUser };

@@ -11,3 +11,4 @@ export const keygrip = makeKeygrip(keys);
 const knex = knexConnect(knexConfig[mode]);
 Model.knex(knex);
 export const objection = { ...models, knex };
+export type IObjection = typeof objection;

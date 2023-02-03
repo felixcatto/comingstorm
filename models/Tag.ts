@@ -1,7 +1,6 @@
-import { Model, ModelObject } from 'objection';
-import path from 'path';
+import { Model } from 'objection';
 import * as y from 'yup';
-import { IArticle } from '../client/lib/types';
+import { Article, IArticle } from './Article';
 
 export class Tag extends Model {
   id: string;
@@ -16,7 +15,7 @@ export class Tag extends Model {
     return {
       articles: {
         relation: Model.ManyToManyRelation,
-        modelClass: path.resolve(__dirname, 'Article.js'),
+        modelClass: Article,
         join: {
           from: 'tags.id',
           through: {
@@ -34,6 +33,10 @@ export const tagSchema = y.object({
   name: y.string().required('required'),
 });
 
-export type ITag = ModelObject<Tag>;
+export type ITag = {
+  id: any;
+  name: any;
+  articles?: IArticle[];
+};
 export type ITagClass = typeof Tag;
 export type ITagSchema = y.InferType<typeof tagSchema>;

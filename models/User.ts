@@ -1,9 +1,10 @@
-import path from 'path';
 import { Model, ModelObject } from 'objection';
+import path from 'path';
 import * as y from 'yup';
-import { roles, IRole } from '../lib/utils';
+import { IComment } from '../client/lib/types';
 import { encrypt } from '../lib/secure';
-import { IArticle, IComment } from '../client/lib/types';
+import { IRole, roles } from '../lib/utils';
+import { Article, IArticle } from './Article';
 
 export type IUserLoginCreds = {
   email: string;
@@ -27,7 +28,7 @@ export class User extends Model {
     return {
       articles: {
         relation: Model.HasManyRelation,
-        modelClass: path.resolve(__dirname, 'Article.js'),
+        modelClass: Article,
         join: {
           from: 'users.id',
           to: 'articles.author_id',

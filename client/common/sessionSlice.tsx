@@ -7,7 +7,7 @@ type ISession = {
   currentUser: IUser;
   isAdmin: boolean;
   isSignedIn: boolean;
-  isBelongsToUser: () => boolean;
+  isBelongsToUser: (resourceAuthorId: string) => boolean;
   status: IAsyncState;
   errors: any;
 };
