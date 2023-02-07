@@ -46,7 +46,7 @@ export default (props: IForm) => {
           </div>
         </div>
 
-        <Link href={getUrl('articles')} className="mr-10">
+        <Link href={getUrl('articles')} className="mr-15">
           Back
         </Link>
         <SubmitBtn className="btn btn-primary">Save</SubmitBtn>

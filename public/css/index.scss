@@ -110,7 +110,7 @@ a {
     user-select: none;
     &:hover {
       text-decoration: none;
-      color: #0056b3;
+      color: var(--orange-600);
     }
   }
 }

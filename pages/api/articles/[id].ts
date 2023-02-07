@@ -24,7 +24,6 @@ export default switchHttpMethod({
     const id = req.query.id!;
     const { Article } = objection;
     const article = await Article.query().findById(id).withGraphFetched('[author, tags]');
-    // .withGraphFetched('[author, comments(orderByCreated).author, tags]');
     if (!article) {
       return res.status(400).json({ message: `Entity with id '${id}' not found` });
     }

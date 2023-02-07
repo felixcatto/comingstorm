@@ -57,8 +57,8 @@ export const routes = {
   tag: '/tags/:id',
   newTag: '/tags/new',
   editTag: '/tags/:id/edit',
-  comments: '/articles/:articleId/comments',
-  comment: '/articles/:articleId/comments/:commentId',
+  comments: '/articles/:id/comments',
+  comment: '/articles/:id/comments/:commentId',
   projectStructure: '/structure',
   session: '/session',
   newSession: '/session/new',
@@ -66,7 +66,7 @@ export const routes = {
 type IRouteName = keyof typeof routes;
 
 export const getUrl = makeUrlFor(routes);
-export const getApiUrl = (name: IRouteName, args?) => `/api/${getUrl(name, args)}`;
+export const getApiUrl = (name: IRouteName, args?) => `/api${getUrl(name, args)}`;
 
 export type IGetApiUrl = typeof getApiUrl;
 export type IRole = keyof typeof roles;

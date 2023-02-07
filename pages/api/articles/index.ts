@@ -1,15 +1,15 @@
+import isEmpty from 'lodash/isEmpty';
+import { ICurrentUser } from '../../../client/lib/types';
 import { keygrip, objection } from '../../../lib/init';
 import {
   checkSignedIn,
   getCurrentUser,
+  isSignedIn,
   IValidate,
   switchHttpMethod,
   validate,
 } from '../../../lib/utils';
-import { IArticleSchema, articleSchema } from '../../../models';
-import { ICurrentUser } from '../../../client/lib/types';
-import { isSignedIn } from '../../../lib/utils';
-import isEmpty from 'lodash/isEmpty';
+import { articleSchema, IArticleSchema } from '../../../models';
 
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 
@@ -36,11 +36,3 @@ export default switchHttpMethod({
     },
   ],
 });
-
-// export const getArticles = async Article => Article.query().withGraphFetched('[author, tags]');
-
-// export default async app => {
-//   app.get('/articles', { name: 'articles' }, async () => getArticles(Article));
-
-//   app.register(comments, { prefix: '/articles/:id' });
-// };

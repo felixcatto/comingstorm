@@ -1,56 +1,78 @@
-export {};
-// import path from 'path';
-// import { Model } from 'objection';
-// import * as y from 'yup';
-// import { requiredIfExists } from '../lib/utils';
+import { Model } from 'objection';
+import * as y from 'yup';
+import { Article, IArticle } from './Article';
+import { IUser, User } from './User';
 
-// export class Comment extends Model {
-//   static get tableName() {
-//     return 'comments';
-//   }
+export class Comment extends Model {
+  id: any;
+  guest_name: any;
+  text: any;
+  created_at: any;
+  updated_at: any;
+  author_id: any;
+  article_id: any;
+  author?: IUser;
+  article?: IArticle;
 
-//   static get relationMappings() {
-//     return {
-//       author: {
-//         relation: Model.BelongsToOneRelation,
-//         modelClass: path.resolve(__dirname, 'User.js'),
-//         join: {
-//           from: 'comments.author_id',
-//           to: 'users.id',
-//         },
-//       },
+  static get tableName() {
+    return 'comments';
+  }
 
-//       article: {
-//         relation: Model.BelongsToOneRelation,
-//         modelClass: path.resolve(__dirname, 'Article.js'),
-//         join: {
-//           from: 'comments.article_id',
-//           to: 'articles.id',
-//         },
-//       },
-//     };
-//   }
+  static get relationMappings() {
+    return {
+      author: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: User,
+        join: {
+          from: 'comments.author_id',
+          to: 'users.id',
+        },
+      },
 
-//   $beforeInsert() {
-//     this.created_at = new Date().toISOString();
-//   }
+      article: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Article,
+        join: {
+          from: 'comments.article_id',
+          to: 'articles.id',
+        },
+      },
+    };
+  }
 
-//   $beforeUpdate() {
-//     this.updated_at = new Date().toISOString();
-//   }
+  $beforeInsert() {
+    this.created_at = new Date().toISOString();
+    this.updated_at = new Date().toISOString();
+  }
 
-//   static get yupSchema() {
-//     return y.object({
-//       guest_name: y.string().test(...requiredIfExists()),
-//       text: y.string().required('required'),
-//     });
-//   }
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
 
-//   static get modifiers() {
-//     return {
-//       orderByCreated(builder) {
-//         builder.orderBy('created_at');
-//       },
-//     };
-//   }
-// }
+  static get modifiers() {
+    return {
+      orderByCreated(builder) {
+        builder.orderBy('created_at');
+      },
+    };
+  }
+}
+
+export const commentsSchema = y.object({
+  guest_name: y.string().default(''),
+  text: y.string().required('required'),
+});
+
+export type IComment = {
+  id: any;
+  guest_name: any;
+  text: any;
+  created_at: any;
+  updated_at: any;
+  author_id: any;
+  article_id: any;
+  author?: IUser;
+  article?: IArticle;
+};
+export type ICommentClass = typeof Comment;
+export type ICommentSchema = y.InferType<typeof commentsSchema>;

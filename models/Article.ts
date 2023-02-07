@@ -1,7 +1,6 @@
 import { Model } from 'objection';
-import path from 'path';
 import * as y from 'yup';
-import { IComment } from '../client/lib/types';
+import { Comment, IComment } from './Comment';
 import { ITag, Tag } from './Tag';
 import { IUser, User } from './User';
 
@@ -11,7 +10,7 @@ export class Article extends Model {
   text: any;
   created_at: any;
   updated_at: any;
-  author_id?: any;
+  author_id: any;
   author?: IUser;
   comments?: IComment[];
   tags?: ITag[];
@@ -33,7 +32,7 @@ export class Article extends Model {
 
       comments: {
         relation: Model.HasManyRelation,
-        modelClass: path.resolve(__dirname, 'Comment.js'),
+        modelClass: Comment,
         join: {
           from: 'articles.id',
           to: 'comments.article_id',
@@ -82,7 +81,7 @@ export type IArticle = {
   created_at: any;
   updated_at: any;
   tagIds: any[];
-  author_id?: any;
+  author_id: any;
   author?: IUser;
   comments?: IComment[];
   tags?: ITag[];

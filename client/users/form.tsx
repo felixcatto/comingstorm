@@ -53,7 +53,7 @@ const UserForm = (props: IForm) => {
           </div>
         </div>
 
-        <Link href={getUrl('users')} className="mr-10">
+        <Link href={getUrl('users')} className="mr-15">
           Back
         </Link>
         <SubmitBtn className="btn btn-primary">Save</SubmitBtn>

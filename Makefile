@@ -4,6 +4,12 @@ start:
 start-test-server:
 	INODE_ENV=test npx next dev -p 3001
 
+start-prod-server:
+	npx next start
+
+build:
+	npx next build
+
 migrate:
 	npx knex migrate:latest
 

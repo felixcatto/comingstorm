@@ -3,6 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { IUserClass } from '../models';
 import { IObjection } from './init';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils';
+import isUndefined from 'lodash/isUndefined';
+import isString from 'lodash/isString';
+import isEmpty from 'lodash/isEmpty';
 
 export * from './sharedUtils';
 
@@ -149,3 +152,10 @@ export const getCurrentUser = (objection: IObjection, keygrip) => async (req, re
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   return { currentUser };
 };
+
+export const requiredIfExists = () =>
+  [
+    'requiredIfExists',
+    'required',
+    value => isUndefined(value) || (isString(value) && !isEmpty(value)),
+  ] as const;

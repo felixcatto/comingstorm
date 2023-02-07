@@ -1,4 +1,4 @@
-const { omit } = require('lodash');
+const omit = require('lodash/omit');
 const { encrypt } = require('../lib/devUtils');
 const users = require('../__tests__/fixtures/users').default;
 

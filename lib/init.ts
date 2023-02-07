@@ -4,7 +4,11 @@ import makeKeygrip from 'keygrip';
 import knexConfig from '../knexfile';
 import * as models from '../models';
 
-const mode = process.env.INODE_ENV;
+if (!process.env.INODE_ENV) {
+  console.warn('*** Using default NODE_ENV for configuring database connection ***');
+}
+
+const mode = process.env.INODE_ENV || process.env.NODE_ENV;
 export const keys = ['heavy rain', 'hedgehog'];
 export const keygrip = makeKeygrip(keys);
 

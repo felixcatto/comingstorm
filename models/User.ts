@@ -1,10 +1,10 @@
 import { Model, ModelObject } from 'objection';
 import path from 'path';
 import * as y from 'yup';
-import { IComment } from '../client/lib/types';
 import { encrypt } from '../lib/secure';
 import { IRole, roles } from '../lib/utils';
 import { Article, IArticle } from './Article';
+import { IComment } from './Comment';
 
 export type IUserLoginCreds = {
   email: string;

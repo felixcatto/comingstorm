@@ -59,7 +59,7 @@ describe('articles', () => {
     expect(articleFromDb).toMatchObject(article);
   });
 
-  it('POST /api/articles with tags', async () => {
+  it('POST /api/articles - with tags', async () => {
     const tagIds = tagsFixture.map(tag => tag.id);
     const article = {
       title: 'test2',
@@ -75,7 +75,7 @@ describe('articles', () => {
     expect(articleFromDb).toMatchObject(article);
   });
 
-  it('PUT /api/articles/:id article does not belong to user', async () => {
+  it('PUT /api/articles/:id - article does not belong to user', async () => {
     expect.assertions(1);
     const [vasaArticle] = articlesFixture;
     const [, tomUser] = usersFixture;
@@ -91,7 +91,7 @@ describe('articles', () => {
     }
   });
 
-  it('PUT /api/articles/:id with tags', async () => {
+  it('PUT /api/articles/:id - with tags', async () => {
     const tomsArticle = articlesFixture[2];
     const article = {
       ...tomsArticle,
