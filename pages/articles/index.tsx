@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Layout from '../../client/common/Layout';
 import { getUrl, unwrap, useContext, useRefreshPage } from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
+import { IArticle } from '../../lib/types';
 import { getUserFromRequest } from '../../lib/utils';
-import { IArticle } from '../../models';
 
 type IArticlesProps = {
   articles: IArticle[];

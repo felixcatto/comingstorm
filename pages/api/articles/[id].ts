@@ -1,15 +1,14 @@
-import { IObjection, keygrip, objection } from '../../../lib/init';
 import difference from 'lodash/difference';
+import { keygrip, objection } from '../../../lib/init';
+import { IArticleSchema, ICurrentUser, IObjection, IValidate } from '../../../lib/types';
 import {
-  isBelongsToUser,
   checkSignedIn,
   getCurrentUser,
-  IValidate,
+  isBelongsToUser,
   switchHttpMethod,
   validate,
 } from '../../../lib/utils';
-import { articleSchema, IArticleSchema, ITagSchema, tagSchema } from '../../../models';
-import { ICurrentUser } from '../../../client/lib/types';
+import { articleSchema } from '../../../models';
 
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 

@@ -1,15 +1,10 @@
-import { Model, ModelObject } from 'objection';
+import { Model } from 'objection';
 import path from 'path';
 import * as y from 'yup';
 import { encrypt } from '../lib/secure';
-import { IRole, roles } from '../lib/utils';
-import { Article, IArticle } from './Article';
-import { IComment } from './Comment';
-
-export type IUserLoginCreds = {
-  email: string;
-  password: string;
-};
+import { IArticle, IComment, IRole } from '../lib/types';
+import { roles } from '../lib/utils';
+import { Article } from './Article';
 
 export class User extends Model {
   id: string;
@@ -62,8 +57,3 @@ export const userLoginSchema = y.object({
   email: y.string().email().required('required'),
   password: y.string().required('required'),
 });
-
-export type IUser = Omit<ModelObject<User>, 'password'>;
-export type IUserClass = typeof User;
-export type IUserSchema = y.InferType<typeof userSchema>;
-export type IUserLoginSchema = y.InferType<typeof userLoginSchema>;

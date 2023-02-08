@@ -1,15 +1,14 @@
-import { ICurrentUser } from '../../../../../client/lib/types';
-import { IObjection, keygrip, objection } from '../../../../../lib/init';
+import { keygrip, objection } from '../../../../../lib/init';
+import { ICommentSchema, ICurrentUser, IObjection, IValidate } from '../../../../../lib/types';
 import {
   checkSignedIn,
   getCurrentUser,
   isAdmin,
   isBelongsToUser,
-  IValidate,
   switchHttpMethod,
   validate,
 } from '../../../../../lib/utils';
-import { commentsSchema, ICommentSchema } from '../../../../../models';
+import { commentsSchema } from '../../../../../models';
 
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 

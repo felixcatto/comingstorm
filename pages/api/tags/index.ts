@@ -1,12 +1,7 @@
 import { keygrip, objection } from '../../../lib/init';
-import {
-  checkSignedIn,
-  getCurrentUser,
-  IValidate,
-  switchHttpMethod,
-  validate,
-} from '../../../lib/utils';
-import { ITagSchema, tagSchema } from '../../../models';
+import { ITagSchema, IValidate } from '../../../lib/types';
+import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils';
+import { tagSchema } from '../../../models';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),

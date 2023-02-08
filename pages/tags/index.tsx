@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Layout from '../../client/common/Layout';
 import { getUrl, unwrap, useContext, useRefreshPage } from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
+import { ITag } from '../../lib/types';
 import { getUserFromRequest } from '../../lib/utils';
-import { ITag } from '../../models';
 
 type ITagsProps = {
   tags: ITag[];

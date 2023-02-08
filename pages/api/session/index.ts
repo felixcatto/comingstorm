@@ -1,7 +1,8 @@
 import { keygrip, objection } from '../../../lib/init';
 import { encrypt } from '../../../lib/secure';
-import { guestUser, removeCookie, setCookie, switchHttpMethod, validate, IValidate } from '../../../lib/utils';
-import { IUserLoginSchema, userLoginSchema } from '../../../models/User';
+import { guestUser, removeCookie, setCookie, switchHttpMethod, validate } from '../../../lib/utils';
+import { userLoginSchema } from '../../../models/User';
+import { IValidate, IUserLoginSchema } from '../../../lib/types';
 
 export default switchHttpMethod({
   post: [

@@ -5,8 +5,8 @@ import Form from '../../client/articles/form';
 import Layout from '../../client/common/Layout';
 import { useContext, WithApiErrors } from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
-import { getUrl, getUserFromRequest, INullable, unwrap } from '../../lib/utils';
-import { ITag } from '../../models';
+import { INullable, ITag } from '../../lib/types';
+import { getUrl, getUserFromRequest, unwrap } from '../../lib/utils';
 
 export async function getServerSideProps({ req, res }) {
   const { User } = objection;

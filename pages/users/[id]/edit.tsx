@@ -5,7 +5,7 @@ import { useContext, WithApiErrors } from '../../../client/lib/utils';
 import Form from '../../../client/users/form';
 import { keygrip, objection } from '../../../lib/init';
 import { getUrl, getUserFromRequest, unwrap } from '../../../lib/utils';
-import { IUser } from '../../../models';
+import { IUser } from '../../../lib/types';
 
 export async function getServerSideProps({ req, res }) {
   const { User } = objection;

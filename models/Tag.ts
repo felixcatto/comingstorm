@@ -1,6 +1,7 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { Article, IArticle } from './Article';
+import { Article } from './Article';
+import { IArticle } from '../lib/types';
 
 export class Tag extends Model {
   id: string;
@@ -32,11 +33,3 @@ export class Tag extends Model {
 export const tagSchema = y.object({
   name: y.string().required('required'),
 });
-
-export type ITag = {
-  id: any;
-  name: any;
-  articles?: IArticle[];
-};
-export type ITagClass = typeof Tag;
-export type ITagSchema = y.InferType<typeof tagSchema>;

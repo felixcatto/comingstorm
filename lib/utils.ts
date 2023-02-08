@@ -1,61 +1,48 @@
 import cookie from 'cookie';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { IUserClass } from '../models';
-import { IObjection } from './init';
+import isObject from 'lodash/isObject';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils';
-import isUndefined from 'lodash/isUndefined';
-import isString from 'lodash/isString';
-import isEmpty from 'lodash/isEmpty';
+import {
+  IHandler,
+  IMixHandler,
+  INullable,
+  IObjection,
+  ISwitchHttpMethod,
+  IUserClass,
+} from './types';
 
 export * from './sharedUtils';
 
-type IHandler = (req: NextApiRequest, res: NextApiResponse, ctx: any) => object | void;
-type IMixHandler = IHandler | IHandler[];
-type IHttpMethods = {
-  preHandler?: IMixHandler;
-  get?: IMixHandler;
-  post?: IMixHandler;
-  put?: IMixHandler;
-  delete?: IMixHandler;
-};
-export type IValidate<T> = {
-  body: T;
-};
-export type INullable<T> = T | null;
+export const switchHttpMethod: ISwitchHttpMethod = methods => async (req, res) => {
+  const requestMethod = req.method?.toLowerCase() || '';
+  if (!methods.hasOwnProperty(requestMethod)) return res.status(404).json({ message: 'Not Found' });
 
-export const switchHttpMethod =
-  (methods: IHttpMethods) => async (req: NextApiRequest, res: NextApiResponse) => {
-    const requestMethod = req.method?.toLowerCase() || '';
-    if (!methods.hasOwnProperty(requestMethod))
-      return res.status(404).json({ message: 'Not Found' });
-
-    const handlers: IHandler[] = [];
-    if (methods.preHandler) {
-      if (typeof methods.preHandler === 'function') {
-        handlers.push(methods.preHandler);
-      } else {
-        handlers.push(...methods.preHandler);
-      }
-    }
-
-    const mixHandler: IMixHandler = methods[requestMethod];
-    if (typeof mixHandler === 'function') {
-      handlers.push(mixHandler);
+  const handlers: IHandler[] = [];
+  if (methods.preHandler) {
+    if (typeof methods.preHandler === 'function') {
+      handlers.push(methods.preHandler);
     } else {
-      handlers.push(...mixHandler);
+      handlers.push(...methods.preHandler);
     }
+  }
 
-    let i = 0;
-    let ctx = {} as any;
-    while (!res.writableEnded && i < handlers.length) {
-      const currentMiddleware = handlers[i];
-      const result = await currentMiddleware(req, res, ctx);
-      i += 1;
-      if (result) {
-        ctx = { ...ctx, ...result };
-      }
+  const mixHandler: IMixHandler = methods[requestMethod];
+  if (typeof mixHandler === 'function') {
+    handlers.push(mixHandler);
+  } else {
+    handlers.push(...mixHandler);
+  }
+
+  let i = 0;
+  let ctx = {} as any;
+  while (!res.writableEnded && i < handlers.length) {
+    const currentMiddleware = handlers[i];
+    const result = await currentMiddleware(req, res, ctx);
+    i += 1;
+    if (isObject(result)) {
+      ctx = { ...ctx, ...result };
     }
-  };
+  }
+};
 
 const getYupErrors = e => {
   if (e.inner) {
@@ -152,10 +139,3 @@ export const getCurrentUser = (objection: IObjection, keygrip) => async (req, re
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   return { currentUser };
 };
-
-export const requiredIfExists = () =>
-  [
-    'requiredIfExists',
-    'required',
-    value => isUndefined(value) || (isString(value) && !isEmpty(value)),
-  ] as const;

@@ -1,10 +1,8 @@
 import { compile } from 'path-to-regexp';
+import { IMakeEnum, IMakeUrlFor } from './types';
 
-type IMakeEnumResult<T extends ReadonlyArray<string>> = { [key in T[number]]: key };
-
-function makeEnum<T extends ReadonlyArray<string>>(...args: T): IMakeEnumResult<T> {
-  return args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as IMakeEnumResult<T>);
-}
+const makeEnum: IMakeEnum = (...args) =>
+  args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
 
 export const roles = makeEnum('user', 'admin', 'guest');
 export const asyncStates = makeEnum('idle', 'pending', 'resolved', 'rejected');
@@ -31,17 +29,17 @@ export const guestUser = {
   password_digest: '',
 };
 
-export function makeUrlFor<T extends object>(rawRoutes: T) {
+export const makeUrlFor: IMakeUrlFor = rawRoutes => {
   const routes = Object.keys(rawRoutes).reduce(
     (acc, name) => ({ ...acc, [name]: compile(rawRoutes[name]) }),
     {} as any
   );
 
-  return (name: keyof T, args = {}, opts = {}) => {
+  return (name, args = {}, opts = {}) => {
     const toPath = routes[name];
     return toPath(args, opts);
   };
-}
+};
 
 export const routes = {
   home: '/',
@@ -63,11 +61,6 @@ export const routes = {
   session: '/session',
   newSession: '/session/new',
 };
-type IRouteName = keyof typeof routes;
 
 export const getUrl = makeUrlFor(routes);
-export const getApiUrl = (name: IRouteName, args?) => `/api${getUrl(name, args)}`;
-
-export type IGetApiUrl = typeof getApiUrl;
-export type IRole = keyof typeof roles;
-export type IAsyncState = keyof typeof asyncStates;
+export const getApiUrl = (name: keyof typeof routes, args?) => `/api${getUrl(name, args)}`;

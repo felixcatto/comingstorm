@@ -1,7 +1,6 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import { ITag } from '../../models';
-import { IEmptyObject } from '../lib/types';
+import { IEmptyObject, ITag } from '../../lib/types';
 import { emptyObject, ErrorMessage, Field, getUrl, SubmitBtn } from '../lib/utils';
 
 interface IForm {

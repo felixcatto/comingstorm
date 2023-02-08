@@ -15,8 +15,8 @@ import {
   userRolesToIcons,
 } from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
+import { IArticle, IComment } from '../../lib/types';
 import { getUserFromRequest, unwrap } from '../../lib/utils';
-import { IArticle, IComment } from '../../models';
 
 type IShowComment = {
   comment: IComment;

@@ -12,7 +12,7 @@ import {
 } from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
 import { getUserFromRequest } from '../../lib/utils';
-import { IUser } from '../../models/User';
+import { IUser } from '../../lib/types';
 
 type IUsersProps = {
   users: IUser[];

@@ -1,8 +1,7 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import { IUser } from '../../models';
-import { IEmptyObject } from '../lib/types';
 import { emptyObject, ErrorMessage, Field, getUrl, roles, SubmitBtn } from '../lib/utils';
+import { IUser, IEmptyObject } from '../../lib/types';
 
 interface IForm {
   onSubmit: any;

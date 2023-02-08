@@ -1,16 +1,6 @@
 import { createEffect, createStore } from 'effector';
-import { asyncStates, IAsyncState, makeSessionInfo } from '../lib/utils';
-import { IUserLoginCreds } from '../../models/User';
-import { IUser } from '../../models/User';
-
-type ISession = {
-  currentUser: IUser;
-  isAdmin: boolean;
-  isSignedIn: boolean;
-  isBelongsToUser: (resourceAuthorId: string) => boolean;
-  status: IAsyncState;
-  errors: any;
-};
+import { ISession, IUserLoginCreds } from '../../lib/types';
+import { asyncStates, makeSessionInfo } from '../lib/utils';
 
 export const makeSessionActions = ({ getApiUrl, axios }) => ({
   signIn: createEffect(async (userCredentials: IUserLoginCreds) =>
@@ -46,6 +36,3 @@ export const makeSession = (
       status: asyncStates.resolved,
       errors: null,
     }));
-
-export type ISessionActions = ReturnType<typeof makeSessionActions>;
-export type ISessionStore = ReturnType<typeof makeSession>;

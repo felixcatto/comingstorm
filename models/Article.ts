@@ -1,8 +1,9 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { Comment, IComment } from './Comment';
-import { ITag, Tag } from './Tag';
-import { IUser, User } from './User';
+import { IComment, ITag, IUser } from '../lib/types';
+import { Comment } from './Comment';
+import { Tag } from './Tag';
+import { User } from './User';
 
 export class Article extends Model {
   id: any;
@@ -73,18 +74,3 @@ export const articleSchema = y.object({
   text: y.string().default(''),
   tagIds: y.array().default([]),
 });
-
-export type IArticle = {
-  id: any;
-  title: any;
-  text: any;
-  created_at: any;
-  updated_at: any;
-  tagIds: any[];
-  author_id: any;
-  author?: IUser;
-  comments?: IComment[];
-  tags?: ITag[];
-};
-export type IArticleClass = typeof Article;
-export type IArticleSchema = y.InferType<typeof articleSchema>;

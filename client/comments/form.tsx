@@ -2,8 +2,7 @@ import { useStore } from 'effector-react';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import React from 'react';
-import { IComment } from '../../models';
-import { IEmptyObject } from '../lib/types';
+import { IComment, IEmptyObject } from '../../lib/types';
 import { emptyObject, ErrorMessage, Field, getUrl, SubmitBtn, useContext } from '../lib/utils';
 
 interface IForm {

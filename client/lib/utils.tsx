@@ -1,33 +1,18 @@
-import { useState } from 'react';
 import cn from 'classnames';
 import { useFormikContext } from 'formik';
-import omit from 'lodash/omit';
+import produce from 'immer';
 import isFunction from 'lodash/isFunction';
+import omit from 'lodash/omit';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
-import { roles } from '../../lib/sharedUtils';
-import Context from './context';
-import { IEmptyObject } from './types';
-import produce from 'immer';
+import React, { useState } from 'react';
 import Select from 'react-select';
-
-import { IGetApiUrl } from '../../lib/sharedUtils';
-import { ISessionActions, ISessionStore } from '../common/sessionSlice';
+import { roles } from '../../lib/sharedUtils';
+import { IApiErrors, IContext, IEmptyObject } from '../../lib/types';
+import Context from './context';
 
 export * from '../../lib/sharedUtils';
 export { Context };
-
-type IContext = {
-  getApiUrl: IGetApiUrl;
-  axios: any;
-  actions: ISessionActions;
-  $session: ISessionStore;
-};
-export type IApiErrors = {
-  apiErrors: any;
-  setApiErrors: any;
-};
 
 export const useContext = () => React.useContext<IContext>(Context);
 
@@ -102,7 +87,7 @@ export const ErrorMessage = ({ name }) => {
 };
 
 export const Field = props => {
-  const { apiErrors, setApiErrors } = React.useContext(FormContext) as any;
+  const { apiErrors, setApiErrors } = React.useContext(FormContext);
   const { values, handleBlur: onBlur, handleChange }: any = useFormikContext();
   const value = values[props.name];
   const { as, children, ...restProps } = props;

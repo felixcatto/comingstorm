@@ -1,15 +1,14 @@
 import isEmpty from 'lodash/isEmpty';
-import { ICurrentUser } from '../../../client/lib/types';
 import { keygrip, objection } from '../../../lib/init';
+import { IArticleSchema, ICurrentUser, IValidate } from '../../../lib/types';
 import {
   checkSignedIn,
   getCurrentUser,
   isSignedIn,
-  IValidate,
   switchHttpMethod,
   validate,
 } from '../../../lib/utils';
-import { articleSchema, IArticleSchema } from '../../../models';
+import { articleSchema } from '../../../models';
 
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 

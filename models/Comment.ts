@@ -1,7 +1,8 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { Article, IArticle } from './Article';
-import { IUser, User } from './User';
+import { IArticle, IUser } from '../lib/types';
+import { Article } from './Article';
+import { User } from './User';
 
 export class Comment extends Model {
   id: any;
@@ -62,17 +63,3 @@ export const commentsSchema = y.object({
   guest_name: y.string().default(''),
   text: y.string().required('required'),
 });
-
-export type IComment = {
-  id: any;
-  guest_name: any;
-  text: any;
-  created_at: any;
-  updated_at: any;
-  author_id: any;
-  article_id: any;
-  author?: IUser;
-  article?: IArticle;
-};
-export type ICommentClass = typeof Comment;
-export type ICommentSchema = y.InferType<typeof commentsSchema>;

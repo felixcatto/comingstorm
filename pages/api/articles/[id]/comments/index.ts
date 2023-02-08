@@ -1,13 +1,7 @@
-import { ICurrentUser } from '../../../../../client/lib/types';
 import { keygrip, objection } from '../../../../../lib/init';
-import {
-  getCurrentUser,
-  isSignedIn,
-  IValidate,
-  switchHttpMethod,
-  validate,
-} from '../../../../../lib/utils';
-import { commentsSchema, ICommentSchema } from '../../../../../models';
+import { ICommentSchema, ICurrentUser, IValidate } from '../../../../../lib/types';
+import { getCurrentUser, isSignedIn, switchHttpMethod, validate } from '../../../../../lib/utils';
+import { commentsSchema } from '../../../../../models';
 
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 

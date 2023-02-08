@@ -3,11 +3,11 @@ import {
   checkAdmin,
   checkValueUnique,
   getCurrentUser,
-  IValidate,
   switchHttpMethod,
   validate,
 } from '../../../lib/utils';
-import { IUserSchema, userSchema } from '../../../models';
+import { userSchema } from '../../../models';
+import { IValidate, IUserSchema } from '../../../lib/types';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),

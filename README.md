@@ -1,21 +1,22 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Description
 
-## Getting Started
+SPA app using  NextJs, Objection orm, Postgres db. Traditional CRUD blog with ability to add articles, tags and comments. Also have users and authentification.
 
-First, run the development server:
+### Requirements
 
-```bash
-npm run dev
-# or
-yarn dev
+Node, Docker, Git. No need to install Postgres. 
+
+### Commands
+
+*Development*
+```
+git clone https://github.com/felixcatto/comingstorm.git
+cd comingstorm
+make database-build # only first time, download database image
+make database-up
+make migrate # only first time, create database structure
+make database-seed # only first time, for prepopulate database
+make start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+then go to `http://localhost:3000`
