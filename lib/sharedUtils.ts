@@ -1,7 +1,7 @@
 import { compile } from 'path-to-regexp';
-import { IMakeEnum, IMakeUrlFor } from './types';
+import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types';
 
-const makeEnum: IMakeEnum = (...args) =>
+export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
 
 export const roles = makeEnum('user', 'admin', 'guest');
@@ -22,12 +22,12 @@ export const makeSessionInfo: any = currentUser => ({
 export const unwrap = value => JSON.parse(JSON.stringify(value));
 
 export const guestUser = {
-  id: '-1',
+  id: '-111',
   name: 'Guest',
   role: roles.guest,
   email: '',
   password_digest: '',
-};
+} as const;
 
 export const makeUrlFor: IMakeUrlFor = rawRoutes => {
   const routes = Object.keys(rawRoutes).reduce(
@@ -64,3 +64,17 @@ export const routes = {
 
 export const getUrl = makeUrlFor(routes);
 export const getApiUrl = (name: keyof typeof routes, args?) => `/api${getUrl(name, args)}`;
+
+export const socketStates = makeEnum('unset', 'connecting', 'open', 'closed');
+export const wsGeneralEvents = makeEnum('open', 'close');
+export const wsEvents = makeEnum(
+  'error',
+  'echo',
+  'signIn',
+  'signOut',
+  'signedInUsersIds',
+  'getSignedInUsersIds'
+);
+export const encode: IEncode = (wsEvent, message) =>
+  JSON.stringify({ type: wsEvent, payload: message });
+export const decode = objBuffer => JSON.parse(objBuffer.toString()) as IDecodeReturn;

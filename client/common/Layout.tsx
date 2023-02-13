@@ -1,11 +1,10 @@
+import cn from 'classnames';
+import { useStore } from 'effector-react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { NavLink } from '../lib/utils';
-import cn from 'classnames';
-import { useContext, userRolesToIcons, getUrl } from '../lib/utils';
-import { useStore } from 'effector-react';
+import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils';
 
-export default function Layout({ children }: any) {
+const Layout = ({ children }: any) => {
   const { $session, actions } = useContext();
   const { currentUser, isSignedIn } = useStore($session);
   const userIconClass = role => cn('app__user-role-icon mr-5', userRolesToIcons[role]);
@@ -52,4 +51,6 @@ export default function Layout({ children }: any) {
       </div>
     </>
   );
-}
+};
+
+export default Layout;

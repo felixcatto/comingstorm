@@ -74,12 +74,19 @@ export const validate =
     }
   };
 
+export const makeSignature = (keygrip, cookieName, cookieValue) => {
+  return keygrip.sign(`${cookieName}=${cookieValue}`);
+};
+
+export const verifySignature = (keygrip, cookieName, cookieValue, signature) => {
+  return keygrip.verify(`${cookieName}=${cookieValue}`, signature);
+};
+
 export const setCookie = (res, keygrip, cookieName, cookieValue) => {
-  const cookieSigName = `${cookieName}Sig`;
-  const cookieSignature = keygrip.sign(`${cookieName}=${cookieValue}`);
+  const signature = makeSignature(keygrip, cookieName, cookieValue);
   res.setHeader('Set-Cookie', [
     cookie.serialize(cookieName, cookieValue, { path: '/', httpOnly: true }),
-    cookie.serialize(cookieSigName, cookieSignature, { path: '/', httpOnly: true }),
+    cookie.serialize(`${cookieName}Sig`, signature, { path: '/', httpOnly: true }),
   ]);
 };
 
@@ -94,8 +101,7 @@ export const getUserFromRequest = async (res, cookies, keygrip, User: IUserClass
   const { userId, userIdSig } = cookies;
   if (!userId || !userIdSig) return guestUser;
 
-  const usedIdCookie = `userId=${userId}`;
-  const isSignatureCorrect = keygrip.verify(usedIdCookie, userIdSig);
+  const isSignatureCorrect = verifySignature(keygrip, 'userId', userId, userIdSig);
   if (isSignatureCorrect) {
     const user = await User.query().findById(userId);
     return user || guestUser;
@@ -138,4 +144,10 @@ export const getCurrentUser = (objection: IObjection, keygrip) => async (req, re
   const { User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   return { currentUser };
+};
+
+export const waitForSocketState = async (socket, state) => {
+  while (socket.readyState !== state) {
+    await new Promise(resolve => setTimeout(resolve, 333));
+  }
 };

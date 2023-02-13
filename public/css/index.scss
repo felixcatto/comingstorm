@@ -2,7 +2,8 @@
 
 @import '~bootstrap/dist/css/bootstrap.min.css';
 @import './fontawesome.min.css';
-@import './solid.min.css';
+@import './regular.css';
+@import './solid.css';
 @import './scssHelpers.scss';
 
 :root {
@@ -100,7 +101,8 @@ a {
   }
 }
 
-.fa {
+.fa,
+.far {
   color: var(--orange);
   &_big {
     padding: 2px 5px;

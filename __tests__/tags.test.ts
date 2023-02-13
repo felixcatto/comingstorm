@@ -6,7 +6,7 @@ import usersFixture from './fixtures/users';
 import { getLoginCookie } from './fixtures/utils';
 
 describe('tags', () => {
-  const baseURL = process.env.BASE_URL;
+  const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
   const { User, Tag } = objection;
   let loginOptions;

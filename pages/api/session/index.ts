@@ -1,10 +1,28 @@
 import { keygrip, objection } from '../../../lib/init';
 import { encrypt } from '../../../lib/secure';
-import { guestUser, removeCookie, setCookie, switchHttpMethod, validate } from '../../../lib/utils';
+import {
+  checkSignedIn,
+  getCurrentUser,
+  guestUser,
+  removeCookie,
+  setCookie,
+  switchHttpMethod,
+  validate,
+} from '../../../lib/utils';
 import { userLoginSchema } from '../../../models/User';
-import { IValidate, IUserLoginSchema } from '../../../lib/types';
+import { IValidate, IUserLoginSchema, ICurrentUser } from '../../../lib/types';
+
+type ICtx = ICurrentUser;
 
 export default switchHttpMethod({
+  get: [
+    getCurrentUser(objection, keygrip),
+    checkSignedIn,
+    async (req, res, ctx: ICtx) => {
+      const { userIdSig } = req.cookies;
+      res.json({ cookieName: 'userId', cookieValue: ctx.currentUser.id, signature: userIdSig });
+    },
+  ],
   post: [
     validate(userLoginSchema),
     async (req, res, ctx: IValidate<IUserLoginSchema>) => {
@@ -22,8 +40,11 @@ export default switchHttpMethod({
       res.status(201).json(user);
     },
   ],
-  delete: (req, res) => {
-    removeCookie(res, 'userId');
-    res.status(201).json(guestUser);
-  },
+  delete: [
+    getCurrentUser(objection, keygrip),
+    (req, res, ctx: ICtx) => {
+      removeCookie(res, 'userId');
+      res.status(201).json({ currentUser: guestUser, signOutUserId: ctx.currentUser.id });
+    },
+  ],
 });

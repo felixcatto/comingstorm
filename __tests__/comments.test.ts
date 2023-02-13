@@ -7,7 +7,7 @@ import usersFixture from './fixtures/users';
 import { getLoginOptions } from './fixtures/utils';
 
 describe('articles', () => {
-  const baseURL = process.env.BASE_URL;
+  const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
   const { User, Comment, Article, knex } = objection;
   let loginOptions;

@@ -7,7 +7,7 @@ import { objection } from '../lib/init';
 import { getLoginCookie } from './fixtures/utils';
 
 describe('users', () => {
-  const baseURL = process.env.BASE_URL;
+  const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
   const { User } = objection;
   let loginOptions;

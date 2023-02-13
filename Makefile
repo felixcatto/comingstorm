@@ -5,13 +5,22 @@ start:
 	npx next dev
 
 start-test-server:
-	INODE_ENV=test npx next dev -p 3001
+	INODE_ENV=test NODE_ENV=test npx next dev -p 3002
 
 start-prod-server:
 	npx next start
 
+start-ws-server:
+	npx gulp startWsServer
+
+start-prod-ws-server: build-wss
+	node dist/services/webSocketServer/bin.js
+
 build:
 	npx next build
+
+build-wss:
+	NODE_ENV=production npx webpack
 
 migrate:
 	npx knex migrate:latest

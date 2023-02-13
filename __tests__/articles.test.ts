@@ -8,7 +8,7 @@ import { getApiUrl, getUrl } from '../lib/sharedUtils';
 import { getLoginOptions } from './fixtures/utils';
 
 describe('articles', () => {
-  const baseURL = process.env.BASE_URL;
+  const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
   const { User, Tag, Article, knex } = objection;
   let loginOptions;

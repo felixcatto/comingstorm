@@ -7,8 +7,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import Select from 'react-select';
-import { roles } from '../../lib/sharedUtils';
-import { IApiErrors, IContext, IEmptyObject } from '../../lib/types';
+import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils';
+import {
+  IApiErrors,
+  IContext,
+  IEmptyObject,
+  INativeWSocketClient,
+  IWsEvent,
+  IWsGeneralEvent,
+} from '../../lib/types';
 import Context from './context';
 
 export * from '../../lib/sharedUtils';
@@ -134,3 +141,37 @@ export const emptyObject: IEmptyObject = new Proxy(
     },
   }
 );
+
+export const makeWsClient = url => {
+  const wsEventHandlers = {} as any;
+  const wsClient = {} as INativeWSocketClient;
+  const socket = new WebSocket(url);
+
+  wsClient.socket = socket;
+  wsClient.on = (wsEvent: IWsEvent | IWsGeneralEvent, fn) => {
+    if (Object.keys(wsGeneralEvents).includes(wsEvent)) {
+      socket.addEventListener(wsEvent, fn);
+    } else {
+      wsEventHandlers[wsEvent] = fn;
+    }
+  };
+  wsClient.emit = (wsEvent: IWsEvent, message = '') => {
+    socket.send(encode(wsEvent, message));
+  };
+  wsClient.close = () => socket.close();
+
+  socket.addEventListener('message', msgBuffer => {
+    const { type, payload } = decode(msgBuffer.data);
+    const handler = wsEventHandlers[type];
+    if (!handler) {
+      console.log(`
+        receive event with type "${type}", but have no handler
+        -> ${payload}
+      `);
+      return;
+    }
+    handler(payload);
+  });
+
+  return wsClient;
+};

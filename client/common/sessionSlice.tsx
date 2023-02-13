@@ -1,16 +1,26 @@
 import { createEffect, createStore } from 'effector';
-import { ISession, IUserLoginCreds } from '../../lib/types';
+import {
+  IActions,
+  IDeleteSessionResponse,
+  IPostSessionResponse,
+  ISession,
+  IUserLoginCreds,
+} from '../../lib/types';
 import { asyncStates, makeSessionInfo } from '../lib/utils';
 
+type ISignIn = (arg: IUserLoginCreds) => Promise<IPostSessionResponse>;
+type ISignOut = () => Promise<IDeleteSessionResponse>;
 export const makeSessionActions = ({ getApiUrl, axios }) => ({
-  signIn: createEffect(async (userCredentials: IUserLoginCreds) =>
+  signIn: createEffect<ISignIn>(async userCredentials =>
     axios({ method: 'post', url: getApiUrl('session'), data: userCredentials })
   ),
-  signOut: createEffect(async () => axios({ method: 'delete', url: getApiUrl('session') })),
+  signOut: createEffect<ISignOut>(async () =>
+    axios({ method: 'delete', url: getApiUrl('session') })
+  ),
 });
 
 export const makeSession = (
-  actions,
+  actions: IActions,
   initialState = {
     currentUser: null,
     isAdmin: false,
@@ -31,8 +41,8 @@ export const makeSession = (
       status: asyncStates.resolved,
       errors: null,
     }))
-    .on(actions.signOut.done, (state, { result: currentUser }) => ({
-      ...makeSessionInfo(currentUser),
+    .on(actions.signOut.done, (state, { result }) => ({
+      ...makeSessionInfo(result.currentUser),
       status: asyncStates.resolved,
       errors: null,
     }));

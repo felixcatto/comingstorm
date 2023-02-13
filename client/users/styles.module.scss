@@ -1,0 +1,13 @@
+.isOnlineCell {
+  width: 70px;
+  text-align: center;
+}
+
+.onlineIcon {
+  color: #bdbdbd;
+  font-size: 10px;
+  vertical-align: 2px;
+  &_online {
+    color: #4caf50;
+  }
+}

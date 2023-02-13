@@ -10,9 +10,10 @@ import {
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils';
+import s from '../../client/users/styles.module.scss';
 import { keygrip, objection } from '../../lib/init';
-import { getUserFromRequest } from '../../lib/utils';
 import { IUser } from '../../lib/types';
+import { getUserFromRequest } from '../../lib/utils';
 
 type IUsersProps = {
   users: IUser[];
@@ -30,7 +31,8 @@ export async function getServerSideProps({ req, res }) {
 const userIconClass = role => cn('mr-5', userRolesToIcons[role]);
 
 const Users = ({ users }: IUsersProps) => {
-  const { $session, getApiUrl, axios } = useContext();
+  const { $session, getApiUrl, axios, $signedInUsersIds } = useContext();
+  const signedInUsersIds = useStore($signedInUsersIds);
   const { isAdmin } = useStore($session);
   const refreshPage = useRefreshPage();
 
@@ -38,6 +40,10 @@ const Users = ({ users }: IUsersProps) => {
     dedup(async () => {
       await axios.delete(getApiUrl('user', { id }));
       refreshPage();
+    });
+  const onlineIconClass = userId =>
+    cn('fa fa-circle', s.onlineIcon, {
+      [s.onlineIcon_online]: signedInUsersIds.includes(userId),
     });
 
   return (
@@ -53,6 +59,7 @@ const Users = ({ users }: IUsersProps) => {
       <table className="table">
         <thead>
           <tr>
+            <th>Status</th>
             <th>Name</th>
             <th>Role</th>
             <th>Email</th>
@@ -62,6 +69,9 @@ const Users = ({ users }: IUsersProps) => {
         <tbody>
           {users?.map(user => (
             <tr key={user.id}>
+              <td className={s.isOnlineCell}>
+                <i className={onlineIconClass(user.id)}></i>
+              </td>
               <td>{user.name}</td>
               <td>
                 <div className="d-flex align-items-center">
