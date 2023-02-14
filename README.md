@@ -12,6 +12,7 @@ Node, Docker, Git. No need to install Postgres.
 ```
 git clone https://github.com/felixcatto/comingstorm.git
 cd comingstorm
+make install # only first time, install node packages
 make database-build # only first time, download database image
 make database-up
 make migrate # only first time, create database structure

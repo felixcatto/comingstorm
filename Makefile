@@ -1,3 +1,6 @@
+install:
+	npm i
+
 start:
 	npx next dev
 
