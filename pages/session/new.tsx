@@ -1,7 +1,9 @@
+import cn from 'classnames';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout';
+import { TContent, Tooltip, TTrigger } from '../../client/components/Tooltip';
 import {
   ErrorMessage,
   Field,
@@ -36,7 +38,20 @@ const LoginForm = WithApiErrors(props => {
 
   return (
     <Layout>
-      <h3>Login form</h3>
+      <h3 className="d-flex">
+        <div className="mr-10">Login form</div>
+        <Tooltip offset={2} placement='right' className='inline-flex' theme='outline'>
+          <TTrigger>
+            <i className="d-flex items-center far fa-circle-question fa_hint"></i>
+          </TTrigger>
+          <TContent>
+            <div className="py-5 px-10">
+              <div>Email - use any email from "users" page</div>
+              <div>Password - 1</div>
+            </div>
+          </TContent>
+        </Tooltip>
+      </h3>
       <Formik initialValues={{ email: '', password: '' }} onSubmit={onSubmit}>
         <Form>
           <div className="row mb-20">

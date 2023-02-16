@@ -3,7 +3,7 @@ import { useStore } from 'effector-react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React from 'react';
-import s from '../../client/articles/styles.module.scss';
+import s from './styles.module.scss';
 import CommentForm from '../../client/comments/form';
 import Layout from '../../client/common/Layout';
 import {

@@ -1,3 +1,4 @@
+import { Side } from '@floating-ui/react';
 import cn from 'classnames';
 import { useFormikContext } from 'formik';
 import produce from 'immer';
@@ -6,6 +7,7 @@ import omit from 'lodash/omit';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import Select from 'react-select';
 import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils';
 import {
@@ -71,6 +73,21 @@ export function useImmerState<T = any>(initialState) {
 
   return [state, setImmerState.current] as const;
 }
+
+type ITooltipContext = {
+  setIsOpen;
+  x;
+  y;
+  strategy;
+  refs;
+  context;
+  getReferenceProps;
+  getFloatingProps;
+  placement: Side;
+  className;
+  theme;
+};
+export const TooltipContext = React.createContext<ITooltipContext>(null as any);
 
 export const FormContext = React.createContext<IApiErrors>(null as any);
 
@@ -174,4 +191,16 @@ export const makeWsClient = url => {
   });
 
   return wsClient;
+};
+
+export const Portal = ({ children, selector }) => {
+  const ref: any = React.useRef();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    ref.current = document.querySelector(selector);
+    setMounted(true);
+  }, [selector]);
+
+  return mounted ? createPortal(children, ref.current) : null;
 };

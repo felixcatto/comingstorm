@@ -10,7 +10,7 @@ import {
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils';
-import s from '../../client/users/styles.module.scss';
+import s from './styles.module.scss';
 import { keygrip, objection } from '../../lib/init';
 import { IUser } from '../../lib/types';
 import { getUserFromRequest } from '../../lib/utils';

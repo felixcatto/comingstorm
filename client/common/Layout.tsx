@@ -49,6 +49,7 @@ const Layout = ({ children }: any) => {
         </div>
         <div className="container app__body">{children}</div>
       </div>
+      <div id="tooltipRoot"></div>
     </>
   );
 };

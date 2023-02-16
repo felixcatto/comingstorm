@@ -2,7 +2,6 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Store } from 'effector';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ModelObject } from 'objection';
-console.log('*** IMPORT WS ***');
 import wsWebSocket from 'ws';
 import * as y from 'yup';
 import { makeSession, makeSessionActions } from '../client/common/sessionSlice';

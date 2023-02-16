@@ -32,7 +32,6 @@ const WssConnect = () => {
       wsClient!.emit(wsEvents.signOut, { id: payload.result.signOutUserId });
     });
     return () => {
-      console.log('unwatch called');
       unwatchSignIn();
       unwatchSignOut();
     };

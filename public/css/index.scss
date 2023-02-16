@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 
 @import '~bootstrap/dist/css/bootstrap.min.css';
 @import './fontawesome.min.css';
@@ -13,6 +13,15 @@
   // --orange-600: #673ab7;
   --orange-600: #7e57c2;
   // --orange-600: #311b92;
+
+  --primary-color: #512da8;
+  --primary-color-darker: #7e57c2;
+}
+#tooltipRoot {
+  --tooltipCaretHeight: 8px;
+  --tooltipCaretWidth: 6px;
+  --tooltipTransitionDuration: 0.15s;
+  --tooltipColor: var(--primary-color);
 }
 
 html {
@@ -116,10 +125,20 @@ a {
     }
   }
 }
+.fa {
+  &_hint {
+    font-size: 20px;
+    cursor: help;
+    user-select: none;
+  }
+}
 
 .clickable {
   cursor: pointer;
   user-select: none;
+}
+.items-center {
+  align-items: center;
 }
 
 .fake-link {
@@ -142,6 +161,10 @@ a {
 
 .orange {
   color: var(--orange);
+}
+
+.inline-flex {
+  display: inline-flex;
 }
 
 // spinner START
