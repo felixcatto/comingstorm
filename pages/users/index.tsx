@@ -10,7 +10,7 @@ import {
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils';
-import s from './styles.module.scss';
+import s from './styles.module.css';
 import { keygrip, objection } from '../../lib/init';
 import { IUser } from '../../lib/types';
 import { getUserFromRequest } from '../../lib/utils';
@@ -28,7 +28,7 @@ export async function getServerSideProps({ req, res }) {
   };
 }
 
-const userIconClass = role => cn('mr-5', userRolesToIcons[role]);
+const userIconClass = role => cn('mr-1', userRolesToIcons[role]);
 
 const Users = ({ users }: IUsersProps) => {
   const { $session, getApiUrl, axios, $signedInUsersIds } = useContext();
@@ -51,8 +51,8 @@ const Users = ({ users }: IUsersProps) => {
       <h3>Users List</h3>
 
       {isAdmin && (
-        <Link href={getUrl('newUser')} className="d-inline-block mb-30">
-          <button className="btn btn-primary">Create new user</button>
+        <Link href={getUrl('newUser')} className="btn mb-6">
+          Create new user
         </Link>
       )}
 
@@ -74,7 +74,7 @@ const Users = ({ users }: IUsersProps) => {
               </td>
               <td>{user.name}</td>
               <td>
-                <div className="d-flex align-items-center">
+                <div className="flex items-center">
                   <i className={userIconClass(user.role)}></i>
                   <div>{user.role}</div>
                 </div>
@@ -82,14 +82,14 @@ const Users = ({ users }: IUsersProps) => {
               <td>{user.email}</td>
               {isAdmin && (
                 <td>
-                  <div className="d-flex justify-content-end">
+                  <div className="flex justify-end">
                     <Link
                       href={getUrl('editUser', { id: user.id })}
-                      className="btn btn-sm btn-outline-primary mr-10"
+                      className="btn btn_sm btn_outline mr-2"
                     >
                       Edit user
                     </Link>
-                    <div className="btn btn-sm btn-outline-primary" onClick={deleteUser(user.id)}>
+                    <div className="btn btn_sm btn_outline" onClick={deleteUser(user.id)}>
                       Remove user
                     </div>
                   </div>

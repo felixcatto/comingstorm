@@ -28,7 +28,7 @@ const CommentsForm = (props: IForm, ref) => {
         <div className="row">
           <div className="col-6">
             {canShowGuestName && (
-              <div className="mb-15">
+              <div className="mb-4">
                 <label>Guest name</label>
                 <Field className="form-control" name="guest_name" />
                 <ErrorMessage name="guest_name" />
@@ -43,12 +43,12 @@ const CommentsForm = (props: IForm, ref) => {
         </div>
 
         {isNewCommentForm && (
-          <div className="mt-20">
-            <Link href={getUrl('articles')} className="mr-15">
+          <div className="mt-5">
+            <Link href={getUrl('articles')} className="mr-4">
               Back
             </Link>
 
-            <SubmitBtn className="btn btn-primary">Save</SubmitBtn>
+            <SubmitBtn className="btn">Save</SubmitBtn>
           </div>
         )}
       </Form>

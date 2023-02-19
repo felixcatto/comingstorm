@@ -13,7 +13,7 @@ import {
 import cn from 'classnames';
 import React from 'react';
 import { Portal, TooltipContext } from '../lib/utils';
-import s from './Tooltip.module.scss';
+import s from './Tooltip.module.css';
 
 type ITooltipProps = {
   className?: string;

@@ -29,7 +29,7 @@ export const NavLink = ({ href, children }) => {
   const router = useRouter();
   const { pathname } = router;
   const className = cn('nav-link', {
-    'app__nav-link_active':
+    'nav-link_active':
       (href !== '/' && pathname.startsWith(href)) || (href === '/' && pathname === '/'),
   });
   return (

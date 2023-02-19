@@ -3,12 +3,12 @@ import { useStore } from 'effector-react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils';
-import s from './Layout.module.scss';
+import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {
   const { $session, actions } = useContext();
   const { currentUser, isSignedIn } = useStore($session);
-  const userIconClass = role => cn('app__user-role-icon mr-5', userRolesToIcons[role]);
+  const userIconClass = role => cn(s.userRoleIcon, 'mr-1', userRolesToIcons[role]);
 
   return (
     <>
@@ -21,9 +21,9 @@ const Layout = ({ children }: any) => {
       <div>
         <div className={s.header}>
           <div className={cn('container', s.headerFg)}>
-            <div className="d-flex align-items-center">
-              <img src="/img/storm.svg" className={cn('mr-30', s.logo)} />
-              <div className="d-flex">
+            <div className="flex items-center">
+              <img src="/img/storm.svg" className={cn('mr-7', s.logo)} />
+              <div className="flex">
                 <NavLink href={getUrl('home')}>Home</NavLink>
                 <NavLink href={getUrl('users')}>Users</NavLink>
                 <NavLink href={getUrl('articles')}>Articles</NavLink>
@@ -31,9 +31,9 @@ const Layout = ({ children }: any) => {
               </div>
             </div>
             {isSignedIn ? (
-              <div className="d-flex align-items-center">
+              <div className="flex items-center">
                 <i className={userIconClass(currentUser.role)}></i>
-                <div className={cn('mr-10', s.userName)}>{currentUser.name}</div>
+                <div className={cn('mr-2', s.userName)}>{currentUser.name}</div>
                 <i
                   className={cn('fa fa-sign-out-alt', s.signIcon)}
                   title="Sign out"

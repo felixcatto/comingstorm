@@ -27,28 +27,28 @@ export default (props: IForm) => {
       onSubmit={onSubmit}
     >
       <Form>
-        <div className="row mb-20">
+        <div className="row mb-5">
           <div className="col-6">
-            <div className="mb-15">
+            <div className="mb-4">
               <label>Title</label>
               <Field className="form-control" name="title" />
               <ErrorMessage name="title" />
             </div>
-            <div className="mb-15">
+            <div className="mb-4">
               <label>Text</label>
               <Field className="form-control" as="textarea" name="text" />
             </div>
-            <div className="mb-0">
+            <div>
               <label>Tags</label>
               <MultiSelect name="tagIds" defaultValue={selectedTags} options={tagsForSelect} />
             </div>
           </div>
         </div>
 
-        <Link href={getUrl('articles')} className="mr-15">
+        <Link href={getUrl('articles')} className="mr-4">
           Back
         </Link>
-        <SubmitBtn className="btn btn-primary">Save</SubmitBtn>
+        <SubmitBtn className="btn">Save</SubmitBtn>
       </Form>
     </Formik>
   );

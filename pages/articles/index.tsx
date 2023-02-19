@@ -35,8 +35,8 @@ const Articles = ({ articles }: IArticlesProps) => {
       <h3>Articles List</h3>
 
       {isSignedIn && (
-        <Link href={getUrl('newArticle')} className="d-inline-block mb-30">
-          <button className="btn btn-primary">Create new article</button>
+        <Link href={getUrl('newArticle')} className="btn mb-6">
+          Create new article
         </Link>
       )}
 
@@ -58,22 +58,22 @@ const Articles = ({ articles }: IArticlesProps) => {
               <td>{article.author?.name}</td>
               <td>{article.tags?.map(tag => tag.name).join(', ')}</td>
               <td>
-                <div className="d-flex justify-content-end">
-                  <Link href={getUrl('article', { id: article.id })} className="mr-10">
-                    <button className="btn btn-sm btn-outline-primary">Show Article</button>
+                <div className="flex justify-end">
+                  <Link
+                    href={getUrl('article', { id: article.id })}
+                    className="btn btn_sm btn_outline mr-2"
+                  >
+                    Show Article
                   </Link>
                   {isBelongsToUser(article.author_id) && (
                     <>
                       <Link
                         href={getUrl('editArticle', { id: article.id })}
-                        className="btn btn-sm btn-outline-primary mr-10"
+                        className="btn btn_sm btn_outline mr-2"
                       >
                         Edit Article
                       </Link>
-                      <div
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={deleteArticle(article.id)}
-                      >
+                      <div className="btn btn_sm btn_outline" onClick={deleteArticle(article.id)}>
                         Remove Article
                       </div>
                     </>

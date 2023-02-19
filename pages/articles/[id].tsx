@@ -3,7 +3,7 @@ import { useStore } from 'effector-react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React from 'react';
-import s from './styles.module.scss';
+import s from './styles.module.css';
 import CommentForm from '../../client/comments/form';
 import Layout from '../../client/common/Layout';
 import {
@@ -28,21 +28,21 @@ type IShowComment = {
 const ShowComment = (props: IShowComment) => {
   const { comment, articleId, isBelongsToUser, editComment, deleteComment } = props;
   return (
-    <div className="mb-15">
-      <div className="d-flex align-items-center">
+    <div className="mb-4">
+      <div className="flex items-center">
         {comment.author ? (
-          <div className="d-flex align-items-center">
+          <div className="flex items-center">
             <i className={userRolesToIcons[comment.author.role]}></i>
-            <div className="steelblue ml-5">{comment.author.name}</div>
+            <div className="steelblue ml-1">{comment.author.name}</div>
           </div>
         ) : (
-          <div className="d-flex align-items-center">
+          <div className="flex items-center">
             <i className={userRolesToIcons[roles.guest]}></i>
-            <div className="steelblue ml-5">{comment.guest_name}</div>
+            <div className="steelblue ml-1">{comment.guest_name}</div>
           </div>
         )}
         {isBelongsToUser(comment.author_id) && (
-          <div className="ml-30">
+          <div className="ml-7">
             <i
               className="fa fa-edit fa_big fa_link"
               title="edit"
@@ -73,20 +73,20 @@ const EditComment = (props: IEditComment) => {
   const saveComment = () => formRef.current.requestSubmit();
 
   return (
-    <div className="mb-15">
-      <div className="d-flex align-items-center">
+    <div className="mb-4">
+      <div className="flex items-center">
         {comment.author ? (
-          <div className="d-flex align-items-center">
+          <div className="flex items-center">
             <i className={userRolesToIcons[comment.author.role]}></i>
-            <div className="steelblue ml-5">{comment.author.name}</div>
+            <div className="steelblue ml-1">{comment.author.name}</div>
           </div>
         ) : (
-          <div className="d-flex align-items-center">
+          <div className="flex items-center">
             <i className={userRolesToIcons[roles.guest]}></i>
-            <div className="steelblue ml-5">{comment.guest_name}</div>
+            <div className="steelblue ml-1">{comment.guest_name}</div>
           </div>
         )}
-        <div className="ml-30">
+        <div className="ml-7">
           <i
             className="fa fa-undo-alt fa_big fa_link"
             title="edit"
@@ -161,21 +161,21 @@ const ShowArticle = ({ article }: IArticleProps) => {
 
   return (
     <Layout>
-      <div className="d-flex align-items-center mb-10">
-        <h3 className="mr-20 mb-0">{article.title}</h3>
+      <div className="flex items-center mb-2">
+        <h3 className="mr-5 mb-0">{article.title}</h3>
         {article.author && (
-          <div className="d-flex align-items-center">
-            <div className="steelblue mr-5">{article.author.name}</div>
+          <div className="flex items-center">
+            <div className="steelblue mr-1">{article.author.name}</div>
             <i className={userRolesToIcons[article.author.role]}></i>
           </div>
         )}
       </div>
 
-      <p className="text-justify mb-30">{article.text}</p>
+      <p className="text-justify mb-7">{article.text}</p>
 
       {!isEmpty(article.tags) && (
         <div className={s.articleTags}>
-          <div className="text-light mr-10">Tags:</div>
+          <div className="text-light mr-2">Tags:</div>
           {article.tags?.map(tag => (
             <div key={tag.id} className={s.articleTag}>
               {tag.name}
@@ -185,7 +185,7 @@ const ShowArticle = ({ article }: IArticleProps) => {
       )}
 
       {article.comments && (
-        <div className="mb-30">
+        <div className="mb-7">
           <FormWrapper
             apiErrors={apiErrorsForEditCommentForm}
             setApiErrors={setApiErrorsForEditCommentForm}
@@ -213,7 +213,7 @@ const ShowArticle = ({ article }: IArticleProps) => {
         </div>
       )}
 
-      <div className="mb-10">Leave a comment</div>
+      <div className="mb-2">Leave a comment</div>
 
       <FormWrapper
         apiErrors={apiErrorsForNewCommentForm}

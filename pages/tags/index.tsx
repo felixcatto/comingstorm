@@ -34,8 +34,8 @@ const Tags = ({ tags }: ITagsProps) => {
       <h3>Tags List</h3>
 
       {isSignedIn && (
-        <Link href={getUrl('newTag')} className="d-inline-block mb-30">
-          <button className="btn btn-primary">Create new tag</button>
+        <Link href={getUrl('newTag')} className="btn mb-6">
+          Create new tag
         </Link>
       )}
 
@@ -52,14 +52,14 @@ const Tags = ({ tags }: ITagsProps) => {
               <td>{tag.name}</td>
               {isSignedIn && (
                 <td>
-                  <div className="d-flex justify-content-end">
+                  <div className="flex justify-end">
                     <Link
                       href={getUrl('editTag', { id: tag.id })}
-                      className="btn btn-sm btn-outline-primary mr-10"
+                      className="btn btn_sm btn_outline mr-2"
                     >
                       Edit Tag
                     </Link>
-                    <div className="btn btn-sm btn-outline-primary" onClick={deleteTag(tag.id)}>
+                    <div className="btn btn_sm btn_outline" onClick={deleteTag(tag.id)}>
                       Remove Tag
                     </div>
                   </div>

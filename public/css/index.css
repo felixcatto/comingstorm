@@ -1,16 +1,20 @@
-/*@tailwind base;
+@tailwind base;
 @tailwind components;
-@tailwind utilities;*/
+@tailwind utilities;
 
-@import '~bootstrap/dist/css/bootstrap.min.css';
+@import './bootstrap-grid.css';
 @import './fontawesome.min.css';
 @import './regular.css';
 @import './solid.css';
-@import './scssHelpers.scss';
 
 :root {
   --primary: #512da8;
-  --secondary: #8e24aa;
+  --primary-light: #8e24aa;
+  --primary-dark: #311b92;
+  --primary-rgba-50: rgba(81, 45, 168, 0.5);
+  --primary-rgba-25: rgba(81, 45, 168, 0.25);
+  --secondary: #1976d2;
+  --secondary-dark: #0d47a1;
 }
 #tooltipRoot {
   --tooltipCaretHeight: 8px;
@@ -44,7 +48,79 @@ body {
 h1,
 h2,
 h3 {
+  margin-bottom: 10px;
   font-family: SSPL;
+  line-height: 1.2;
+  font-weight: 500;
+}
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  line-height: 1.3;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  vertical-align: middle;
+  text-decoration: none;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  color: #fff;
+  background-color: var(--primary);
+  border-color: var(--primary);
+  &:hover {
+    text-decoration: none;
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+  }
+  &:active,
+  &:focus {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 3.2px var(--primary-rgba-50);
+  }
+
+  &_outline {
+    color: var(--primary);
+    background-color: #fff;
+    border-color: var(--primary);
+    &:hover {
+      color: #fff;
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    &:active,
+    &:focus {
+      color: #fff;
+      background-color: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3.2px var(--primary-rgba-50);
+    }
+  }
+  &_sm {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    border-radius: 4px;
+  }
+}
+
+a {
+  color: var(--secondary);
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 input.form-control,
@@ -55,51 +131,22 @@ select.form-control,
 select.form-control:focus {
   color: #222;
 }
-
-.btn-primary {
-  padding-top: 4px;
-  background-color: var(--primary);
-  border-color: var(--primary);
-  &:hover {
-    background-color: var(--secondary);
-    border-color: var(--secondary);
-  }
-  &:active,
-  &:focus {
-    background-color: var(--secondary) !important;
-    border-color: var(--secondary) !important;
-    box-shadow: 0 0 0 0.2rem rgba(230, 81, 0, 0.5) !important;
-  }
-}
-.btn-outline-primary {
-  color: var(--primary);
-  border-color: var(--primary);
-  &:hover {
-    color: #fff;
-    background-color: var(--primary);
-    border-color: var(--primary);
-  }
-}
-
-a {
-  color: var(--primary);
-  &:hover {
-    color: var(--secondary);
-  }
-}
-
-.btn-link {
-  display: inline-block;
-  cursor: pointer;
-  user-select: none;
-  color: var(--primary);
-  &:hover {
-    color: var(--secondary);
-  }
-}
-
 .form-control {
-  &__inline {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #dee2e6;
+  appearance: none;
+  border-radius: 6px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  &:focus {
+    border-color: var(--primary);
+    outline: 0;
+    box-shadow: 0 0 0 4px var(--primary-rgba-25);
+  }
+  &_inline {
     width: auto;
   }
 }
@@ -118,8 +165,6 @@ a {
       color: var(--secondary);
     }
   }
-}
-.fa {
   &_hint {
     font-size: 20px;
     cursor: help;
@@ -127,26 +172,22 @@ a {
   }
 }
 
+table {
+  width: 100%;
+  & th,
+  & td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  & th {
+    color: var(--secondary);
+    text-align: left;
+  }
+}
+
 .clickable {
   cursor: pointer;
   user-select: none;
-}
-
-/*remove*/
-.items-center {
-  align-items: center;
-}
-.inline-flex {
-  display: inline-flex;
-}
-
-.fake-link {
-  display: inline-block;
-  &__button {
-    padding: 0;
-    border: none;
-    background: transparent;
-  }
 }
 
 .error {
@@ -189,7 +230,6 @@ a {
     &:hover {
       color: var(--primary);
       text-decoration: none;
-      cursor: default;
     }
   }
 }

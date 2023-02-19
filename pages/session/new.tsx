@@ -38,25 +38,26 @@ const LoginForm = WithApiErrors(props => {
 
   return (
     <Layout>
-      <h3 className="d-flex">
-        <div className="mr-10">Login form</div>
+      <h3 className="flex">
+        <div className="mr-2">Login form</div>
         <Tooltip offset={2} placement="right" className="inline-flex" theme="outline">
           <TTrigger>
-            <i className="d-flex items-center far fa-circle-question fa_hint"></i>
+            <i className="flex items-center far fa-circle-question fa_hint"></i>
           </TTrigger>
           <TContent>
-            <div className="py-5 px-10">
+            <div className="py-1 px-2">
               <div>Email - use any email from `Users` page</div>
               <div>Password - 1</div>
             </div>
           </TContent>
         </Tooltip>
       </h3>
+
       <Formik initialValues={{ email: '', password: '' }} onSubmit={onSubmit}>
         <Form>
-          <div className="row mb-20">
+          <div className="row mb-5">
             <div className="col-6">
-              <div className="mb-15">
+              <div className="mb-4">
                 <label>Email</label>
                 <Field className="form-control" name="email" />
                 <ErrorMessage name="email" />
@@ -68,10 +69,10 @@ const LoginForm = WithApiErrors(props => {
               </div>
             </div>
           </div>
-          <Link href={getUrl('home')} className="mr-10">
+          <Link href={getUrl('home')} className="mr-2">
             Cancel
           </Link>
-          <SubmitBtn className="btn btn-primary">Sign in</SubmitBtn>
+          <SubmitBtn className="btn">Sign in</SubmitBtn>
         </Form>
       </Formik>
     </Layout>

@@ -64,3 +64,6 @@ test-once:
 
 lint:
 	npx tsc
+
+css-styles:
+	npx sass --no-source-map public/css/src/bootstrap-grid.scss public/css/bootstrap-grid.css

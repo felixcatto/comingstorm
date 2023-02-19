@@ -9,7 +9,7 @@ import {
 } from '../client/common/wsSlice';
 import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils';
 import { IActions, IContext } from '../lib/types';
-import '../public/css/index.scss';
+import '../public/css/index.css';
 import WssConnect from '../client/common/WssConnect';
 import { combine } from 'effector';
 

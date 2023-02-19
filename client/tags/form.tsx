@@ -13,9 +13,9 @@ export default (props: IForm) => {
   return (
     <Formik initialValues={{ name: tag.name }} onSubmit={onSubmit}>
       <Form>
-        <div className="row mb-20">
+        <div className="row mb-5">
           <div className="col-6">
-            <div className="mb-15">
+            <div>
               <label>Name</label>
               <Field className="form-control" name="name" />
               <ErrorMessage name="name" />
@@ -23,10 +23,10 @@ export default (props: IForm) => {
           </div>
         </div>
 
-        <Link href={getUrl('tags')} className="mr-15">
+        <Link href={getUrl('tags')} className="mr-4">
           Back
         </Link>
-        <SubmitBtn className="btn btn-primary">Save</SubmitBtn>
+        <SubmitBtn className="btn">Save</SubmitBtn>
       </Form>
     </Formik>
   );

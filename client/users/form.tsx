@@ -21,14 +21,14 @@ const UserForm = (props: IForm) => {
       onSubmit={onSubmit}
     >
       <Form>
-        <div className="row mb-20">
+        <div className="row mb-5">
           <div className="col-6">
-            <div className="mb-15">
+            <div className="mb-4">
               <label>Name</label>
               <Field className="form-control" name="name" />
               <ErrorMessage name="name" />
             </div>
-            <div className="mb-15">
+            <div className="mb-4">
               <label>Role</label>
               <Field className="form-control" as="select" name="role">
                 {Object.values(roles).map(role => (
@@ -39,7 +39,7 @@ const UserForm = (props: IForm) => {
               </Field>
               <ErrorMessage name="role" />
             </div>
-            <div className="mb-15">
+            <div className="mb-4">
               <label>Email</label>
               <Field className="form-control" name="email" />
               <ErrorMessage name="email" />
@@ -52,10 +52,10 @@ const UserForm = (props: IForm) => {
           </div>
         </div>
 
-        <Link href={getUrl('users')} className="mr-15">
+        <Link href={getUrl('users')} className="mr-4">
           Back
         </Link>
-        <SubmitBtn className="btn btn-primary">Save</SubmitBtn>
+        <SubmitBtn className="btn">Save</SubmitBtn>
       </Form>
     </Formik>
   );
