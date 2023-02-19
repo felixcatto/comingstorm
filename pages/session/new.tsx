@@ -40,13 +40,13 @@ const LoginForm = WithApiErrors(props => {
     <Layout>
       <h3 className="d-flex">
         <div className="mr-10">Login form</div>
-        <Tooltip offset={2} placement='right' className='inline-flex' theme='outline'>
+        <Tooltip offset={2} placement="right" className="inline-flex" theme="outline">
           <TTrigger>
             <i className="d-flex items-center far fa-circle-question fa_hint"></i>
           </TTrigger>
           <TContent>
             <div className="py-5 px-10">
-              <div>Email - use any email from "users" page</div>
+              <div>Email - use any email from `Users` page</div>
               <div>Password - 1</div>
             </div>
           </TContent>

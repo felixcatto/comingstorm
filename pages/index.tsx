@@ -12,5 +12,9 @@ export async function getServerSideProps({ req, res }: GetServerSidePropsContext
 }
 
 export default function Home(props) {
-  return <Layout>Hello world</Layout>;
+  return (
+    <Layout>
+      <div className="splash-screen"></div>
+    </Layout>
+  );
 }

@@ -3,6 +3,7 @@ import { useStore } from 'effector-react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils';
+import s from './Layout.module.scss';
 
 const Layout = ({ children }: any) => {
   const { $session, actions } = useContext();
@@ -17,11 +18,11 @@ const Layout = ({ children }: any) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="app">
-        <div className="app__header">
-          <div className="container app__header-fg">
+      <div>
+        <div className={s.header}>
+          <div className={cn('container', s.headerFg)}>
             <div className="d-flex align-items-center">
-              <img src="/img/storm.svg" className="app__logo mr-30" />
+              <img src="/img/storm.svg" className={cn('mr-30', s.logo)} />
               <div className="d-flex">
                 <NavLink href={getUrl('home')}>Home</NavLink>
                 <NavLink href={getUrl('users')}>Users</NavLink>
@@ -32,22 +33,22 @@ const Layout = ({ children }: any) => {
             {isSignedIn ? (
               <div className="d-flex align-items-center">
                 <i className={userIconClass(currentUser.role)}></i>
-                <div className="app__user-name mr-10">{currentUser.name}</div>
+                <div className={cn('mr-10', s.userName)}>{currentUser.name}</div>
                 <i
-                  className="fa fa-sign-out-alt app__sign-icon"
+                  className={cn('fa fa-sign-out-alt', s.signIcon)}
                   title="Sign out"
                   onClick={() => actions.signOut()}
                 ></i>
               </div>
             ) : (
-              <Link href={getUrl('newSession')} className="app__sign-in">
-                <div className="app__sign-in-text">Sign In</div>
-                <i className="fa fa-sign-in-alt app__sign-icon" title="Sign in"></i>
+              <Link href={getUrl('newSession')} className={s.signIn}>
+                <div className={s.signInText}>Sign In</div>
+                <i className={cn('fa fa-sign-in-alt', s.signIcon)} title="Sign in"></i>
               </Link>
             )}
           </div>
         </div>
-        <div className="container app__body">{children}</div>
+        <div className={cn('container', s.content)}>{children}</div>
       </div>
       <div id="tooltipRoot"></div>
     </>

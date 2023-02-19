@@ -28,7 +28,7 @@ export const useContext = () => React.useContext<IContext>(Context);
 export const NavLink = ({ href, children }) => {
   const router = useRouter();
   const { pathname } = router;
-  const className = cn('app__nav-link', {
+  const className = cn('nav-link', {
     'app__nav-link_active':
       (href !== '/' && pathname.startsWith(href)) || (href === '/' && pathname === '/'),
   });
