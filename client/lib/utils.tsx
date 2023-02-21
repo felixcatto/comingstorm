@@ -1,23 +1,27 @@
 import { Side } from '@floating-ui/react';
 import cn from 'classnames';
+import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
 import produce from 'immer';
 import isFunction from 'lodash/isFunction';
+import isString from 'lodash/isString';
 import omit from 'lodash/omit';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import Select from 'react-select';
 import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils';
 import {
   IApiErrors,
   IContext,
   IEmptyObject,
   INativeWSocketClient,
+  IUsualSelect,
   IWsEvent,
   IWsGeneralEvent,
 } from '../../lib/types';
+import { MultiSelect } from '../components/MultiSelect';
+import { Select } from '../components/Select';
 import Context from './context';
 
 export * from '../../lib/sharedUtils';
@@ -133,14 +137,38 @@ export const SubmitBtn = ({ children, ...props }) => {
   );
 };
 
-export const MultiSelect = ({ name, defaultValue, options }) => {
+export const UsualSelect: IUsualSelect = ({ name, data, defaultItem }) => {
   const { setFieldValue } = useFormikContext();
   return (
     <Select
-      defaultValue={defaultValue}
-      onChange={values => setFieldValue(name, values?.map(option => option.value) || [], false)}
-      options={options}
-      isMulti
+      data={data}
+      placeholder=""
+      defaultItem={defaultItem}
+      searchable={false}
+      onSelect={selectedItem => {
+        if (isString(selectedItem)) {
+          setFieldValue(name, selectedItem, false);
+        } else {
+          setFieldValue(name, selectedItem.value, false);
+        }
+      }}
+    />
+  );
+};
+
+export const FMultiSelect = ({ name, data, defaultItems }) => {
+  const { setFieldValue } = useFormikContext();
+  return (
+    <MultiSelect
+      data={data}
+      defaultItems={defaultItems}
+      onSelect={selectedItems => {
+        setFieldValue(
+          name,
+          selectedItems.map(el => (isString(el) ? el : el.value)),
+          false
+        );
+      }}
     />
   );
 };
@@ -204,3 +232,5 @@ export const Portal = ({ children, selector }) => {
 
   return mounted ? createPortal(children, ref.current) : null;
 };
+
+export const fmtISO = (isoDate, formatStr) => format(parseISO(isoDate), formatStr);

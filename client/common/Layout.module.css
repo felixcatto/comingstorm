@@ -1,4 +1,14 @@
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    'header'
+    'content';
+  grid-template-rows: var(--headerHeight) 1fr;
+}
+
 .header {
+  grid-area: header;
   position: relative;
   background: var(--primary);
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.5);
@@ -43,9 +53,9 @@
 }
 
 .content {
-  min-height: calc(100vh - 70px);
-  padding-top: 20px;
-  padding-bottom: 20px;
+  grid-area: content;
+  padding-top: var(--content-py);
+  padding-bottom: var(--content-py);
   background: #fff;
   box-shadow: inset 12px 0 25px -15px rgba(0, 0, 0, 0.9),
     inset -12px 0 25px -15px rgba(0, 0, 0, 0.9);

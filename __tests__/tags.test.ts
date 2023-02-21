@@ -4,14 +4,17 @@ import { getApiUrl, getUrl } from '../lib/sharedUtils';
 import tagsFixture from './fixtures/tags';
 import usersFixture from './fixtures/users';
 import { getLoginCookie } from './fixtures/utils';
+import avatarsFixture from './fixtures/avatars';
 
 describe('tags', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
-  const { User, Tag } = objection;
+  const { User, Tag, Avatar } = objection;
   let loginOptions;
 
   beforeAll(async () => {
+    await Avatar.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await User.query().insertGraph(usersFixture as any);
     const loginCookie = await getLoginCookie(axios, getApiUrl);

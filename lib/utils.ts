@@ -74,6 +74,8 @@ export const validate =
     }
   };
 
+export const makeErrors = obj => ({ errors: obj });
+
 export const makeSignature = (keygrip, cookieName, cookieValue) => {
   return keygrip.sign(`${cookieName}=${cookieValue}`);
 };
@@ -103,7 +105,7 @@ export const getUserFromRequest = async (res, cookies, keygrip, User: IUserClass
 
   const isSignatureCorrect = verifySignature(keygrip, 'userId', userId, userIdSig);
   if (isSignatureCorrect) {
-    const user = await User.query().findById(userId);
+    const user = await User.query().findById(userId).withGraphFetched('avatar');
     return user || guestUser;
   } else {
     removeCookie(res, 'userId');
@@ -151,3 +153,6 @@ export const waitForSocketState = async (socket, state) => {
     await new Promise(resolve => setTimeout(resolve, 333));
   }
 };
+
+// not including "n"
+export const getRandomNumUpTo = n => Math.floor(Math.random() * n);

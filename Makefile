@@ -22,6 +22,9 @@ build:
 build-wss:
 	NODE_ENV=production npx webpack
 
+analyze-bundle:
+	ANALYZE=true npx next build
+
 migrate:
 	npx knex migrate:latest
 

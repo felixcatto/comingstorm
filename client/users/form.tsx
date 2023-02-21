@@ -1,7 +1,15 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import { emptyObject, ErrorMessage, Field, getUrl, roles, SubmitBtn } from '../lib/utils';
-import { IUser, IEmptyObject } from '../../lib/types';
+import { IEmptyObject, IUser } from '../../lib/types';
+import {
+  emptyObject,
+  ErrorMessage,
+  Field,
+  getUrl,
+  roles,
+  SubmitBtn,
+  UsualSelect,
+} from '../lib/utils';
 
 interface IForm {
   onSubmit: any;
@@ -14,7 +22,7 @@ const UserForm = (props: IForm) => {
     <Formik
       initialValues={{
         name: user.name,
-        role: user.role || roles.guest,
+        role: user.role || roles.user,
         email: user.email,
         password: '',
       }}
@@ -30,13 +38,11 @@ const UserForm = (props: IForm) => {
             </div>
             <div className="mb-4">
               <label>Role</label>
-              <Field className="form-control" as="select" name="role">
-                {Object.values(roles).map(role => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
-              </Field>
+              <UsualSelect
+                name="role"
+                data={Object.values(roles).filter(el => el !== roles.guest)}
+                defaultItem={roles.user}
+              />
               <ErrorMessage name="role" />
             </div>
             <div className="mb-4">

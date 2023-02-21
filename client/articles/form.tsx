@@ -1,7 +1,7 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { IArticle, IEmptyObject, ITag } from '../../lib/types';
-import { emptyObject, ErrorMessage, Field, getUrl, MultiSelect, SubmitBtn } from '../lib/utils';
+import { emptyObject, ErrorMessage, Field, FMultiSelect, getUrl, SubmitBtn } from '../lib/utils';
 
 interface IForm {
   onSubmit: any;
@@ -40,7 +40,7 @@ export default (props: IForm) => {
             </div>
             <div>
               <label>Tags</label>
-              <MultiSelect name="tagIds" defaultValue={selectedTags} options={tagsForSelect} />
+              <FMultiSelect name="tagIds" data={tagsForSelect} defaultItems={selectedTags} />
             </div>
           </div>
         </div>

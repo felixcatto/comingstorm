@@ -1,17 +1,17 @@
+import '../public/css/index.css';
 import originalAxios from 'axios';
+import { combine } from 'effector';
 import React from 'react';
 import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
+import WssConnect from '../client/common/WssConnect';
 import {
   makeSignedInUsersIds,
-  makeWsClientStore,
-  makeWsClientActions,
   makeWebSocketState,
+  makeWsClientActions,
+  makeWsClientStore,
 } from '../client/common/wsSlice';
 import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils';
 import { IActions, IContext } from '../lib/types';
-import '../public/css/index.css';
-import WssConnect from '../client/common/WssConnect';
-import { combine } from 'effector';
 
 function App(appProps) {
   const { Component, pageProps } = appProps;

@@ -4,7 +4,7 @@ import { Article } from './Article';
 import { IArticle } from '../lib/types';
 
 export class Tag extends Model {
-  id: string;
+  id: number;
   name: string;
   articles?: IArticle[];
 

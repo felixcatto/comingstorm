@@ -6,14 +6,17 @@ import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init';
 import { getApiUrl, getUrl } from '../lib/sharedUtils';
 import { getLoginOptions } from './fixtures/utils';
+import avatarsFixture from './fixtures/avatars';
 
 describe('articles', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
-  const { User, Tag, Article, knex } = objection;
+  const { User, Tag, Article, Avatar, knex } = objection;
   let loginOptions;
 
   beforeAll(async () => {
+    await Avatar.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await Tag.query().delete();
     await User.query().insertGraph(usersFixture as any);
@@ -33,25 +36,25 @@ describe('articles', () => {
     expect(res.status).toBe(200);
   });
 
-  it('GET /article/new', async () => {
+  it('GET /articles/new', async () => {
     const [article] = articlesFixture;
     const res = await axios.get(getUrl('newArticle'));
     expect(res.status).toBe(200);
   });
 
-  it('GET /article/-1/edit', async () => {
+  it('GET /articles/-1/edit', async () => {
     const [article] = articlesFixture;
     const res = await axios.get(getUrl('editArticle', { id: '-1' }));
     expect(res.status).toBe(200);
   });
 
-  it('GET /article/:id', async () => {
+  it('GET /articles/:id', async () => {
     const [article] = articlesFixture;
     const res = await axios.get(getUrl('article', { id: article.id }));
     expect(res.status).toBe(200);
   });
 
-  it('GET /api/article/:id', async () => {
+  it('GET /api/articles/:id', async () => {
     const [article] = articlesFixture;
     const res = await axios.get(getApiUrl('article', { id: article.id }));
     const articleFromDb = await Article.query().findById(article.id);

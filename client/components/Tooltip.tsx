@@ -69,14 +69,7 @@ export const Tooltip = ({
 export const TTrigger = ({ children }) => {
   const { setIsOpen, refs, getReferenceProps, className } = React.useContext(TooltipContext);
   return (
-    <div
-      style={className ? {} : { display: 'inline-block' }}
-      className={className}
-      onMouseEnter={e => setIsOpen(true)}
-      onMouseLeave={e => setIsOpen(false)}
-      ref={refs.setReference}
-      {...getReferenceProps()}
-    >
+    <div className={className || 'inline-block'} ref={refs.setReference} {...getReferenceProps()}>
       {children}
     </div>
   );

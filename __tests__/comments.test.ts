@@ -5,14 +5,17 @@ import articlesFixture from './fixtures/articles';
 import commentsFixture from './fixtures/comments';
 import usersFixture from './fixtures/users';
 import { getLoginOptions } from './fixtures/utils';
+import avatarsFixture from './fixtures/avatars';
 
 describe('articles', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
-  const { User, Comment, Article, knex } = objection;
+  const { User, Comment, Article, Avatar, knex } = objection;
   let loginOptions;
 
   beforeAll(async () => {
+    await Avatar.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await Article.query().delete();
     await User.query().insertGraph(usersFixture as any);

@@ -42,7 +42,7 @@ const Users = ({ users }: IUsersProps) => {
       refreshPage();
     });
   const onlineIconClass = userId =>
-    cn('fa fa-circle', s.onlineIcon, {
+    cn(s.onlineIcon, {
       [s.onlineIcon_online]: signedInUsersIds.includes(userId),
     });
 

@@ -10,7 +10,10 @@ import { makeWsClientActions, makeWsClientStore } from '../client/common/wsSlice
 import {
   Article,
   articleSchema,
+  Avatar,
   commentsSchema,
+  Message,
+  messageSchema,
   Tag,
   tagSchema,
   User,
@@ -108,8 +111,29 @@ export type ITag = {
 export type ITagClass = typeof Tag;
 export type ITagSchema = y.InferType<typeof tagSchema>;
 
+export type IMessage = {
+  id: number;
+  text: string;
+  created_at: string;
+  updated_at: string;
+  sender_id: number;
+  receiver_id: number;
+  sender?: IUser;
+  receiver?: IUser;
+};
+export type IMessageClass = typeof Message;
+export type IMessageSchema = y.InferType<typeof messageSchema>;
+
+export type IAvatar = {
+  id: number;
+  path: string;
+  users?: IUser[];
+};
+export type IAvatarClass = typeof Avatar;
+
+export type IUserWithAvatar = IUser & { avatar: IAvatar };
 export type ISession = {
-  currentUser: IUser;
+  currentUser: IUserWithAvatar;
   isAdmin: boolean;
   isSignedIn: boolean;
   isBelongsToUser: (resourceAuthorId: string) => boolean;
@@ -184,3 +208,19 @@ export type IDeleteSessionResponse = {
   currentUser: IUser;
   signOutUserId: any;
 };
+
+export type ISelectItem =
+  | string
+  | {
+      value: any;
+      label: string;
+      [key: string]: any;
+    };
+export type ISelectedItem = ISelectItem | null;
+export type ISelectedItems = ISelectItem[];
+
+export type IUsualSelect = (props: {
+  name: string;
+  data: ISelectItem[];
+  defaultItem: ISelectItem;
+}) => JSX.Element;

@@ -5,6 +5,7 @@ export default [
     role: 'admin',
     email: 'vasa@yandex.ru',
     password: '1',
+    avatar_id: -2,
   },
   {
     id: -2,
@@ -12,6 +13,7 @@ export default [
     role: 'user',
     email: 'tom@thunderstorm.com',
     password: '1',
+    avatar_id: -5,
   },
   {
     id: -3,
@@ -19,5 +21,6 @@ export default [
     role: 'user',
     email: 'fedya@yandex.ru',
     password: '1',
+    avatar_id: -3,
   },
 ];

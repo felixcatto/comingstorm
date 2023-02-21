@@ -4,6 +4,7 @@ import {
   checkSignedIn,
   getCurrentUser,
   guestUser,
+  makeErrors,
   removeCookie,
   setCookie,
   switchHttpMethod,
@@ -27,13 +28,13 @@ export default switchHttpMethod({
     validate(userLoginSchema),
     async (req, res, ctx: IValidate<IUserLoginSchema>) => {
       const { User } = objection;
-      const user = await User.query().findOne('email', ctx.body.email);
+      const user = await User.query().findOne('email', ctx.body.email).withGraphFetched('avatar');
       if (!user) {
-        return res.status(400).json({ errors: { email: 'User with such email not found' } });
+        return res.status(400).json(makeErrors({ email: 'User with such email not found' }));
       }
 
       if (user.password_digest !== encrypt(ctx.body.password)) {
-        return res.status(400).json({ errors: { password: 'Wrong password' } });
+        return res.status(400).json(makeErrors({ password: 'Wrong password' }));
       }
 
       setCookie(res, keygrip, 'userId', user.id);

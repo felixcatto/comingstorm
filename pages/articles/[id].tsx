@@ -1,12 +1,11 @@
-import { format, parseISO } from 'date-fns';
 import { useStore } from 'effector-react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 import React from 'react';
-import s from './styles.module.css';
 import CommentForm from '../../client/comments/form';
 import Layout from '../../client/common/Layout';
 import {
+  fmtISO,
   FormWrapper,
   roles,
   useContext,
@@ -17,6 +16,7 @@ import {
 import { keygrip, objection } from '../../lib/init';
 import { IArticle, IComment } from '../../lib/types';
 import { getUserFromRequest, unwrap } from '../../lib/utils';
+import s from './styles.module.css';
 
 type IShowComment = {
   comment: IComment;
@@ -57,7 +57,9 @@ const ShowComment = (props: IShowComment) => {
         )}
       </div>
       <div className="text-justify">{comment.text}</div>
-      <div className="text-light">{format(parseISO(comment.created_at), 'dd MMM yyyy HH:mm')}</div>
+      <div className="text-xs text-slate-500">
+        {fmtISO(comment.created_at, 'dd MMM yyyy HH:mm')}
+      </div>
     </div>
   );
 };
@@ -96,7 +98,9 @@ const EditComment = (props: IEditComment) => {
         </div>
       </div>
       <CommentForm type="edit" comment={comment} ref={formRef} onSubmit={saveEditedComment} />
-      <div className="text-light">{format(parseISO(comment.created_at), 'dd MMM yyyy HH:mm')}</div>
+      <div className="text-xs text-slate-500">
+        {fmtISO(comment.created_at, 'dd MMM yyyy HH:mm')}
+      </div>
     </div>
   );
 };
@@ -175,7 +179,7 @@ const ShowArticle = ({ article }: IArticleProps) => {
 
       {!isEmpty(article.tags) && (
         <div className={s.articleTags}>
-          <div className="text-light mr-2">Tags:</div>
+          <div className="text-xs text-slate-500 mr-2">Tags:</div>
           {article.tags?.map(tag => (
             <div key={tag.id} className={s.articleTag}>
               {tag.name}

@@ -5,11 +5,17 @@ import { getApiUrl } from '../lib/sharedUtils';
 import { makeSignature } from '../lib/utils';
 import usersFixture from './fixtures/users';
 import { getLoginCookie, getLoginOptions } from './fixtures/utils';
+import avatarsFixture from './fixtures/avatars';
 
 describe('session', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
-  const { User } = objection;
+  const { User, Avatar } = objection;
+
+  beforeAll(async () => {
+    await Avatar.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
+  });
 
   beforeEach(async () => {
     await User.query().delete();

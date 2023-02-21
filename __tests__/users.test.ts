@@ -5,15 +5,18 @@ import usersFixture from './fixtures/users';
 import { encrypt } from '../lib/secure';
 import { objection } from '../lib/init';
 import { getLoginCookie } from './fixtures/utils';
+import avatarsFixture from './fixtures/avatars';
 
 describe('users', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = originalAxios.create({ baseURL });
-  const { User } = objection;
+  const { User, Avatar } = objection;
   let loginOptions;
 
   beforeAll(async () => {
     const [admin] = usersFixture;
+    await Avatar.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await User.query().insert(admin as any);
     const loginCookie = await getLoginCookie(axios, getApiUrl);
@@ -21,8 +24,8 @@ describe('users', () => {
   });
 
   beforeEach(async () => {
-    await objection.User.query().delete();
-    await objection.User.query().insertGraph(usersFixture as any);
+    await User.query().delete();
+    await User.query().insertGraph(usersFixture as any);
   });
 
   it('GET /users', async () => {

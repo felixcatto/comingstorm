@@ -1,5 +1,6 @@
 import { compile } from 'path-to-regexp';
 import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types';
+import avatars from './avatars';
 
 export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
@@ -21,12 +22,15 @@ export const makeSessionInfo: any = currentUser => ({
 
 export const unwrap = value => JSON.parse(JSON.stringify(value));
 
+const [guestAvatar] = avatars;
 export const guestUser = {
-  id: '-111',
+  id: -111,
   name: 'Guest',
   role: roles.guest,
   email: '',
   password_digest: '',
+  avatar_id: guestAvatar.id,
+  avatar: guestAvatar,
 } as const;
 
 export const makeUrlFor: IMakeUrlFor = rawRoutes => {
@@ -60,6 +64,8 @@ export const routes = {
   projectStructure: '/structure',
   session: '/session',
   newSession: '/session/new',
+  messages: '/messages',
+  message: '/messages/:id',
 };
 
 export const getUrl = makeUrlFor(routes);

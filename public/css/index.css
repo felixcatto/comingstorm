@@ -8,19 +8,30 @@
 @import './solid.css';
 
 :root {
+  --headerHeight: 70px;
+  --content-py: 20px;
+
   --primary: #512da8;
   --primary-light: #8e24aa;
   --primary-dark: #311b92;
   --primary-rgba-50: rgba(81, 45, 168, 0.5);
   --primary-rgba-25: rgba(81, 45, 168, 0.25);
   --secondary: #1976d2;
+  --secondary-light: #e3f2fd; /*#bbdefb;*/
   --secondary-dark: #0d47a1;
+  --secondary-rgba-25: rgba(25, 118, 210, 0.25);
 }
 #tooltipRoot {
   --tooltipCaretHeight: 8px;
   --tooltipCaretWidth: 6px;
   --tooltipTransitionDuration: 0.15s;
   --tooltipColor: var(--primary);
+}
+
+html,
+body,
+#__next {
+  height: 100%;
 }
 
 html {
@@ -149,11 +160,17 @@ select.form-control:focus {
   &_inline {
     width: auto;
   }
+  &_secondary:focus {
+    border-color: var(--secondary);
+    outline: 0;
+    box-shadow: 0 0 0 4px var(--secondary-rgba-25);
+  }
 }
 
 .fa,
 .far {
   color: var(--primary);
+  transition: color 0.15s;
   &_big {
     padding: 2px 5px;
   }
@@ -169,6 +186,9 @@ select.form-control:focus {
     font-size: 20px;
     cursor: help;
     user-select: none;
+  }
+  &_secondary {
+    color: var(--secondary);
   }
 }
 
@@ -194,9 +214,11 @@ table {
   color: #c9302c;
 }
 
-.text-light {
-  font-size: 0.75rem;
-  color: #6e7582 !important;
+.text-primary {
+  color: var(--primary);
+}
+.text-secondary {
+  color: var(--secondary);
 }
 
 .splash-screen {
@@ -256,6 +278,11 @@ table {
       0 var(--radius) 0 var(--size) var(--altColor),
       0 calc(var(--radius) * -1) 0 var(--size) var(--altColor),
       calc(var(--radius) * -1) 0 0 var(--size) var(--color);
+  }
+
+  &_sm {
+    --radius: 7px;
+    --size: 2px;
   }
 }
 
