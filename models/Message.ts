@@ -1,7 +1,7 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { IUser } from '../lib/types';
-import { User } from './User';
+import { IUser } from '../lib/types.js';
+import { User } from './User.js';
 
 export class Message extends Model {
   id: number;

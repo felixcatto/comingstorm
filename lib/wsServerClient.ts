@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
-import { IWSClient, IWsEvent, IWsGeneralEvent } from './types';
-import { decode, encode, wsGeneralEvents } from './utils';
+import { IWSClient, IWsEvent, IWsGeneralEvent } from './types.js';
+import { decode, encode, wsGeneralEvents } from './utils.js';
 
 export const makeWsClient = url => {
   const wsEventHandlers = {} as any;

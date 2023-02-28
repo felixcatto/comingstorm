@@ -5,8 +5,8 @@ import {
   IPostSessionResponse,
   ISession,
   IUserLoginCreds,
-} from '../../lib/types';
-import { asyncStates, makeSessionInfo } from '../lib/utils';
+} from '../../lib/types.js';
+import { asyncStates, makeSessionInfo } from '../lib/utils.js';
 
 type ISignIn = (arg: IUserLoginCreds) => Promise<IPostSessionResponse>;
 type ISignOut = () => Promise<IDeleteSessionResponse>;

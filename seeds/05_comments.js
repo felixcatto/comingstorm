@@ -1,6 +1,6 @@
-const comments = require('../__tests__/fixtures/comments').default;
+import comments from '../__tests__/fixtures/comments.js';
 
-exports.seed = async knex => {
+export const seed = async knex => {
   await knex('comments').delete();
   await knex('comments').insert(comments);
 };

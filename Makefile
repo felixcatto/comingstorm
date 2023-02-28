@@ -51,19 +51,19 @@ database-down:
 	docker stop comingstorm_database
 
 database-seed:
-	npx knex --esm seed:run
+	npx knex seed:run
 
 database-seed-new:
 	npx knex seed:make $(arg)
 
 test:
-	npx jest --runInBand --watch
+	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch
 
 test-file:
-	npx jest --runInBand --watch $(arg)
+	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch $(arg)
 
 test-once:
-	npx jest --runInBand
+	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand
 
 lint:
 	npx tsc

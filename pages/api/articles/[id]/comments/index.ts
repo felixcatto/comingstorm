@@ -1,7 +1,7 @@
-import { keygrip, objection } from '../../../../../lib/init';
-import { ICommentSchema, ICurrentUser, IValidate } from '../../../../../lib/types';
-import { getCurrentUser, isSignedIn, switchHttpMethod, validate } from '../../../../../lib/utils';
-import { commentsSchema } from '../../../../../models';
+import { keygrip, objection } from '../../../../../lib/init.js';
+import { ICommentSchema, ICurrentUser, IValidate } from '../../../../../lib/types.js';
+import { getCurrentUser, isSignedIn, switchHttpMethod, validate } from '../../../../../lib/utils.js';
+import { commentsSchema } from '../../../../../models/index.js';
 
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 

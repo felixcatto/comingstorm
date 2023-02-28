@@ -1,11 +1,11 @@
 import originalAxios from 'axios';
 import cookie from 'cookie';
-import { keygrip, objection } from '../lib/init';
-import { getApiUrl } from '../lib/sharedUtils';
-import { makeSignature } from '../lib/utils';
-import usersFixture from './fixtures/users';
-import { getLoginCookie, getLoginOptions } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { keygrip, objection } from '../lib/init.js';
+import { getApiUrl } from '../lib/sharedUtils.js';
+import { makeSignature } from '../lib/utils.js';
+import usersFixture from './fixtures/users.js';
+import { getLoginCookie, getLoginOptions } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('session', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

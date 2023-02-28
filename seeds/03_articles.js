@@ -1,6 +1,6 @@
-const articles = require('../__tests__/fixtures/articles').default;
+import articles from '../__tests__/fixtures/articles.js';
 
-exports.seed = async knex => {
+export const seed = async knex => {
   await knex('articles').delete();
   await knex('articles').insert(articles);
 };

@@ -4,8 +4,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ModelObject } from 'objection';
 import wsWebSocket from 'ws';
 import * as y from 'yup';
-import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
-import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice';
+import { makeSession, makeSessionActions } from '../client/common/sessionSlice.js';
+import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice.js';
 import {
   Article,
   articleSchema,
@@ -20,9 +20,9 @@ import {
   User,
   userLoginSchema,
   userSchema,
-} from '../models';
-import { objection } from './init';
-import { asyncStates, getApiUrl, roles, socketStates, wsEvents, wsGeneralEvents } from './utils';
+} from '../models/index.js';
+import { objection } from './init.js';
+import { asyncStates, getApiUrl, roles, socketStates, wsEvents, wsGeneralEvents } from './utils.js';
 
 export type IObjection = typeof objection;
 

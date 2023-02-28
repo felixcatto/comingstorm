@@ -1,11 +1,11 @@
 import originalAxios, { AxiosError } from 'axios';
-import omit from 'lodash/omit';
-import { getApiUrl, getUrl } from '../lib/sharedUtils';
-import usersFixture from './fixtures/users';
-import { encrypt } from '../lib/secure';
-import { objection } from '../lib/init';
-import { getLoginCookie } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { omit } from 'lodash-es';
+import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import usersFixture from './fixtures/users.js';
+import { encrypt } from '../lib/secure.js';
+import { objection } from '../lib/init.js';
+import { getLoginCookie } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('users', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

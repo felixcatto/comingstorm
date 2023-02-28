@@ -7,7 +7,7 @@ import {
   useContext,
   wsEvents,
   wsGeneralEvents,
-} from '../lib/utils';
+} from '../lib/utils.js';
 
 const WssConnect = () => {
   const { $ws, actions, $session, $isSignedInWss, axios } = useContext();

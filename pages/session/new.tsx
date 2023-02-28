@@ -2,8 +2,8 @@ import cn from 'classnames';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Layout from '../../client/common/Layout';
-import { TContent, Tooltip, TTrigger } from '../../client/components/Tooltip';
+import Layout from '../../client/common/Layout.js';
+import { TContent, Tooltip, TTrigger } from '../../client/components/Tooltip.js';
 import {
   ErrorMessage,
   Field,
@@ -11,9 +11,9 @@ import {
   SubmitBtn,
   useContext,
   WithApiErrors,
-} from '../../client/lib/utils';
-import { keygrip, objection } from '../../lib/init';
-import { getUserFromRequest, unwrap } from '../../lib/utils';
+} from '../../client/lib/utils.js';
+import { keygrip, objection } from '../../lib/init.js';
+import { getUserFromRequest, unwrap } from '../../lib/utils.js';
 
 export async function getServerSideProps({ req, res }) {
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);

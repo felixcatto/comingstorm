@@ -1,9 +1,9 @@
 import { useStore } from 'effector-react';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import React from 'react';
-import CommentForm from '../../client/comments/form';
-import Layout from '../../client/common/Layout';
+import CommentForm from '../../client/comments/form.js';
+import Layout from '../../client/common/Layout.js';
 import {
   fmtISO,
   FormWrapper,
@@ -12,10 +12,10 @@ import {
   useImmerState,
   useRefreshPage,
   userRolesToIcons,
-} from '../../client/lib/utils';
-import { keygrip, objection } from '../../lib/init';
-import { IArticle, IComment } from '../../lib/types';
-import { getUserFromRequest, unwrap } from '../../lib/utils';
+} from '../../client/lib/utils.js';
+import { keygrip, objection } from '../../lib/init.js';
+import { IArticle, IComment } from '../../lib/types.js';
+import { getUserFromRequest, unwrap } from '../../lib/utils.js';
 import s from './styles.module.css';
 
 type IShowComment = {

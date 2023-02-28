@@ -1,10 +1,11 @@
 import WebSocket from 'ws';
-import { startServer, closeServer } from '../services/webSocketServer/main';
-import { makeEnum, makeSignature, wsEvents } from '../lib/utils';
-import { waitForSocketState } from '../lib/utils';
-import usersFixture from './fixtures/users';
+import { startServer, closeServer } from '../services/webSocketServer/main.js';
+import { makeEnum, makeSignature, wsEvents } from '../lib/utils.js';
+import { waitForSocketState } from '../lib/utils.js';
+import usersFixture from './fixtures/users.js';
 import makeKeygrip from 'keygrip';
-import { makeWsClient } from '../lib/wsServerClient';
+import { makeWsClient } from '../lib/wsServerClient.js';
+import { jest } from '@jest/globals';
 
 describe('wss', () => {
   const keys = process.env.KEYS!.split(',');

@@ -2,8 +2,8 @@ import { useStore } from 'effector-react';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import React from 'react';
-import { IComment, IEmptyObject } from '../../lib/types';
-import { emptyObject, ErrorMessage, Field, getUrl, SubmitBtn, useContext } from '../lib/utils';
+import { IComment, IEmptyObject } from '../../lib/types.js';
+import { emptyObject, ErrorMessage, Field, getUrl, SubmitBtn, useContext } from '../lib/utils.js';
 
 interface IForm {
   onSubmit: any;

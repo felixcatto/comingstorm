@@ -1,10 +1,10 @@
 import originalAxios, { AxiosError } from 'axios';
-import { objection } from '../lib/init';
-import { getApiUrl } from '../lib/sharedUtils';
-import messagesFixture from './fixtures/messages';
-import usersFixture from './fixtures/users';
-import { getLoginOptions } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { objection } from '../lib/init.js';
+import { getApiUrl } from '../lib/sharedUtils.js';
+import messagesFixture from './fixtures/messages.js';
+import usersFixture from './fixtures/users.js';
+import { getLoginOptions } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('messages', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

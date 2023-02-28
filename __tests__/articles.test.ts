@@ -1,12 +1,12 @@
-import usersFixture from './fixtures/users';
-import articlesFixture from './fixtures/articles';
-import tagsFixture from './fixtures/tags';
-import articleTagsFixture from './fixtures/articles_tags';
+import usersFixture from './fixtures/users.js';
+import articlesFixture from './fixtures/articles.js';
+import tagsFixture from './fixtures/tags.js';
+import articleTagsFixture from './fixtures/articles_tags.js';
 import originalAxios, { AxiosError } from 'axios';
-import { objection } from '../lib/init';
-import { getApiUrl, getUrl } from '../lib/sharedUtils';
-import { getLoginOptions } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { objection } from '../lib/init.js';
+import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import { getLoginOptions } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('articles', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

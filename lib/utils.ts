@@ -1,6 +1,6 @@
 import cookie from 'cookie';
-import isObject from 'lodash/isObject';
-import { guestUser, isAdmin, isSignedIn } from './sharedUtils';
+import { isObject } from 'lodash-es';
+import { guestUser, isAdmin, isSignedIn } from './sharedUtils.js';
 import {
   IHandler,
   IMixHandler,
@@ -9,9 +9,9 @@ import {
   ISwitchHttpMethod,
   IUserClass,
   IValidateFn,
-} from './types';
+} from './types.js';
 
-export * from './sharedUtils';
+export * from './sharedUtils.js';
 
 export const switchHttpMethod: ISwitchHttpMethod = methods => async (req, res) => {
   const requestMethod = req.method?.toLowerCase() || '';

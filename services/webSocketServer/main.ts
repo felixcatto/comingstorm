@@ -1,17 +1,17 @@
 import fy, { FastifyInstance } from 'fastify';
 import fastifyWs from '@fastify/websocket';
 import makeKeygrip from 'keygrip';
-import { decode, encode, wsEvents, verifySignature, findKeyByValue } from '../../lib/utils';
+import { decode, encode, wsEvents, verifySignature, findKeyByValue } from '../../lib/utils.js';
 import cookie from 'cookie';
 import { WebSocket } from 'ws';
 
 type UsedID = number;
 type ISignedInUsers = Map<UsedID, WebSocket>;
 
-const keys = process.env.KEYS!.split(',');
-const keygrip = makeKeygrip(keys);
-
 const wss = async (fastify: FastifyInstance) => {
+  const keys = process.env.KEYS!.split(',');
+  const keygrip = makeKeygrip(keys);
+
   const signedInUsers: ISignedInUsers = new Map();
   const getUsersIds = userSockets => Array.from(userSockets.keys());
 

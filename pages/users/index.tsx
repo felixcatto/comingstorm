@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { useStore } from 'effector-react';
 import Link from 'next/link';
-import Layout from '../../client/common/Layout';
+import Layout from '../../client/common/Layout.js';
 import {
   dedup,
   getUrl,
@@ -9,11 +9,11 @@ import {
   useContext,
   useRefreshPage,
   userRolesToIcons,
-} from '../../client/lib/utils';
+} from '../../client/lib/utils.js';
 import s from './styles.module.css';
-import { keygrip, objection } from '../../lib/init';
-import { IUser } from '../../lib/types';
-import { getUserFromRequest } from '../../lib/utils';
+import { keygrip, objection } from '../../lib/init.js';
+import { IUser } from '../../lib/types.js';
+import { getUserFromRequest } from '../../lib/utils.js';
 
 type IUsersProps = {
   users: IUser[];

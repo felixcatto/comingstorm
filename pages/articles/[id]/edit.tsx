@@ -1,13 +1,13 @@
 import { useStore } from 'effector-react';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import React from 'react';
-import Form from '../../../client/articles/form';
-import Layout from '../../../client/common/Layout';
-import { useContext, useImmerState, WithApiErrors } from '../../../client/lib/utils';
-import { keygrip, objection } from '../../../lib/init';
-import { IArticle, INullable, ITag } from '../../../lib/types';
-import { getUrl, getUserFromRequest, unwrap } from '../../../lib/utils';
+import Form from '../../../client/articles/form.js';
+import Layout from '../../../client/common/Layout.js';
+import { useContext, useImmerState, WithApiErrors } from '../../../client/lib/utils.js';
+import { keygrip, objection } from '../../../lib/init.js';
+import { IArticle, INullable, ITag } from '../../../lib/types.js';
+import { getUrl, getUserFromRequest, unwrap } from '../../../lib/utils.js';
 
 type IState = {
   article: INullable<IArticle>;

@@ -1,6 +1,6 @@
-const tags = require('../__tests__/fixtures/tags').default;
+import tags from '../__tests__/fixtures/tags.js';
 
-exports.seed = async knex => {
+export const seed = async knex => {
   await knex('tags').delete();
   await knex('tags').insert(tags);
 };

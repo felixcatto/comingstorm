@@ -1,13 +1,13 @@
-import { keygrip, objection } from '../../../lib/init';
-import { ICurrentUser, IMessageSchema, IValidate } from '../../../lib/types';
+import { keygrip, objection } from '../../../lib/init.js';
+import { ICurrentUser, IMessageSchema, IValidate } from '../../../lib/types.js';
 import {
   checkSignedIn,
   getCurrentUser,
   makeErrors,
   switchHttpMethod,
   validate,
-} from '../../../lib/utils';
-import { messageSchema } from '../../../models';
+} from '../../../lib/utils.js';
+import { messageSchema } from '../../../models/index.js';
 
 type ICtx = ICurrentUser & IValidate<IMessageSchema>;
 

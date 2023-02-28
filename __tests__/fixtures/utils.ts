@@ -1,7 +1,7 @@
-import usersFixture from './users';
+import usersFixture from './users.js';
 import { AxiosInstance } from 'axios';
 import cookie from 'cookie';
-import { IGetApiUrl } from '../../lib/types';
+import { IGetApiUrl } from '../../lib/types.js';
 
 const [admin] = usersFixture;
 export const getLoginCookie = async (axios: AxiosInstance, getApiUrl: IGetApiUrl, user = admin) => {

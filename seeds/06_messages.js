@@ -1,6 +1,6 @@
-const messages = require('../__tests__/fixtures/messages').default;
+import messages from '../__tests__/fixtures/messages.js';
 
-exports.seed = async knex => {
+export const seed = async knex => {
   await knex('messages').delete();
   await knex('messages').insert(messages);
 };

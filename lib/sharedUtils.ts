@@ -1,7 +1,7 @@
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { compile } from 'path-to-regexp';
-import avatars from './avatars';
-import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types';
+import avatars from './avatars.js';
+import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types.js';
 
 export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);

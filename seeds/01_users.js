@@ -1,8 +1,17 @@
-const omit = require('lodash/omit');
-const { encrypt } = require('../lib/devUtils');
-const users = require('../__tests__/fixtures/users').default;
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+import { omit } from 'lodash-es';
+import path from 'path';
+import { dirname } from '../lib/devUtils.js';
+import users from '../__tests__/fixtures/users.js';
 
-exports.seed = async knex => {
+const __dirname = dirname(import.meta.url);
+dotenv.config({ path: path.resolve(__dirname, '../.env.development') });
+
+const keys = process.env.KEYS.split(',');
+const encrypt = value => crypto.createHmac('sha256', keys[0]).update(value).digest('hex');
+
+export const seed = async knex => {
   const newUsers = users
     .map(user => ({ ...user, password_digest: encrypt(user.password) }))
     .map(user => omit(user, 'password'));

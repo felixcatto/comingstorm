@@ -1,6 +1,6 @@
-const avatars = require('../__tests__/fixtures/avatars').default;
+import avatars from '../__tests__/fixtures/avatars.js';
 
-exports.seed = async knex => {
+export const seed = async knex => {
   await knex('avatars').delete();
   await knex('avatars').insert(avatars);
 };

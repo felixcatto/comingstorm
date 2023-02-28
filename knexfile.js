@@ -1,6 +1,6 @@
 const POSTGRES_HOST = process.env.POSTGRES_HOST || '127.0.0.1';
 
-module.exports = {
+export default {
   development: {
     client: 'pg',
     connection: {

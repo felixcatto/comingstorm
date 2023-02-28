@@ -1,5 +1,5 @@
-import { keygrip, objection } from '../../../lib/init';
-import { encrypt } from '../../../lib/secure';
+import { keygrip, objection } from '../../../lib/init.js';
+import { encrypt } from '../../../lib/secure.js';
 import {
   checkSignedIn,
   getCurrentUser,
@@ -9,9 +9,9 @@ import {
   setCookie,
   switchHttpMethod,
   validate,
-} from '../../../lib/utils';
-import { userLoginSchema } from '../../../models/User';
-import { IValidate, IUserLoginSchema, ICurrentUser } from '../../../lib/types';
+} from '../../../lib/utils.js';
+import { userLoginSchema } from '../../../models/User.js';
+import { IValidate, IUserLoginSchema, ICurrentUser } from '../../../lib/types.js';
 
 type ICtx = ICurrentUser;
 

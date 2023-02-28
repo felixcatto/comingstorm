@@ -1,6 +1,6 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import { IEmptyObject, IUser } from '../../lib/types';
+import { IEmptyObject, IUser } from '../../lib/types.js';
 import {
   emptyObject,
   ErrorMessage,
@@ -9,7 +9,7 @@ import {
   roles,
   SubmitBtn,
   UsualSelect,
-} from '../lib/utils';
+} from '../lib/utils.js';
 
 interface IForm {
   onSubmit: any;

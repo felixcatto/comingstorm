@@ -1,6 +1,6 @@
 import { createEvent, createStore } from 'effector';
-import { IActions, INativeWSocketClient, INullable, ISocketState } from '../../lib/types';
-import { socketStates } from '../lib/utils';
+import { IActions, INativeWSocketClient, INullable, ISocketState } from '../../lib/types.js';
+import { socketStates } from '../lib/utils.js';
 
 export const makeWsClientActions = () => ({
   setWsClient: createEvent<INullable<INativeWSocketClient>>(),

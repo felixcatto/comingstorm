@@ -2,11 +2,12 @@ import '../public/css/index.css';
 import originalAxios from 'axios';
 import { combine } from 'effector';
 import React from 'react';
-import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
-import WssConnect from '../client/common/WssConnect';
-import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice';
-import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils';
-import { IActions, IContext } from '../lib/types';
+import { makeSession, makeSessionActions } from '../client/common/sessionSlice.js';
+import WssConnect from '../client/common/WssConnect.js';
+import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice.js';
+import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils.js';
+import { IActions, IContext } from '../lib/types.js';
+
 
 function App(appProps) {
   const { Component, pageProps } = appProps;

@@ -1,14 +1,14 @@
-import difference from 'lodash/difference';
-import { keygrip, objection } from '../../../lib/init';
-import { IArticleSchema, ICurrentUser, IObjection, IValidate } from '../../../lib/types';
+import { difference } from 'lodash-es';
+import { keygrip, objection } from '../../../lib/init.js';
+import { IArticleSchema, ICurrentUser, IObjection, IValidate } from '../../../lib/types.js';
 import {
   checkSignedIn,
   getCurrentUser,
   isBelongsToUser,
   switchHttpMethod,
   validate,
-} from '../../../lib/utils';
-import { articleSchema } from '../../../models';
+} from '../../../lib/utils.js';
+import { articleSchema } from '../../../models/index.js';
 
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 

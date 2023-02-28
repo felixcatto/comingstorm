@@ -1,11 +1,11 @@
 import originalAxios, { AxiosError } from 'axios';
-import { objection } from '../lib/init';
-import { getApiUrl } from '../lib/sharedUtils';
-import articlesFixture from './fixtures/articles';
-import commentsFixture from './fixtures/comments';
-import usersFixture from './fixtures/users';
-import { getLoginOptions } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { objection } from '../lib/init.js';
+import { getApiUrl } from '../lib/sharedUtils.js';
+import articlesFixture from './fixtures/articles.js';
+import commentsFixture from './fixtures/comments.js';
+import usersFixture from './fixtures/users.js';
+import { getLoginOptions } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('articles', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

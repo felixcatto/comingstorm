@@ -1,5 +1,5 @@
 import originalAxios, { AxiosError } from 'axios';
-import { getUrl } from '../lib/sharedUtils';
+import { getUrl } from '../lib/sharedUtils.js';
 
 describe('requests', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

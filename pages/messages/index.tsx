@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import { useStore } from 'effector-react';
-import isNull from 'lodash/isNull';
+import { isNull } from 'lodash-es';
 import Textarea from 'react-textarea-autosize';
-import Layout from '../../client/common/Layout';
-import { Select } from '../../client/components/Select';
+import Layout from '../../client/common/Layout.js';
+import { Select } from '../../client/components/Select.js';
 import {
   fmtISO,
   socketStates,
@@ -12,10 +12,10 @@ import {
   useImmerState,
   useRefreshPage,
   wsEvents,
-} from '../../client/lib/utils';
-import { keygrip, objection } from '../../lib/init';
-import { IMessage, IUser, IUserWithAvatar } from '../../lib/types';
-import { getUserFromRequest } from '../../lib/utils';
+} from '../../client/lib/utils.js';
+import { keygrip, objection } from '../../lib/init.js';
+import { IMessage, IUser, IUserWithAvatar } from '../../lib/types.js';
+import { getUserFromRequest } from '../../lib/utils.js';
 import s from './styles.module.css';
 
 type IMessagesProps = {

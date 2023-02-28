@@ -1,9 +1,9 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { IComment, ITag, IUser } from '../lib/types';
-import { Comment } from './Comment';
-import { Tag } from './Tag';
-import { User } from './User';
+import { IComment, ITag, IUser } from '../lib/types.js';
+import { Comment } from './Comment.js';
+import { Tag } from './Tag.js';
+import { User } from './User.js';
 
 export class Article extends Model {
   id: any;

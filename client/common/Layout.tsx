@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { useStore } from 'effector-react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils';
+import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils.js';
 import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {

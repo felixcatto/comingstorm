@@ -1,10 +1,10 @@
 import originalAxios from 'axios';
-import { objection } from '../lib/init';
-import { getApiUrl, getUrl } from '../lib/sharedUtils';
-import tagsFixture from './fixtures/tags';
-import usersFixture from './fixtures/users';
-import { getLoginCookie } from './fixtures/utils';
-import avatarsFixture from './fixtures/avatars';
+import { objection } from '../lib/init.js';
+import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import tagsFixture from './fixtures/tags.js';
+import usersFixture from './fixtures/users.js';
+import { getLoginCookie } from './fixtures/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 
 describe('tags', () => {
   const baseURL = process.env.HTTP_SERVER_URL;

@@ -10,14 +10,10 @@ import {
   useInteractions,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import isNull from 'lodash/isNull';
-import isString from 'lodash/isString';
-import isUndefined from 'lodash/isUndefined';
+import { isEmpty, isFunction, isNull, isString, isUndefined } from 'lodash-es';
 import React from 'react';
-import { ISelectedItem, ISelectItem } from '../../lib/types';
-import { Portal, useImmerState } from '../lib/utils';
+import { ISelectedItem, ISelectItem } from '../../lib/types.js';
+import { Portal, useImmerState } from '../lib/utils.js';
 import s from './Select.module.css';
 
 type ISelectProps = {

@@ -1,15 +1,5 @@
-module.exports = {
+export default {
   server: {
-    presets: [
-      [
-        '@babel/env',
-        {
-          targets: {
-            node: true,
-          },
-        },
-      ],
-      '@babel/preset-typescript',
-    ],
+    presets: ['@babel/preset-typescript'],
   },
 };

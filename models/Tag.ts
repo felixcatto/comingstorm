@@ -1,7 +1,7 @@
 import { Model } from 'objection';
 import * as y from 'yup';
-import { Article } from './Article';
-import { IArticle } from '../lib/types';
+import { Article } from './Article.js';
+import { IArticle } from '../lib/types.js';
 
 export class Tag extends Model {
   id: number;

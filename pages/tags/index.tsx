@@ -1,10 +1,10 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
-import Layout from '../../client/common/Layout';
-import { getUrl, unwrap, useContext, useRefreshPage } from '../../client/lib/utils';
-import { keygrip, objection } from '../../lib/init';
-import { ITag } from '../../lib/types';
-import { getUserFromRequest } from '../../lib/utils';
+import Layout from '../../client/common/Layout.js';
+import { getUrl, unwrap, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import { keygrip, objection } from '../../lib/init.js';
+import { ITag } from '../../lib/types.js';
+import { getUserFromRequest } from '../../lib/utils.js';
 
 type ITagsProps = {
   tags: ITag[];

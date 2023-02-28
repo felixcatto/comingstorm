@@ -1,7 +1,7 @@
-import { keygrip, objection } from '../../../lib/init';
-import { ICurrentUser, IUnreadMessageSchema, IValidateQuery } from '../../../lib/types';
-import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils';
-import { unreadMessageSchema } from '../../../models';
+import { keygrip, objection } from '../../../lib/init.js';
+import { ICurrentUser, IUnreadMessageSchema, IValidateQuery } from '../../../lib/types.js';
+import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils.js';
+import { unreadMessageSchema } from '../../../models/index.js';
 
 type ICtx = ICurrentUser & IValidateQuery<IUnreadMessageSchema>;
 

@@ -1,5 +1,5 @@
-import { keygrip, objection } from '../../../../../lib/init';
-import { ICommentSchema, ICurrentUser, IObjection, IValidate } from '../../../../../lib/types';
+import { keygrip, objection } from '../../../../../lib/init.js';
+import { ICommentSchema, ICurrentUser, IObjection, IValidate } from '../../../../../lib/types.js';
 import {
   checkSignedIn,
   getCurrentUser,
@@ -7,8 +7,8 @@ import {
   isBelongsToUser,
   switchHttpMethod,
   validate,
-} from '../../../../../lib/utils';
-import { commentsSchema } from '../../../../../models';
+} from '../../../../../lib/utils.js';
+import { commentsSchema } from '../../../../../models/index.js';
 
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 

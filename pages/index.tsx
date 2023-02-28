@@ -1,8 +1,8 @@
 import { GetServerSidePropsContext } from 'next';
-import Layout from '../client/common/Layout';
-import { keygrip, objection } from '../lib/init';
-import { unwrap } from '../lib/sharedUtils';
-import { getUserFromRequest } from '../lib/utils';
+import Layout from '../client/common/Layout.js';
+import { keygrip, objection } from '../lib/init.js';
+import { unwrap } from '../lib/sharedUtils.js';
+import { getUserFromRequest } from '../lib/utils.js';
 
 export async function getServerSideProps({ req, res }: GetServerSidePropsContext) {
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);

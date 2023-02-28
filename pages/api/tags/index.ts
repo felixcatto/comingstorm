@@ -1,7 +1,7 @@
-import { keygrip, objection } from '../../../lib/init';
-import { ITagSchema, IValidate } from '../../../lib/types';
-import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils';
-import { tagSchema } from '../../../models';
+import { keygrip, objection } from '../../../lib/init.js';
+import { ITagSchema, IValidate } from '../../../lib/types.js';
+import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils.js';
+import { tagSchema } from '../../../models/index.js';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),

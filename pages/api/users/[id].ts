@@ -1,13 +1,13 @@
-import { keygrip, objection } from '../../../lib/init';
+import { keygrip, objection } from '../../../lib/init.js';
 import {
   checkAdmin,
   checkValueUnique,
   getCurrentUser,
   switchHttpMethod,
   validate,
-} from '../../../lib/utils';
-import { userSchema } from '../../../models';
-import { IValidate, IUserSchema } from '../../../lib/types';
+} from '../../../lib/utils.js';
+import { userSchema } from '../../../models/index.js';
+import { IValidate, IUserSchema } from '../../../lib/types.js';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),

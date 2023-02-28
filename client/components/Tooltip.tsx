@@ -12,7 +12,7 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React from 'react';
-import { Portal, TooltipContext } from '../lib/utils';
+import { Portal, TooltipContext } from '../lib/utils.js';
 import s from './Tooltip.module.css';
 
 type ITooltipProps = {

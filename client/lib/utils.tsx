@@ -3,14 +3,12 @@ import cn from 'classnames';
 import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
 import produce from 'immer';
-import isFunction from 'lodash/isFunction';
-import isString from 'lodash/isString';
-import omit from 'lodash/omit';
+import { isFunction, isString, omit } from 'lodash-es';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils';
+import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils.js';
 import {
   IApiErrors,
   IContext,
@@ -19,12 +17,12 @@ import {
   IUsualSelect,
   IWsEvent,
   IWsGeneralEvent,
-} from '../../lib/types';
-import { MultiSelect } from '../components/MultiSelect';
-import { Select } from '../components/Select';
-import Context from './context';
+} from '../../lib/types.js';
+import { MultiSelect } from '../components/MultiSelect.js';
+import { Select } from '../components/Select.js';
+import Context from './context.js';
 
-export * from '../../lib/sharedUtils';
+export * from '../../lib/sharedUtils.js';
 export { Context };
 
 export const useContext = () => React.useContext<IContext>(Context);

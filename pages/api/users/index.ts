@@ -1,8 +1,7 @@
-import differenceBy from 'lodash/differenceBy';
-import isEmpty from 'lodash/isEmpty';
-import avatars from '../../../lib/avatars';
-import { keygrip, objection } from '../../../lib/init';
-import { IUserSchema, IValidate } from '../../../lib/types';
+import { differenceBy, isEmpty } from 'lodash-es';
+import avatars from '../../../lib/avatars.js';
+import { keygrip, objection } from '../../../lib/init.js';
+import { IUserSchema, IValidate } from '../../../lib/types.js';
 import {
   checkAdmin,
   checkValueUnique,
@@ -10,8 +9,8 @@ import {
   getRandomNumUpTo,
   switchHttpMethod,
   validate,
-} from '../../../lib/utils';
-import { userSchema } from '../../../models';
+} from '../../../lib/utils.js';
+import { userSchema } from '../../../models/index.js';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(objection, keygrip),
