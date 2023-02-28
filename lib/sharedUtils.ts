@@ -1,6 +1,7 @@
+import isEmpty from 'lodash/isEmpty';
 import { compile } from 'path-to-regexp';
-import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types';
 import avatars from './avatars';
+import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types';
 
 export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
@@ -33,15 +34,24 @@ export const guestUser = {
   avatar: guestAvatar,
 } as const;
 
+const qs = {
+  stringify: (obj = {}) => {
+    if (isEmpty(obj)) return '';
+    return Object.keys(obj)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
+      .join('&');
+  },
+};
+
 export const makeUrlFor: IMakeUrlFor = rawRoutes => {
   const routes = Object.keys(rawRoutes).reduce(
     (acc, name) => ({ ...acc, [name]: compile(rawRoutes[name]) }),
     {} as any
   );
 
-  return (name, args = {}, opts = {}) => {
+  return (name, routeParams = {}, query = {}) => {
     const toPath = routes[name];
-    return toPath(args, opts);
+    return isEmpty(query) ? toPath(routeParams) : `${toPath(routeParams)}?${qs.stringify(query)}`;
   };
 };
 
@@ -66,10 +76,12 @@ export const routes = {
   newSession: '/session/new',
   messages: '/messages',
   message: '/messages/:id',
+  unreadMessages: '/unread-messages',
 };
 
 export const getUrl = makeUrlFor(routes);
-export const getApiUrl = (name: keyof typeof routes, args?) => `/api${getUrl(name, args)}`;
+export const getApiUrl = (name: keyof typeof routes, routeParams?, query?) =>
+  `/api${getUrl(name, routeParams, query)}`;
 
 export const socketStates = makeEnum('unset', 'connecting', 'open', 'closed');
 export const wsGeneralEvents = makeEnum('open', 'close');
@@ -79,7 +91,9 @@ export const wsEvents = makeEnum(
   'signIn',
   'signOut',
   'signedInUsersIds',
-  'getSignedInUsersIds'
+  'getSignedInUsersIds',
+  'notifyNewMessage',
+  'newMessagesArrived'
 );
 export const encode: IEncode = (wsEvent, message) =>
   JSON.stringify({ type: wsEvent, payload: message });

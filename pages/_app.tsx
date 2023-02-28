@@ -4,12 +4,7 @@ import { combine } from 'effector';
 import React from 'react';
 import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
 import WssConnect from '../client/common/WssConnect';
-import {
-  makeSignedInUsersIds,
-  makeWebSocketState,
-  makeWsClientActions,
-  makeWsClientStore,
-} from '../client/common/wsSlice';
+import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice';
 import { asyncStates, Context, getApiUrl, guestUser, makeSessionInfo } from '../client/lib/utils';
 import { IActions, IContext } from '../lib/types';
 
@@ -56,8 +51,7 @@ function App(appProps) {
       axios,
       actions,
       $session,
-      $wsClient: makeWsClientStore(actions),
-      $webSocketState: makeWebSocketState(actions),
+      $ws: makeWs(actions),
       $isSignedInWss,
       $signedInUsersIds,
     };

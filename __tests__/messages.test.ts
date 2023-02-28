@@ -14,11 +14,9 @@ describe('messages', () => {
 
   beforeAll(async () => {
     await Avatar.query().delete();
-    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
-    await Message.query().delete();
+    await Avatar.query().insertGraph(avatarsFixture);
     await User.query().insertGraph(usersFixture as any);
-    await Message.query().insertGraph(messagesFixture);
     loginOptions = await getLoginOptions(axios, getApiUrl);
   });
 

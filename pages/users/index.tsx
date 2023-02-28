@@ -42,8 +42,8 @@ const Users = ({ users }: IUsersProps) => {
       refreshPage();
     });
   const onlineIconClass = userId =>
-    cn(s.onlineIcon, {
-      [s.onlineIcon_online]: signedInUsersIds.includes(userId),
+    cn('online-icon mx-auto', {
+      ['online-icon_online']: signedInUsersIds.includes(userId),
     });
 
   return (

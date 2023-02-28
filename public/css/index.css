@@ -291,3 +291,22 @@ table {
     transform: rotate(360deg);
   }
 }
+
+.online-icon {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: #bdbdbd;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  &_online {
+    background: #4caf50;
+  }
+  &_sm {
+    width: 8px;
+    height: 8px;
+  }
+  &_shadow-white {
+    box-shadow: 0 1px 3px 0 rgb(255 255 255 / 60%), 0 1px 2px -1px rgb(255 255 255 / 60%);
+  }
+}

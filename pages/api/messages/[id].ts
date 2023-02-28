@@ -27,10 +27,17 @@ export default switchHttpMethod({
       }
     },
     validate(messageSchema),
-    async (req, res, ctx: IValidate<IMessageSchema>) => {
+    async (req, res, ctx: ICtx) => {
       const id = req.query.id!;
-      const { Message } = objection;
+      const sender_id = ctx.currentUser.id;
+      const { Message, UnreadMessage } = objection;
       const message = await Message.query().updateAndFetchById(id, ctx.body);
+      await UnreadMessage.query().insert({
+        message_id: message.id,
+        receiver_id: ctx.body.receiver_id,
+        sender_id,
+      });
+
       res.status(201).json(message);
     },
   ],

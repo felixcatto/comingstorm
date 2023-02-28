@@ -10,10 +10,9 @@ import {
 } from '../lib/utils';
 
 const WssConnect = () => {
-  const { $wsClient, actions, $session, $webSocketState, $isSignedInWss, axios } = useContext();
+  const { $ws, actions, $session, $isSignedInWss, axios } = useContext();
   const { isSignedIn } = useStore($session);
-  const wsClient = useStore($wsClient);
-  const webSocketState = useStore($webSocketState);
+  const { wsClient, webSocketState } = useStore($ws);
   const isSignedInWss = useStore($isSignedInWss);
 
   React.useEffect(() => {
@@ -48,6 +47,9 @@ const WssConnect = () => {
     });
     wsClient.on(wsEvents.signedInUsersIds, data => {
       actions.wssUpdateSignedUsers(data);
+    });
+    wsClient.on(wsEvents.newMessagesArrived, data => {
+      console.log(data); // TODO: ???
     });
   }, [wsClient]);
 

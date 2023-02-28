@@ -1,17 +1,3 @@
 .isOnlineCell {
   width: 70px;
 }
-
-.onlineIcon {
-  display: block;
-  width: 10px;
-  height: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  background: #bdbdbd;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-  &_online {
-    background: #4caf50;
-  }
-}

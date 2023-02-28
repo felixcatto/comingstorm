@@ -8,6 +8,7 @@ import {
   IObjection,
   ISwitchHttpMethod,
   IUserClass,
+  IValidateFn,
 } from './types';
 
 export * from './sharedUtils';
@@ -55,10 +56,10 @@ const getYupErrors = e => {
     );
   }
 
-  return e.message; // no object?
+  return e.message; // TODO: no object?
 };
 
-export const validate =
+export const validate: IValidateFn =
   (schema, payloadType = 'body') =>
   async (req, res) => {
     const payload = payloadType === 'query' ? req.query : req.body;
@@ -68,7 +69,7 @@ export const validate =
         abortEarly: false,
         stripUnknown: true,
       });
-      return { body: validatedBody };
+      return { [payloadType]: validatedBody };
     } catch (e) {
       res.status(400).json({ message: 'Input is not valid', errors: getYupErrors(e) });
     }
@@ -156,3 +157,14 @@ export const waitForSocketState = async (socket, state) => {
 
 // not including "n"
 export const getRandomNumUpTo = n => Math.floor(Math.random() * n);
+
+export const findKeyByValue = <K, V>(map: Map<K, V>, value: V): K | null => {
+  let key = null as any;
+  for (const [mapKey, mapValue] of map) {
+    if (mapValue === value) {
+      key = mapKey;
+      break;
+    }
+  }
+  return key;
+};

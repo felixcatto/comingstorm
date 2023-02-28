@@ -8,20 +8,23 @@ export const makeWsClientActions = () => ({
   wssUpdateSignedUsers: createEvent<any[]>(),
 });
 
-export const makeWsClientStore = (actions: IActions, initialState = null) =>
-  createStore<INullable<INativeWSocketClient>>(initialState).on(
-    actions.setWsClient,
-    (state, payload) => payload
-  );
-
-export const makeWebSocketState = (actions: IActions, initialState = socketStates.unset) =>
-  createStore<ISocketState>(initialState)
-    .on(actions.setWsClient, (state, wsClient) =>
-      wsClient ? socketStates.connecting : socketStates.unset
-    )
+type IWsInitialState = {
+  wsClient: INativeWSocketClient | null;
+  webSocketState: ISocketState;
+};
+const wsInitialState: IWsInitialState = {
+  wsClient: null,
+  webSocketState: socketStates.unset,
+};
+export const makeWs = (actions: IActions, initialState = wsInitialState) =>
+  createStore(initialState)
+    .on(actions.setWsClient, (state, wsClient) => ({
+      wsClient,
+      webSocketState: wsClient ? socketStates.connecting : socketStates.closed,
+    }))
     .on(actions.updateWsState, (state, wsReadyState) => {
       if (wsReadyState === 1) {
-        return socketStates.open;
+        return { ...state, webSocketState: socketStates.open };
       } else {
         return state;
       }

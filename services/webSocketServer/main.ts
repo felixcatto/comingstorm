@@ -1,14 +1,19 @@
 import fy, { FastifyInstance } from 'fastify';
 import fastifyWs from '@fastify/websocket';
 import makeKeygrip from 'keygrip';
-import { decode, encode, wsEvents, verifySignature } from '../../lib/utils';
+import { decode, encode, wsEvents, verifySignature, findKeyByValue } from '../../lib/utils';
 import cookie from 'cookie';
+import { WebSocket } from 'ws';
+
+type UsedID = number;
+type ISignedInUsers = Map<UsedID, WebSocket>;
 
 const keys = process.env.KEYS!.split(',');
 const keygrip = makeKeygrip(keys);
 
 const wss = async (fastify: FastifyInstance) => {
-  const signedInUsersIds = new Set();
+  const signedInUsers: ISignedInUsers = new Map();
+  const getUsersIds = userSockets => Array.from(userSockets.keys());
 
   fastify.get('/', { websocket: true }, (connection, req) => {
     console.log('wss: client connected');
@@ -27,11 +32,10 @@ const wss = async (fastify: FastifyInstance) => {
     };
 
     const userInfo = getUserInfo();
-    let userId = null as any;
     if (userInfo.isSignedIn) {
-      userId = userInfo.userId;
-      signedInUsersIds.add(userId);
-      broadcast(wsEvents.signedInUsersIds, Array.from(signedInUsersIds));
+      const userId = userInfo.userId!;
+      signedInUsers.set(userId, connection.socket);
+      broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
     }
 
     connection.socket.on('message', msgBuffer => {
@@ -44,19 +48,24 @@ const wss = async (fastify: FastifyInstance) => {
           const { cookieName, cookieValue, signature } = payload;
           const isSignatureCorrect = verifySignature(keygrip, cookieName, cookieValue, signature);
           if (isSignatureCorrect) {
-            userId = cookieValue;
-            signedInUsersIds.add(userId);
-            broadcast(wsEvents.signedInUsersIds, Array.from(signedInUsersIds));
+            const userId = cookieValue;
+            signedInUsers.set(userId, connection.socket);
+            broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
           }
           break;
         case wsEvents.signOut:
           const { id } = payload;
-          userId = null;
-          signedInUsersIds.delete(id);
-          broadcast(wsEvents.signedInUsersIds, Array.from(signedInUsersIds));
+          signedInUsers.delete(id);
+          broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
           break;
         case wsEvents.getSignedInUsersIds:
-          broadcast(wsEvents.signedInUsersIds, Array.from(signedInUsersIds));
+          connection.socket.send(encode(wsEvents.signedInUsersIds, getUsersIds(signedInUsers)));
+          break;
+        case wsEvents.notifyNewMessage:
+          const { receiverId, senderId } = payload;
+          const receiverSocket = signedInUsers.get(receiverId);
+          if (!receiverSocket) return;
+          receiverSocket.send(encode(wsEvents.newMessagesArrived, { senderId }));
           break;
         default:
           connection.socket.send(
@@ -67,9 +76,9 @@ const wss = async (fastify: FastifyInstance) => {
 
     connection.socket.on('close', () => {
       console.log('wss: client disconnected');
-      signedInUsersIds.delete(userId);
-      userId = null;
-      broadcast(wsEvents.signedInUsersIds, Array.from(signedInUsersIds));
+      const userId = findKeyByValue(signedInUsers, connection.socket);
+      signedInUsers.delete(userId!);
+      broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
     });
   });
 };

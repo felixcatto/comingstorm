@@ -5,8 +5,7 @@ import { ModelObject } from 'objection';
 import wsWebSocket from 'ws';
 import * as y from 'yup';
 import { makeSession, makeSessionActions } from '../client/common/sessionSlice';
-import { makeSignedInUsersIds, makeWebSocketState } from '../client/common/wsSlice';
-import { makeWsClientActions, makeWsClientStore } from '../client/common/wsSlice';
+import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice';
 import {
   Article,
   articleSchema,
@@ -16,6 +15,8 @@ import {
   messageSchema,
   Tag,
   tagSchema,
+  UnreadMessage,
+  unreadMessageSchema,
   User,
   userLoginSchema,
   userSchema,
@@ -54,6 +55,9 @@ export type ISwitchHttpMethod = (
 
 export type IValidate<T> = {
   body: T;
+};
+export type IValidateQuery<T> = {
+  query: T;
 };
 export type INullable<T> = T | null;
 
@@ -124,6 +128,18 @@ export type IMessage = {
 export type IMessageClass = typeof Message;
 export type IMessageSchema = y.InferType<typeof messageSchema>;
 
+export type IUnreadMessage = {
+  id: number;
+  message_id: number;
+  sender_id: number;
+  receiver_id: number;
+  sender?: IUser;
+  receiver?: IUser;
+  message?: IMessage;
+};
+export type IUnreadMessageClass = typeof UnreadMessage;
+export type IUnreadMessageSchema = y.InferType<typeof unreadMessageSchema>;
+
 export type IAvatar = {
   id: number;
   path: string;
@@ -140,20 +156,18 @@ export type ISession = {
   status: IAsyncState;
   errors: any;
 };
-export type IWsClientStore = ReturnType<typeof makeWsClientStore>;
+export type IWsStore = ReturnType<typeof makeWs>;
 export type IWsClientActions = ReturnType<typeof makeWsClientActions>;
 export type ISessionStore = ReturnType<typeof makeSession>;
 export type ISessionActions = ReturnType<typeof makeSessionActions>;
 export type ISignedInUsersIdsStore = ReturnType<typeof makeSignedInUsersIds>;
-export type IWebSocketStateStore = ReturnType<typeof makeWebSocketState>;
 export type IActions = ISessionActions & IWsClientActions;
 
 export type IContext = {
   getApiUrl: IGetApiUrl;
   axios: IAxiosInstance;
   actions: IActions;
-  $wsClient: IWsClientStore;
-  $webSocketState: IWebSocketStateStore;
+  $ws: IWsStore;
   $session: ISessionStore;
   $signedInUsersIds: ISignedInUsersIdsStore;
   $isSignedInWss: Store<boolean>;
@@ -181,7 +195,16 @@ export type ISignInMessage = {
   };
 };
 export type IGetSignedInUsersIds = { type: typeof wsEvents.getSignedInUsersIds; payload: any[] };
-export type IDecodeReturn = IEchoMessage | ISignInMessage | ISignOutMessage | IGetSignedInUsersIds;
+export type INotifyNewMessage = {
+  type: typeof wsEvents.notifyNewMessage;
+  payload: { receiverId: number; senderId: number };
+};
+export type IDecodeReturn =
+  | IEchoMessage
+  | ISignInMessage
+  | ISignOutMessage
+  | IGetSignedInUsersIds
+  | INotifyNewMessage;
 
 type IWebSocketClient<T> = {
   socket: T;
@@ -224,3 +247,6 @@ export type IUsualSelect = (props: {
   data: ISelectItem[];
   defaultItem: ISelectItem;
 }) => JSX.Element;
+
+export type IPayloadTypes = 'query' | 'body';
+export type IValidateFn = (schema, payloadType?: IPayloadTypes) => (req, res) => any;

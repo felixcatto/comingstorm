@@ -4,7 +4,15 @@ import isNull from 'lodash/isNull';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout';
 import { Select } from '../../client/components/Select';
-import { fmtISO, unwrap, useContext, useImmerState, useRefreshPage } from '../../client/lib/utils';
+import {
+  fmtISO,
+  socketStates,
+  unwrap,
+  useContext,
+  useImmerState,
+  useRefreshPage,
+  wsEvents,
+} from '../../client/lib/utils';
 import { keygrip, objection } from '../../lib/init';
 import { IMessage, IUser, IUserWithAvatar } from '../../lib/types';
 import { getUserFromRequest } from '../../lib/utils';
@@ -83,9 +91,11 @@ type IState = {
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, getApiUrl, axios } = useContext();
+  const { $session, getApiUrl, axios, $signedInUsersIds, $ws } = useContext();
   const refreshPage = useRefreshPage();
   const { isSignedIn, currentUser } = useStore($session);
+  const { wsClient, webSocketState } = useStore($ws);
+  const signedInUsersIds = useStore($signedInUsersIds);
   const [state, setState] = useImmerState<IState>({
     usersWantedToChatWith: [],
     selectedFriendId: null,
@@ -156,6 +166,12 @@ const Messages = ({ messages, users }: IMessagesProps) => {
       const newMessage = await axios.post(getApiUrl('messages'), newMessageBody);
       setState({ isMessageSending: false, usersWantedToChatWith: [] });
       refreshPage();
+      if (webSocketState === socketStates.open) {
+        wsClient!.emit(wsEvents.notifyNewMessage, {
+          receiverId: newMessageBody.receiver_id,
+          senderId: currentUser.id,
+        });
+      }
     }
   };
 
@@ -185,6 +201,10 @@ const Messages = ({ messages, users }: IMessagesProps) => {
     cn(s.friendToChat, { [s.friendToChat_selected]: id === selectedFriendId });
   const friendNameClass = id =>
     cn(s.friendName, { [s.friendName_selected]: id === selectedFriendId });
+  const onlineIconClass = friendId =>
+    cn('online-icon online-icon_online online-icon_sm ml-2', {
+      'online-icon_shadow-white': friendId === selectedFriendId,
+    });
   const messageContentClass = senderId =>
     cn(s.messageContent, { [s.messageContent_own]: senderId === currentUser.id });
   const messageAuthorClass = senderId =>
@@ -227,7 +247,10 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                   <img src={el.avatar!.path} />
                 </div>
                 <div>
-                  <div className={friendNameClass(el.id)}>{el.name}</div>
+                  <div className="flex items-center">
+                    <div className={friendNameClass(el.id)}>{el.name}</div>
+                    {signedInUsersIds.includes(el.id) && <i className={onlineIconClass(el.id)}></i>}
+                  </div>
                   <div className={s.friendLastMessage}>{getLastDialogMessage(el.id)}</div>
                 </div>
               </div>
