@@ -5,6 +5,7 @@ import Layout from '../../client/common/Layout.js';
 import {
   dedup,
   getUrl,
+  isSignedIn,
   unwrap,
   useContext,
   useRefreshPage,
@@ -23,8 +24,12 @@ export async function getServerSideProps({ req, res }) {
   const { User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   const users = await User.query();
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   return {
-    props: unwrap({ currentUser, users }),
+    props: unwrap({ currentUser, unreadMessages, users }),
   };
 }
 

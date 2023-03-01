@@ -32,11 +32,14 @@ export default switchHttpMethod({
       const sender_id = ctx.currentUser.id;
       const { Message, UnreadMessage } = objection;
       const message = await Message.query().updateAndFetchById(id, ctx.body);
-      await UnreadMessage.query().insert({
-        message_id: message.id,
-        receiver_id: ctx.body.receiver_id,
-        sender_id,
-      });
+      await UnreadMessage.query()
+        .insert({
+          message_id: message.id,
+          receiver_id: ctx.body.receiver_id,
+          sender_id,
+        })
+        .onConflict()
+        .ignore();
 
       res.status(201).json(message);
     },

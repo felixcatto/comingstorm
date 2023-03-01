@@ -2,21 +2,19 @@ import { Side } from '@floating-ui/react';
 import cn from 'classnames';
 import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
-import produce from 'immer';
 import { isFunction, isString, omit } from 'lodash-es';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
-import { decode, encode, roles, wsGeneralEvents } from '../../lib/sharedUtils.js';
+import { roles } from '../../lib/sharedUtils.js';
 import {
   IApiErrors,
   IContext,
   IEmptyObject,
-  INativeWSocketClient,
+  IUseImmerState,
   IUsualSelect,
-  IWsEvent,
-  IWsGeneralEvent,
+  IWSDecodeReturn,
 } from '../../lib/types.js';
 import { MultiSelect } from '../components/MultiSelect.js';
 import { Select } from '../components/Select.js';
@@ -60,21 +58,24 @@ export const userRolesToIcons = {
   [roles.guest]: 'fa fa-ghost',
 };
 
-export function useImmerState<T = any>(initialState) {
-  const [state, setState] = useState<T>(initialState);
+export const useImmerState: IUseImmerState = initialState => {
+  const [state, setState] = React.useState(initialState);
 
-  const setImmerState = React.useRef(fnOrObject => {
+  const setImmerState = React.useCallback(fnOrObject => {
     if (isFunction(fnOrObject)) {
       const fn = fnOrObject;
-      setState(curState => produce(curState, fn));
+      setState(curState => {
+        const newState = fn(curState);
+        return { ...curState, ...newState };
+      });
     } else {
       const newState = fnOrObject;
       setState(curState => ({ ...curState, ...newState }));
     }
-  });
+  }, []);
 
-  return [state, setImmerState.current] as const;
-}
+  return [state, setImmerState];
+};
 
 type ITooltipContext = {
   setIsOpen;
@@ -185,39 +186,7 @@ export const emptyObject: IEmptyObject = new Proxy(
   }
 );
 
-export const makeWsClient = url => {
-  const wsEventHandlers = {} as any;
-  const wsClient = {} as INativeWSocketClient;
-  const socket = new WebSocket(url);
-
-  wsClient.socket = socket;
-  wsClient.on = (wsEvent: IWsEvent | IWsGeneralEvent, fn) => {
-    if (Object.keys(wsGeneralEvents).includes(wsEvent)) {
-      socket.addEventListener(wsEvent, fn);
-    } else {
-      wsEventHandlers[wsEvent] = fn;
-    }
-  };
-  wsClient.emit = (wsEvent: IWsEvent, message = '') => {
-    socket.send(encode(wsEvent, message));
-  };
-  wsClient.close = () => socket.close();
-
-  socket.addEventListener('message', msgBuffer => {
-    const { type, payload } = decode(msgBuffer.data);
-    const handler = wsEventHandlers[type];
-    if (!handler) {
-      console.log(`
-        receive event with type "${type}", but have no handler
-        -> ${payload}
-      `);
-      return;
-    }
-    handler(payload);
-  });
-
-  return wsClient;
-};
+export const decode = objBuffer => JSON.parse(objBuffer.data.toString()) as IWSDecodeReturn;
 
 export const Portal = ({ children, selector }) => {
   const ref: any = React.useRef();

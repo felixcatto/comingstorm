@@ -26,6 +26,16 @@
   height: 50px;
 }
 
+.messagesWrap {
+  position: relative;
+}
+
+.unreadMessageCount {
+  position: absolute;
+  top: -4px;
+  left: 76px;
+}
+
 .userRoleIcon {
   color: #fff;
 }

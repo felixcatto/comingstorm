@@ -1,6 +1,6 @@
 import originalAxios from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import { getApiUrl, getUrl } from '../lib/utils.js';
 import tagsFixture from './fixtures/tags.js';
 import usersFixture from './fixtures/users.js';
 import { getLoginCookie } from './fixtures/utils.js';

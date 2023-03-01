@@ -171,6 +171,7 @@ export type IContext = {
   $session: ISessionStore;
   $signedInUsersIds: ISignedInUsersIdsStore;
   $isSignedInWss: Store<boolean>;
+  unreadMessages: IUnreadMessage[];
 };
 
 export type IApiErrors = {
@@ -182,7 +183,12 @@ export type IWsEvents = typeof wsEvents;
 export type IWsEvent = keyof IWsEvents;
 export type IWsGeneralEvents = typeof wsGeneralEvents;
 export type IWsGeneralEvent = keyof IWsGeneralEvents;
-export type IEncode = (wsEvent: IWsEvent, message: string | object) => string;
+export type IEncode = (wsEvent: IWsEvent, message?: string | object) => string;
+export type ISend = (
+  webSocket: INativeWebSocket,
+  wsEvent: IWsEvent,
+  message?: string | object
+) => void;
 
 export type IEchoMessage = { type: typeof wsEvents.echo; payload: any };
 export type ISignOutMessage = { type: typeof wsEvents.signOut; payload: { id: any } };
@@ -199,21 +205,24 @@ export type INotifyNewMessage = {
   type: typeof wsEvents.notifyNewMessage;
   payload: { receiverId: number; senderId: number };
 };
-export type IDecodeReturn =
+export type ISignedInUsersIds = {
+  type: typeof wsEvents.signedInUsersIds;
+  payload: any[];
+};
+export type INewMessagesArrived = {
+  type: typeof wsEvents.newMessagesArrived;
+  payload: { senderId: number };
+};
+export type IWSDecodeReturn = ISignedInUsersIds | INewMessagesArrived;
+export type IWSSDecodeReturn =
   | IEchoMessage
   | ISignInMessage
   | ISignOutMessage
   | IGetSignedInUsersIds
   | INotifyNewMessage;
 
-type IWebSocketClient<T> = {
-  socket: T;
-  on: (wsEvent: IWsEvent | IWsGeneralEvent, handler: any) => void;
-  emit: (wsEvent: IWsEvent, message?: string | object) => void;
-  close: () => void;
-};
-export type INativeWSocketClient = IWebSocketClient<WebSocket>;
-export type IWSClient = IWebSocketClient<InstanceType<typeof wsWebSocket>>;
+export type INativeWebSocket = WebSocket;
+export type IWSClient = InstanceType<typeof wsWebSocket>;
 
 export interface IAxiosInstance extends AxiosInstance {
   request<T = any, R = T, D = any>(config: AxiosRequestConfig<D>): Promise<R>;
@@ -250,3 +259,18 @@ export type IUsualSelect = (props: {
 
 export type IPayloadTypes = 'query' | 'body';
 export type IValidateFn = (schema, payloadType?: IPayloadTypes) => (req, res) => any;
+
+export type IPageProps = {
+  currentUser: IUser;
+  unreadMessages: IUnreadMessage[];
+};
+
+export type IUnreadMessagesDict = {
+  [senderId: string]: {
+    msgCount: number;
+  };
+};
+
+type IFn<T> = (freshState: T) => Partial<T>;
+type ISetState<T> = (fnOrObject: Partial<T> | IFn<T>) => void;
+export type IUseImmerState = <T>(initialState: T) => [state: T, setState: ISetState<T>];

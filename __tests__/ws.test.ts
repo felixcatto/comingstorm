@@ -1,133 +1,147 @@
-import WebSocket from 'ws';
-import { startServer, closeServer } from '../services/webSocketServer/main.js';
-import { makeEnum, makeSignature, wsEvents } from '../lib/utils.js';
-import { waitForSocketState } from '../lib/utils.js';
-import usersFixture from './fixtures/users.js';
-import makeKeygrip from 'keygrip';
-import { makeWsClient } from '../lib/wsServerClient.js';
 import { jest } from '@jest/globals';
+import makeKeygrip from 'keygrip';
+import WebSocket from 'ws';
+import {
+  decode,
+  encode,
+  makeSignature,
+  makeWsData,
+  waitForSocketState,
+  wsEvents,
+} from '../lib/utils.js';
+import { closeServer, startServer } from '../services/webSocketServer/main.js';
+import usersFixture from './fixtures/users.js';
 
 describe('wss', () => {
   const keys = process.env.KEYS!.split(',');
   const keygrip = makeKeygrip(keys);
+  const wsUrl = process.env.NEXT_PUBLIC_WSS_URL!;
 
   beforeAll(async () => {
     await startServer();
   });
 
   it('reflect data', async () => {
-    const client = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
+    const socket = new WebSocket(wsUrl);
     const testMessage = 'This is a test message';
-    let responseMessage;
-    client.on(wsEvents.echo, message => {
-      responseMessage = message;
-      client.close();
-    });
+    const callback = jest.fn();
+    socket.on('message', callback);
 
-    await waitForSocketState(client.socket, client.socket.OPEN);
-    client.emit(wsEvents.echo, testMessage);
-    await waitForSocketState(client.socket, client.socket.CLOSED);
+    await waitForSocketState(socket, socket.OPEN);
+    socket.send(encode(wsEvents.echo, testMessage));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    expect(responseMessage).toBe(testMessage);
+    const data = decode(callback.mock.calls[0][0]);
+    expect(data).toMatchObject(makeWsData(wsEvents.echo, testMessage));
   });
 
   it('broadcast signedIn users', async () => {
     const [user] = usersFixture;
-    const client1 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
-    const client2 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
+    const client1 = new WebSocket(wsUrl);
+    const client2 = new WebSocket(wsUrl);
 
-    let signedInUsersIds1;
-    let signedInUsersIds2;
-    client1.on(wsEvents.signedInUsersIds, payload => {
-      signedInUsersIds1 = payload;
-    });
-    client2.on(wsEvents.signedInUsersIds, payload => {
-      signedInUsersIds2 = payload;
-    });
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+    client1.on('message', callback1);
+    client2.on('message', callback2);
 
-    await waitForSocketState(client1.socket, client1.socket.OPEN);
-    await waitForSocketState(client2.socket, client2.socket.OPEN);
-    client1.emit(wsEvents.signIn, {
-      cookieName: 'userId',
-      cookieValue: user.id,
-      signature: makeSignature(keygrip, 'userId', user.id),
-    });
+    await waitForSocketState(client1, client1.OPEN);
+    await waitForSocketState(client2, client2.OPEN);
+    client1.send(
+      encode(wsEvents.signIn, {
+        cookieName: 'userId',
+        cookieValue: user.id,
+        signature: makeSignature(keygrip, 'userId', user.id),
+      })
+    );
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    expect(signedInUsersIds1).toMatchObject([user.id]);
-    expect(signedInUsersIds2).toMatchObject([user.id]);
+    const data1 = decode(callback1.mock.calls[0][0]);
+    const data2 = decode(callback2.mock.calls[0][0]);
+    expect(data1).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [user.id]));
+    expect(data2).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [user.id]));
 
     client1.close();
-    await waitForSocketState(client1.socket, client1.socket.CLOSED);
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    expect(signedInUsersIds2).toMatchObject([]);
+    const data22 = decode(callback2.mock.calls[1][0]);
+    expect(callback1.mock.calls).toHaveLength(1);
+    expect(callback2.mock.calls).toHaveLength(2);
+    expect(data22).toMatchObject(makeWsData(wsEvents.signedInUsersIds, []));
   });
 
   it('broadcast signedOut users', async () => {
     const [vasa, tom] = usersFixture;
-    const client1 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
-    const client2 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
+    const client1 = new WebSocket(wsUrl);
+    const client2 = new WebSocket(wsUrl);
 
-    let signedInUsersIds1;
-    let signedInUsersIds2;
-    client1.on(wsEvents.signedInUsersIds, payload => {
-      signedInUsersIds1 = payload;
-    });
-    client2.on(wsEvents.signedInUsersIds, payload => {
-      signedInUsersIds2 = payload;
-    });
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+    client1.on('message', callback1);
+    client2.on('message', callback2);
 
-    await waitForSocketState(client1.socket, client1.socket.OPEN);
-    await waitForSocketState(client2.socket, client2.socket.OPEN);
-    client1.emit(wsEvents.signIn, {
-      cookieName: 'userId',
-      cookieValue: vasa.id,
-      signature: makeSignature(keygrip, 'userId', vasa.id),
-    });
-    client2.emit(wsEvents.signIn, {
-      cookieName: 'userId',
-      cookieValue: tom.id,
-      signature: makeSignature(keygrip, 'userId', tom.id),
-    });
+    await waitForSocketState(client1, client1.OPEN);
+    await waitForSocketState(client2, client2.OPEN);
+    client1.send(
+      encode(wsEvents.signIn, {
+        cookieName: 'userId',
+        cookieValue: vasa.id,
+        signature: makeSignature(keygrip, 'userId', vasa.id),
+      })
+    );
+    client2.send(
+      encode(wsEvents.signIn, {
+        cookieName: 'userId',
+        cookieValue: tom.id,
+        signature: makeSignature(keygrip, 'userId', tom.id),
+      })
+    );
     await new Promise(resolve => setTimeout(resolve, 300));
-    client1.emit(wsEvents.signOut, { id: vasa.id });
+    client1.send(encode(wsEvents.signOut, { id: vasa.id }));
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    expect(signedInUsersIds1).toMatchObject([tom.id]);
-    expect(signedInUsersIds2).toMatchObject([tom.id]);
+    const data1 = decode(callback1.mock.lastCall![0]);
+    const data2 = decode(callback2.mock.lastCall![0]);
+    expect(data1).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
+    expect(data2).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
   });
 
   it('notifies user about new message', async () => {
     const [vasa, tom] = usersFixture;
-    const client1 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
-    const client2 = makeWsClient(process.env.NEXT_PUBLIC_WSS_URL);
+    const client1 = new WebSocket(wsUrl);
+    const client2 = new WebSocket(wsUrl);
 
     const vasaCallback = jest.fn();
     const tomCallback = jest.fn();
-    client1.on(wsEvents.newMessagesArrived, vasaCallback);
-    client2.on(wsEvents.newMessagesArrived, tomCallback);
+    client1.on('message', vasaCallback);
+    client2.on('message', tomCallback);
 
-    await waitForSocketState(client1.socket, client1.socket.OPEN);
-    await waitForSocketState(client2.socket, client2.socket.OPEN);
-    client1.emit(wsEvents.signIn, {
-      cookieName: 'userId',
-      cookieValue: vasa.id,
-      signature: makeSignature(keygrip, 'userId', vasa.id),
-    });
-    client2.emit(wsEvents.signIn, {
-      cookieName: 'userId',
-      cookieValue: tom.id,
-      signature: makeSignature(keygrip, 'userId', tom.id),
-    });
+    await waitForSocketState(client1, client1.OPEN);
+    await waitForSocketState(client2, client2.OPEN);
+    client1.send(
+      encode(wsEvents.signIn, {
+        cookieName: 'userId',
+        cookieValue: vasa.id,
+        signature: makeSignature(keygrip, 'userId', vasa.id),
+      })
+    );
+    client2.send(
+      encode(wsEvents.signIn, {
+        cookieName: 'userId',
+        cookieValue: tom.id,
+        signature: makeSignature(keygrip, 'userId', tom.id),
+      })
+    );
     await new Promise(resolve => setTimeout(resolve, 300));
-    client1.emit(wsEvents.notifyNewMessage, { receiverId: tom.id, senderId: vasa.id });
+    vasaCallback.mockClear();
+    tomCallback.mockClear();
+    client1.send(encode(wsEvents.notifyNewMessage, { receiverId: tom.id, senderId: vasa.id }));
     await new Promise(resolve => setTimeout(resolve, 300));
 
     expect(vasaCallback.mock.calls).toHaveLength(0);
     expect(tomCallback.mock.calls).toHaveLength(1);
-    const calledArg = tomCallback.mock.calls[0][0];
-    expect(calledArg).toMatchObject({ senderId: vasa.id });
+    const tomData = decode(tomCallback.mock.calls[0][0]);
+    expect(tomData).toMatchObject(makeWsData(wsEvents.newMessagesArrived, { senderId: vasa.id }));
   });
 
   afterAll(closeServer);

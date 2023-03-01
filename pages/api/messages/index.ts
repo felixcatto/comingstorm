@@ -23,8 +23,8 @@ export default switchHttpMethod({
     validate(messageSchema),
     async (req, res, ctx: ICtx) => {
       const sender_id = ctx.currentUser.id;
-      const { Message, UnreadMessage } = objection;
-      const receiver = await Message.query().findById(ctx.body.receiver_id);
+      const { Message, UnreadMessage, User } = objection;
+      const receiver = await User.query().findById(ctx.body.receiver_id);
       if (!receiver) {
         return res.status(400).json(makeErrors({ receiver_id: 'user does not exist' }));
       }

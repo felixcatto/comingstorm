@@ -8,6 +8,7 @@ import {
   ErrorMessage,
   Field,
   getUrl,
+  isSignedIn,
   SubmitBtn,
   useContext,
   WithApiErrors,
@@ -17,8 +18,12 @@ import { getUserFromRequest, unwrap } from '../../lib/utils.js';
 
 export async function getServerSideProps({ req, res }) {
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   return {
-    props: unwrap({ currentUser }),
+    props: unwrap({ currentUser, unreadMessages }),
   };
 }
 

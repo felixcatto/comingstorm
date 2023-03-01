@@ -5,8 +5,8 @@ import { decode, encode, wsEvents, verifySignature, findKeyByValue } from '../..
 import cookie from 'cookie';
 import { WebSocket } from 'ws';
 
-type UsedID = number;
-type ISignedInUsers = Map<UsedID, WebSocket>;
+type UserID = number;
+type ISignedInUsers = Map<UserID, WebSocket>;
 
 const wss = async (fastify: FastifyInstance) => {
   const keys = process.env.KEYS!.split(',');

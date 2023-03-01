@@ -4,7 +4,7 @@ import tagsFixture from './fixtures/tags.js';
 import articleTagsFixture from './fixtures/articles_tags.js';
 import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import { getApiUrl, getUrl } from '../lib/utils.js';
 import { getLoginOptions } from './fixtures/utils.js';
 import avatarsFixture from './fixtures/avatars.js';
 

@@ -7,6 +7,7 @@ import Layout from '../../client/common/Layout.js';
 import {
   fmtISO,
   FormWrapper,
+  isSignedIn,
   roles,
   useContext,
   useImmerState,
@@ -113,11 +114,15 @@ export async function getServerSideProps({ req, res, params }) {
   const { id } = params;
   const { User, Article } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   const article = await Article.query()
     .findById(id)
     .withGraphFetched('[author, comments(orderByCreated).author, tags]');
   return {
-    props: unwrap({ currentUser, article }),
+    props: unwrap({ currentUser, unreadMessages, article }),
   };
 }
 

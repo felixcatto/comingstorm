@@ -2,6 +2,7 @@ import cookie from 'cookie';
 import { isObject } from 'lodash-es';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils.js';
 import {
+  IWSSDecodeReturn,
   IHandler,
   IMixHandler,
   INullable,
@@ -168,3 +169,7 @@ export const findKeyByValue = <K, V>(map: Map<K, V>, value: V): K | null => {
   }
   return key;
 };
+
+export const decode = buffer => JSON.parse(buffer.toString()) as IWSSDecodeReturn;
+
+export const makeWsData = (type, payload) => ({ type, payload });

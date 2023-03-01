@@ -1,11 +1,15 @@
 import cn from 'classnames';
 import { useStore } from 'effector-react';
 import { isNull } from 'lodash-es';
+import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
 import { Select } from '../../client/components/Select.js';
 import {
+  decode,
   fmtISO,
+  isSignedIn,
+  send,
   socketStates,
   unwrap,
   useContext,
@@ -13,8 +17,9 @@ import {
   useRefreshPage,
   wsEvents,
 } from '../../client/lib/utils.js';
+import { getUsersInfo } from '../../client/messages/utils.js';
 import { keygrip, objection } from '../../lib/init.js';
-import { IMessage, IUser, IUserWithAvatar } from '../../lib/types.js';
+import { IMessage, IUnreadMessagesDict, IUser } from '../../lib/types.js';
 import { getUserFromRequest } from '../../lib/utils.js';
 import s from './styles.module.css';
 
@@ -23,51 +28,13 @@ type IMessagesProps = {
   users: IUser[];
 };
 
-type IGetUserInfoArgs = {
-  messages: IMessage[];
-  users: IUser[];
-  currentUser: IUserWithAvatar;
-  usersWantedToChatWith: IUser[];
-};
-
-const getUsersInfo = ({
-  messages,
-  users,
-  currentUser,
-  usersWantedToChatWith,
-}: IGetUserInfoArgs) => {
-  const usersIdsWantedToChatWith = new Set();
-  const chattedUsersIds = new Set();
-  usersWantedToChatWith.forEach(el => usersIdsWantedToChatWith.add(el.id));
-  messages.forEach(el =>
-    el.receiver_id === currentUser.id
-      ? chattedUsersIds.add(el.sender_id)
-      : chattedUsersIds.add(el.receiver_id)
-  );
-  const chattedFriends = users.filter(el => chattedUsersIds.has(el.id));
-  const contactsOrder = new Set();
-  messages.forEach(el =>
-    currentUser.id === el.sender_id
-      ? contactsOrder.add(el.receiver_id)
-      : contactsOrder.add(el.sender_id)
-  );
-  const orderedChattedFriends = [] as IUser[];
-  contactsOrder.forEach(contactId => {
-    const chattedFriend = chattedFriends.find(el => el.id === contactId)!;
-    orderedChattedFriends.push(chattedFriend);
-  });
-  const usersAvailbleToChat = users.filter(
-    el =>
-      !chattedUsersIds.has(el.id) &&
-      !usersIdsWantedToChatWith.has(el.id) &&
-      el.id !== currentUser.id
-  );
-  return [orderedChattedFriends, usersAvailbleToChat];
-};
-
 export async function getServerSideProps({ req, res }) {
   const { Message, User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   const messages = await Message.query()
     .withGraphFetched('[receiver.avatar, sender.avatar]')
     .where('receiver_id', '=', currentUser.id)
@@ -76,40 +43,37 @@ export async function getServerSideProps({ req, res }) {
 
   const users = await User.query().withGraphFetched('avatar');
   return {
-    props: unwrap({ currentUser, messages, users }),
+    props: unwrap({ currentUser, messages, users, unreadMessages }),
   };
 }
 
 type IState = {
-  usersWantedToChatWith: IUser[];
+  usersNewlySelectedToChat: IUser[];
   selectedFriendId: number | null;
   inputValue: string;
   messageInputHeight: number;
-  newlySendedMessages: IMessage[];
   isMessageSending: boolean;
   editingMessageId: number | null;
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, getApiUrl, axios, $signedInUsersIds, $ws } = useContext();
+  const { $session, getApiUrl, axios, $signedInUsersIds, $ws, unreadMessages } = useContext();
   const refreshPage = useRefreshPage();
   const { isSignedIn, currentUser } = useStore($session);
-  const { wsClient, webSocketState } = useStore($ws);
+  const { webSocket, webSocketState } = useStore($ws);
   const signedInUsersIds = useStore($signedInUsersIds);
   const [state, setState] = useImmerState<IState>({
-    usersWantedToChatWith: [],
+    usersNewlySelectedToChat: [],
     selectedFriendId: null,
     inputValue: '',
-    newlySendedMessages: [],
     messageInputHeight: 0,
     isMessageSending: false,
     editingMessageId: null,
   });
   const {
-    usersWantedToChatWith,
+    usersNewlySelectedToChat,
     selectedFriendId,
     inputValue,
-    newlySendedMessages,
     messageInputHeight,
     isMessageSending,
     editingMessageId,
@@ -118,9 +82,9 @@ const Messages = ({ messages, users }: IMessagesProps) => {
   const getFriendDialog = friendId => {
     if (isNull(friendId)) return [];
     const dialogIds = [currentUser.id, friendId];
-    return newlySendedMessages
-      .concat(messages)
-      .filter(el => dialogIds.includes(el.sender_id) && dialogIds.includes(el.receiver_id));
+    return messages.filter(
+      el => dialogIds.includes(el.sender_id) && dialogIds.includes(el.receiver_id)
+    );
   };
 
   const getLastDialogMessage = friendId => {
@@ -128,56 +92,58 @@ const Messages = ({ messages, users }: IMessagesProps) => {
     return lastMessage?.text || '';
   };
 
-  const [chattedFriends, usersAvailbleToChat] = getUsersInfo({
+  const [contacts, usersAvailbleToChat] = getUsersInfo({
     messages,
     users,
     currentUser,
-    usersWantedToChatWith,
+    usersNewlySelectedToChat,
   });
 
-  const contacts = usersWantedToChatWith.concat(chattedFriends);
   const dialog = getFriendDialog(selectedFriendId);
   const transformToSelect = usersArray =>
     usersArray.map(el => ({ ...el, value: el.id, label: el.name }));
+
+  const unreadMessagesDict = unreadMessages.reduce((acc, message) => {
+    const msgCount = acc[message.sender_id]?.msgCount ?? 0;
+    return { ...acc, [message.sender_id]: { msgCount: msgCount + 1 } };
+  }, {} as IUnreadMessagesDict);
 
   const onNewMessageChange = e => {
     const { value } = e.target;
     setState({ inputValue: value });
   };
+
   const onNewMessageKeydown = async e => {
     const isUserWantSendMessage = e.code === 'Enter' && e.shiftKey === false;
     if (!isUserWantSendMessage) return;
 
-    e.preventDefault();
+    e.preventDefault(); // stop resize textarea
     const { value } = e.target;
     if (value === '') return;
 
     const newMessageBody = { text: value, receiver_id: selectedFriendId };
     if (editingMessageId) {
       setState({ inputValue: '', editingMessageId: null, isMessageSending: true });
-      const editedMessage = await axios.put(
-        getApiUrl('message', { id: editingMessageId }),
-        newMessageBody
-      );
-      setState({ isMessageSending: false });
-      refreshPage();
+      await axios.put(getApiUrl('message', { id: editingMessageId }), newMessageBody);
     } else {
       setState({ inputValue: '', isMessageSending: true });
-      const newMessage = await axios.post(getApiUrl('messages'), newMessageBody);
-      setState({ isMessageSending: false, usersWantedToChatWith: [] });
-      refreshPage();
-      if (webSocketState === socketStates.open) {
-        wsClient!.emit(wsEvents.notifyNewMessage, {
-          receiverId: newMessageBody.receiver_id,
-          senderId: currentUser.id,
-        });
-      }
+      await axios.post(getApiUrl('messages'), newMessageBody);
     }
+
+    setState({ isMessageSending: false });
+
+    if (webSocketState === socketStates.open) {
+      send(webSocket, wsEvents.notifyNewMessage, {
+        receiverId: newMessageBody.receiver_id,
+        senderId: currentUser.id,
+      });
+    }
+    refreshPage();
   };
 
   const selectNewUserToChat: any = (user: IUser) => {
     setState({
-      usersWantedToChatWith: usersWantedToChatWith.concat(user),
+      usersNewlySelectedToChat: usersNewlySelectedToChat.concat(user),
       selectedFriendId: user.id,
       isMessageSending: false,
     });
@@ -190,13 +156,24 @@ const Messages = ({ messages, users }: IMessagesProps) => {
       isMessageSending: false,
     });
   const onCancelEditMessage = () => setState({ editingMessageId: null, inputValue: '' });
-  const deleteMessage = id => async () => {
+  const deleteMessage = (id, receiverId) => async () => {
     await axios.delete(getApiUrl('message', { id }));
+    if (webSocketState === socketStates.open) {
+      send(webSocket, wsEvents.notifyNewMessage, { receiverId, senderId: currentUser.id });
+    }
     refreshPage();
   };
 
-  const selectFriendToChat = friendId => () =>
+  const selectFriendToChat = friendId => async () => {
     setState({ selectedFriendId: friendId, isMessageSending: false });
+    if (unreadMessagesDict[friendId]) {
+      await axios.delete(
+        getApiUrl('unreadMessages', {}, { receiver_id: currentUser.id, sender_id: friendId })
+      );
+      refreshPage();
+    }
+  };
+
   const friendClass = id =>
     cn(s.friendToChat, { [s.friendToChat_selected]: id === selectedFriendId });
   const friendNameClass = id =>
@@ -212,6 +189,29 @@ const Messages = ({ messages, users }: IMessagesProps) => {
   const messageInputClass = cn('form-control form-control_secondary', s.messageInput, {
     [s.messageInput_editMode]: !isNull(editingMessageId),
   });
+
+  React.useEffect(() => {
+    if (!webSocket) return;
+    if (isNull(selectedFriendId)) return;
+
+    // on newMessagesArrived we need refreshUnreadMsgs() & refreshMessages()
+    // but both of this handled via refreshPage in WssConnect,
+    //   although it only wants refreshUnreadMsgs()
+    const removeUnreadMessages = async wsData => {
+      const { type, payload } = decode(wsData);
+      if (wsEvents.newMessagesArrived !== type) return;
+
+      const isNewMessageInActiveChat = payload.senderId === selectedFriendId;
+      if (!isNewMessageInActiveChat) return;
+
+      const data = { receiver_id: currentUser.id, sender_id: selectedFriendId };
+      await axios.delete(getApiUrl('unreadMessages', {}, data));
+      refreshPage();
+    };
+
+    webSocket.addEventListener('message', removeUnreadMessages);
+    return () => webSocket.removeEventListener('message', removeUnreadMessages);
+  }, [webSocket, selectedFriendId]);
 
   if (!isSignedIn) return <Layout>403 frobidden</Layout>;
 
@@ -250,6 +250,17 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                   <div className="flex items-center">
                     <div className={friendNameClass(el.id)}>{el.name}</div>
                     {signedInUsersIds.includes(el.id) && <i className={onlineIconClass(el.id)}></i>}
+                    {unreadMessagesDict[el.id] && (
+                      <div className="flex-1 flex pr-1 justify-end">
+                        <div
+                          className={cn('msg-count', {
+                            'msg-count_inverse': el.id === selectedFriendId,
+                          })}
+                        >
+                          {unreadMessagesDict[el.id].msgCount}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className={s.friendLastMessage}>{getLastDialogMessage(el.id)}</div>
                 </div>
@@ -312,7 +323,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                         <i
                           className={cn('fa fa-trash-alt fa_big fa_link ml-1', s.messageIcon)}
                           title="delete"
-                          onClick={deleteMessage(el.id)}
+                          onClick={deleteMessage(el.id, el.receiver_id)}
                         ></i>
                       </div>
                     )}

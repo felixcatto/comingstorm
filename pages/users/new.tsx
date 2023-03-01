@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout.js';
-import { useContext, WithApiErrors } from '../../client/lib/utils.js';
+import { isSignedIn, useContext, WithApiErrors } from '../../client/lib/utils.js';
 import Form from '../../client/users/form.js';
 import { keygrip, objection } from '../../lib/init.js';
 import { getUrl, getUserFromRequest, unwrap } from '../../lib/utils.js';
@@ -8,8 +8,12 @@ import { getUrl, getUserFromRequest, unwrap } from '../../lib/utils.js';
 export async function getServerSideProps({ req, res }) {
   const { User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   return {
-    props: unwrap({ currentUser }),
+    props: unwrap({ currentUser, unreadMessages }),
   };
 }
 

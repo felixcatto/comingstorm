@@ -5,11 +5,8 @@ export default {
   setupFiles: ['./__tests__/fixtures/envSetup'],
   // preset: 'ts-jest' | 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-
   extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+  moduleNameMapper: { '^(\\.{1,2}/.*)\\.js$': '$1' },
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
     // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`

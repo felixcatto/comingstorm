@@ -1,7 +1,7 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
-import { getUrl, unwrap, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import { getUrl, isSignedIn, unwrap, useContext, useRefreshPage } from '../../client/lib/utils.js';
 import { keygrip, objection } from '../../lib/init.js';
 import { ITag } from '../../lib/types.js';
 import { getUserFromRequest } from '../../lib/utils.js';
@@ -13,9 +13,13 @@ type ITagsProps = {
 export async function getServerSideProps({ req, res }) {
   const { Tag, User } = objection;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
   const tags = await Tag.query();
   return {
-    props: unwrap({ currentUser, tags }),
+    props: unwrap({ currentUser, tags, unreadMessages }),
   };
 }
 

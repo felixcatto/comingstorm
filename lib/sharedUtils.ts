@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash-es';
 import { compile } from 'path-to-regexp';
 import avatars from './avatars.js';
-import { IDecodeReturn, IEncode, IMakeEnum, IMakeUrlFor } from './types.js';
+import { IEncode, IMakeEnum, IMakeUrlFor, ISend } from './types.js';
 
 export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
@@ -84,7 +84,7 @@ export const getApiUrl = (name: keyof typeof routes, routeParams?, query?) =>
   `/api${getUrl(name, routeParams, query)}`;
 
 export const socketStates = makeEnum('unset', 'connecting', 'open', 'closed');
-export const wsGeneralEvents = makeEnum('open', 'close');
+export const wsGeneralEvents = makeEnum('open', 'close', 'message');
 export const wsEvents = makeEnum(
   'error',
   'echo',
@@ -95,6 +95,8 @@ export const wsEvents = makeEnum(
   'notifyNewMessage',
   'newMessagesArrived'
 );
-export const encode: IEncode = (wsEvent, message) =>
+export const encode: IEncode = (wsEvent, message = '') =>
   JSON.stringify({ type: wsEvent, payload: message });
-export const decode = objBuffer => JSON.parse(objBuffer.toString()) as IDecodeReturn;
+
+export const send: ISend = (webSocket, wsEvent, message = '') =>
+  webSocket.send(encode(wsEvent, message));

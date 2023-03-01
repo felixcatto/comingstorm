@@ -1,12 +1,13 @@
 import cn from 'classnames';
 import { useStore } from 'effector-react';
+import { isEmpty } from 'lodash-es';
 import Head from 'next/head';
 import Link from 'next/link';
 import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils.js';
 import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {
-  const { $session, actions } = useContext();
+  const { $session, actions, unreadMessages } = useContext();
   const { currentUser, isSignedIn } = useStore($session);
   const userIconClass = role => cn(s.userRoleIcon, 'mr-1', userRolesToIcons[role]);
 
@@ -28,7 +29,16 @@ const Layout = ({ children }: any) => {
                 <NavLink href={getUrl('users')}>Users</NavLink>
                 <NavLink href={getUrl('articles')}>Articles</NavLink>
                 <NavLink href={getUrl('tags')}>Tags</NavLink>
-                {isSignedIn && <NavLink href={getUrl('messages')}>Messages</NavLink>}
+                {isSignedIn && (
+                  <div className={s.messagesWrap}>
+                    <NavLink href={getUrl('messages')}>Messages</NavLink>
+                    {!isEmpty(unreadMessages) && (
+                      <div className={cn('msg-count', s.unreadMessageCount)}>
+                        {unreadMessages.length}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             {isSignedIn ? (

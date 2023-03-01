@@ -1,6 +1,6 @@
 import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl } from '../lib/sharedUtils.js';
+import { getApiUrl } from '../lib/utils.js';
 import articlesFixture from './fixtures/articles.js';
 import commentsFixture from './fixtures/comments.js';
 import usersFixture from './fixtures/users.js';

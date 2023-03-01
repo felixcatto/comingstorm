@@ -1,6 +1,6 @@
 import originalAxios, { AxiosError } from 'axios';
 import { omit } from 'lodash-es';
-import { getApiUrl, getUrl } from '../lib/sharedUtils.js';
+import { getApiUrl, getUrl } from '../lib/utils.js';
 import usersFixture from './fixtures/users.js';
 import { encrypt } from '../lib/secure.js';
 import { objection } from '../lib/init.js';

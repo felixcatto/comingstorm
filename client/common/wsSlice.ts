@@ -1,33 +1,44 @@
 import { createEvent, createStore } from 'effector';
-import { IActions, INativeWSocketClient, INullable, ISocketState } from '../../lib/types.js';
+import { IActions, INativeWebSocket, ISocketState } from '../../lib/types.js';
 import { socketStates } from '../lib/utils.js';
 
+type IWsInitialState =
+  | {
+      webSocket: null;
+      webSocketState: typeof socketStates.unset;
+    }
+  | {
+      webSocket: INativeWebSocket;
+      webSocketState:
+        | typeof socketStates.open
+        | typeof socketStates.connecting
+        | typeof socketStates.closed;
+    };
+
 export const makeWsClientActions = () => ({
-  setWsClient: createEvent<INullable<INativeWSocketClient>>(),
-  updateWsState: createEvent<number>(),
+  setWebSocket: createEvent<INativeWebSocket | null>(),
+  updateWsState: createEvent<INativeWebSocket>(),
   wssUpdateSignedUsers: createEvent<any[]>(),
 });
 
-type IWsInitialState = {
-  wsClient: INativeWSocketClient | null;
-  webSocketState: ISocketState;
-};
 const wsInitialState: IWsInitialState = {
-  wsClient: null,
+  webSocket: null,
   webSocketState: socketStates.unset,
 };
-export const makeWs = (actions: IActions, initialState = wsInitialState) =>
+
+export const makeWs = (actions: IActions, initialState: IWsInitialState = wsInitialState) =>
   createStore(initialState)
-    .on(actions.setWsClient, (state, wsClient) => ({
-      wsClient,
-      webSocketState: wsClient ? socketStates.connecting : socketStates.closed,
-    }))
-    .on(actions.updateWsState, (state, wsReadyState) => {
-      if (wsReadyState === 1) {
-        return { ...state, webSocketState: socketStates.open };
-      } else {
-        return state;
+    .on(actions.setWebSocket, (state, webSocket) => {
+      if (webSocket) {
+        return { webSocket, webSocketState: socketStates.connecting };
       }
+      return { webSocket, webSocketState: socketStates.unset };
+    })
+    .on(actions.updateWsState, (state, webSocket) => {
+      if (webSocket.readyState === 1) {
+        return { webSocket, webSocketState: socketStates.open };
+      }
+      return state;
     });
 
 export const makeSignedInUsersIds = (actions: IActions, initialState = []) =>

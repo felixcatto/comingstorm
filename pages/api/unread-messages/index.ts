@@ -18,7 +18,7 @@ export default switchHttpMethod({
       }
 
       const { UnreadMessage } = objection;
-      const receiver = await UnreadMessage.query().delete().where({ receiver_id, sender_id });
+      await UnreadMessage.query().delete().where({ receiver_id, sender_id });
       res.status(201).json({});
     },
   ],
