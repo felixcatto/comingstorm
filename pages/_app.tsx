@@ -1,19 +1,20 @@
-import '../public/css/index.css';
+import '../client/css/index.css';    // Import FIRST
 import originalAxios from 'axios';
-import { combine } from 'effector';
 import { AppProps } from 'next/app';
 import React from 'react';
-import { makeSession, makeSessionActions } from '../client/common/sessionSlice.js';
 import WssConnect from '../client/common/WssConnect.js';
-import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice.js';
 import {
-  asyncStates,
-  Context,
-  getApiUrl,
-  guestUser,
-  makeSessionInfo,
-} from '../client/lib/utils.js';
-import { IActions, IContext, IPageProps } from '../lib/types.js';
+  currentUserInitialState,
+  makeActions,
+  makeCurrentUser,
+  makeIsSignedInWss,
+  makeSession,
+  makeSignedInUsersIds,
+  makeWs,
+} from '../client/lib/effectorStore.js';
+import { Context, guestUser } from '../client/lib/utils.js';
+import { IContext, IPageProps } from '../lib/types.js';
+import '../client/css/tailwind.css'; // Import LAST
 
 function App(appProps: AppProps<IPageProps>) {
   const { Component, pageProps } = appProps;
@@ -29,39 +30,25 @@ function App(appProps: AppProps<IPageProps>) {
       response => response.data,
       error => {
         console.log(error.response);
-        return Promise.reject(error);
+        return Promise.reject(error.response.data);
       }
     );
 
-    const actions = [makeSessionActions, makeWsClientActions].reduce(
-      (acc, makeActions) => ({
-        ...acc,
-        ...makeActions({ getApiUrl, axios }),
-      }),
-      {} as IActions
-    );
-
-    const $session = makeSession(actions, {
-      ...makeSessionInfo(currentUser),
-      status: asyncStates.resolved,
-      errors: null,
+    const actions = makeActions({ axios });
+    const $currentUser = makeCurrentUser(actions, {
+      ...currentUserInitialState,
+      data: currentUser,
     });
     const $signedInUsersIds = makeSignedInUsersIds(actions);
-    const $isSignedInWss = combine(
-      $session,
-      $signedInUsersIds,
-      (session, signedInUsersIds) =>
-        signedInUsersIds.findIndex(userId => session.currentUser.id === userId) !== -1
-    );
 
     return {
-      getApiUrl,
       axios,
       actions,
-      $session,
-      $ws: makeWs(actions),
-      $isSignedInWss,
-      $signedInUsersIds,
+      [makeCurrentUser.key]: $currentUser,
+      [makeWs.key]: makeWs(actions),
+      [makeSignedInUsersIds.key]: $signedInUsersIds,
+      [makeSession.key]: makeSession($currentUser),
+      [makeIsSignedInWss.key]: makeIsSignedInWss($currentUser, $signedInUsersIds),
     };
   }, []);
 

@@ -1,22 +1,24 @@
+import originalAxios from 'axios';
 import cookie from 'cookie';
-import { isObject } from 'lodash-es';
+import { isNull, isObject, isString } from 'lodash-es';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils.js';
 import {
-  IWSSDecodeReturn,
+  IAuthenticate,
   IHandler,
   IMixHandler,
-  INullable,
   IObjection,
   ISwitchHttpMethod,
   IUserClass,
   IValidateFn,
+  IWSSDecodeReturn,
 } from './types.js';
 
 export * from './sharedUtils.js';
 
 export const switchHttpMethod: ISwitchHttpMethod = methods => async (req, res) => {
   const requestMethod = req.method?.toLowerCase() || '';
-  if (!methods.hasOwnProperty(requestMethod)) return res.status(404).json({ message: 'Not Found' });
+  if (!Object.keys(methods).includes(requestMethod))
+    return res.status(404).json({ message: 'Not Found' });
 
   const handlers: IHandler[] = [];
   if (methods.preHandler) {
@@ -57,7 +59,7 @@ const getYupErrors = e => {
     );
   }
 
-  return e.message; // TODO: no object?
+  return e.message;
 };
 
 export const validate: IValidateFn =
@@ -78,49 +80,7 @@ export const validate: IValidateFn =
 
 export const makeErrors = obj => ({ errors: obj });
 
-export const makeSignature = (keygrip, cookieName, cookieValue) => {
-  return keygrip.sign(`${cookieName}=${cookieValue}`);
-};
-
-export const verifySignature = (keygrip, cookieName, cookieValue, signature) => {
-  return keygrip.verify(`${cookieName}=${cookieValue}`, signature);
-};
-
-export const setCookie = (res, keygrip, cookieName, cookieValue) => {
-  const signature = makeSignature(keygrip, cookieName, cookieValue);
-  res.setHeader('Set-Cookie', [
-    cookie.serialize(cookieName, cookieValue, { path: '/', httpOnly: true }),
-    cookie.serialize(`${cookieName}Sig`, signature, { path: '/', httpOnly: true }),
-  ]);
-};
-
-export const removeCookie = (res, cookieName) => {
-  res.setHeader('Set-Cookie', [
-    cookie.serialize(cookieName, '', { path: '/', httpOnly: true, maxAge: 0 }),
-    cookie.serialize(`${cookieName}Sig`, '', { path: '/', httpOnly: true, maxAge: 0 }),
-  ]);
-};
-
-export const getUserFromRequest = async (res, cookies, keygrip, User: IUserClass) => {
-  const { userId, userIdSig } = cookies;
-  if (!userId || !userIdSig) return guestUser;
-
-  const isSignatureCorrect = verifySignature(keygrip, 'userId', userId, userIdSig);
-  if (isSignatureCorrect) {
-    const user = await User.query().findById(userId).withGraphFetched('avatar');
-    return user || guestUser;
-  } else {
-    removeCookie(res, 'userId');
-    return guestUser;
-  }
-};
-
-export const checkValueUnique = async (
-  Enitity,
-  column,
-  value,
-  excludeId: INullable<string> = null
-) => {
+export const checkValueUnique = async (Enitity, column, value, excludeId: string | null = null) => {
   const existingEntities = await Enitity.query().select(column).whereNot('id', excludeId);
   if (existingEntities.some(entity => entity[column] === value)) {
     return {
@@ -142,12 +102,6 @@ export const checkSignedIn = async (req, res, ctx) => {
   if (!isSignedIn(ctx.currentUser)) {
     res.status(401).json({ message: 'Unauthorized' });
   }
-};
-
-export const getCurrentUser = (objection: IObjection, keygrip) => async (req, res) => {
-  const { User } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  return { currentUser };
 };
 
 export const waitForSocketState = async (socket, state) => {
@@ -173,3 +127,100 @@ export const findKeyByValue = <K, V>(map: Map<K, V>, value: V): K | null => {
 export const decode = buffer => JSON.parse(buffer.toString()) as IWSSDecodeReturn;
 
 export const makeWsData = (type, payload) => ({ type, payload });
+
+export const makeNonThrowAxios = baseURL => {
+  const axios = originalAxios.create({ baseURL });
+  axios.interceptors.response.use(
+    response => response,
+    error => error.response
+  );
+  return axios;
+};
+
+export const sessionName = 'session';
+
+export const getSessionValue = headers => {
+  const rawCookies = headers['set-cookie'];
+  if (!Array.isArray(rawCookies)) throw new Error('no cookies from server');
+
+  const cookies = rawCookies.map(el => cookie.parse(el));
+  const cookieObj = cookies.find(el => Object.keys(el).includes(sessionName));
+  if (!cookieObj) throw new Error(`no '${sessionName}' cookie from server`);
+
+  const sessionValue = cookieObj[sessionName];
+  if (!isString(sessionValue)) throw new Error('no login cookie from server');
+
+  return sessionValue;
+};
+
+export const composeValue = (value, signature) => `${value}.${signature}`;
+export const decomposeValue = (compositValue: string) => {
+  const values = compositValue.split('.');
+  if (values.length !== 2) return [];
+  return values;
+};
+
+export const setSessionCookie = (res, keygrip, userId) => {
+  const signature = keygrip.sign(String(userId));
+  const sessionValue = composeValue(String(userId), signature);
+  res.setHeader(
+    'Set-Cookie',
+    cookie.serialize(sessionName, sessionValue, { path: '/', httpOnly: true })
+  );
+};
+
+export const removeSessionCookie = res => {
+  res.setHeader(
+    'Set-Cookie',
+    cookie.serialize(sessionName, '', { path: '/', httpOnly: true, maxAge: 0 })
+  );
+};
+
+export const getUserId = (rawCookies, keygrip) => {
+  let cookies;
+  if (isString(rawCookies)) {
+    cookies = cookie.parse(rawCookies);
+  } else if (isObject(rawCookies)) {
+    cookies = rawCookies;
+  } else {
+    return { userId: null, isSignatureCorrect: false };
+  }
+
+  const sessionValue = cookies[sessionName];
+  if (!sessionValue) return { userId: null, isSignatureCorrect: false };
+
+  const [userId, signature] = decomposeValue(sessionValue);
+  if (!userId || !signature) return { userId, isSignatureCorrect: false };
+
+  return { userId, isSignatureCorrect: keygrip.verify(userId, signature) };
+};
+
+export const authenticate: IAuthenticate = async (rawCookies, keygrip, fetchUser) => {
+  const { userId, isSignatureCorrect } = getUserId(rawCookies, keygrip);
+  if (isNull(userId)) {
+    return [guestUser, false];
+  } else if (!isSignatureCorrect) {
+    return [guestUser, true];
+  }
+
+  const user = await fetchUser(userId);
+  if (!user) return [guestUser, true];
+
+  return [user, false];
+};
+
+export const getUserFromRequest = async (res, cookies, keygrip, User: IUserClass) => {
+  // TODO: move fetchUser up, replace User parametr
+  const fetchUser = async userId => User.query().findById(userId).withGraphFetched('avatar');
+  const [currentUser, shouldRemoveSession] = await authenticate(cookies, keygrip, fetchUser);
+
+  if (shouldRemoveSession) removeSessionCookie(res);
+
+  return currentUser;
+};
+
+export const getCurrentUser = (objection: IObjection, keygrip) => async (req, res) => {
+  const { User } = objection;
+  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
+  return { currentUser };
+};

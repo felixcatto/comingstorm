@@ -1,5 +1,4 @@
 import { Model } from 'objection';
-import path from 'path';
 import * as y from 'yup';
 import { encrypt } from '../lib/secure.js';
 import { IArticle, IAvatar, IComment, IRole } from '../lib/types.js';

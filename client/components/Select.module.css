@@ -1,5 +1,7 @@
-.list {
+.popup {
+  @apply shadow;
   z-index: 1;
+  display: inline-block;
   min-width: 250px;
   padding: 4px;
   border: 1px solid #e9ecef;
@@ -8,7 +10,7 @@
   overflow-y: auto;
 }
 
-.item {
+.option {
   padding: 8px 12px;
   cursor: pointer;
   user-select: none;

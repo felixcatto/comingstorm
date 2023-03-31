@@ -1,14 +1,13 @@
-import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl } from '../lib/utils.js';
+import { getApiUrl, makeNonThrowAxios } from '../lib/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 import messagesFixture from './fixtures/messages.js';
 import usersFixture from './fixtures/users.js';
 import { getLoginOptions } from './fixtures/utils.js';
-import avatarsFixture from './fixtures/avatars.js';
 
 describe('messages', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
-  const axios = originalAxios.create({ baseURL });
+  const axios = makeNonThrowAxios(baseURL);
   const { User, Message, Avatar } = objection;
   let loginOptions;
 
@@ -17,7 +16,7 @@ describe('messages', () => {
     await User.query().delete();
     await Avatar.query().insertGraph(avatarsFixture);
     await User.query().insertGraph(usersFixture as any);
-    loginOptions = await getLoginOptions(axios, getApiUrl);
+    loginOptions = await getLoginOptions(axios);
   });
 
   beforeEach(async () => {
@@ -45,32 +44,24 @@ describe('messages', () => {
   });
 
   it("POST /api/messages can't send messages to unexisted users", async () => {
-    expect.assertions(1);
     const message = {
       text: 'ggwp lanaya',
       receiver_id: -333,
     };
-    try {
-      const res = await axios.post(getApiUrl('messages'), message, loginOptions);
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(400);
-    }
+    const res = await axios.post(getApiUrl('messages'), message, loginOptions);
+    expect(res.status).toBe(400);
   });
 
   it('PUT /api/messages cant edit other people messages', async () => {
-    expect.assertions(1);
     const [vasaMessage] = messagesFixture;
     const [, tomUser] = usersFixture;
-    const tomLoginOptions = await getLoginOptions(axios, getApiUrl, tomUser);
-    try {
-      const res = await axios.put(
-        getApiUrl('message', { id: vasaMessage.id }),
-        vasaMessage,
-        tomLoginOptions
-      );
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(403);
-    }
+    const tomLoginOptions = await getLoginOptions(axios, tomUser);
+    const res = await axios.put(
+      getApiUrl('message', { id: vasaMessage.id }),
+      vasaMessage,
+      tomLoginOptions
+    );
+    expect(res.status).toBe(403);
   });
 
   it('PUT /api/messages/:id', async () => {
@@ -80,7 +71,7 @@ describe('messages', () => {
       text: '(edited)',
     };
     const [, tomUser] = usersFixture;
-    const tomLoginOptions = await getLoginOptions(axios, getApiUrl, tomUser);
+    const tomLoginOptions = await getLoginOptions(axios, tomUser);
     const res = await axios.put(getApiUrl('message', { id: message.id }), message, tomLoginOptions);
 
     const messageFromDb = await Message.query().findById(message.id);

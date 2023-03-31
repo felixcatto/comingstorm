@@ -1,7 +1,13 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../../client/common/Layout.js';
-import { isSignedIn, useContext, WithApiErrors } from '../../../client/lib/utils.js';
+import {
+  getApiUrl,
+  isSignedIn,
+  useContext,
+  useSubmit,
+  WithApiErrors,
+} from '../../../client/lib/utils.js';
 import Form from '../../../client/users/form.js';
 import { keygrip, objection } from '../../../lib/init.js';
 import { getUrl, getUserFromRequest, unwrap } from '../../../lib/utils.js';
@@ -19,25 +25,20 @@ export async function getServerSideProps({ req, res }) {
   };
 }
 
-const EditUser = WithApiErrors(props => {
-  const { axios, getApiUrl } = useContext();
+const EditUser = () => {
+  const { axios } = useContext();
   const router = useRouter();
   const [user, setUser] = React.useState<IUser | null>(null);
   const { id } = router.query;
-  const { setApiErrors } = props;
 
   React.useEffect(() => {
     axios.get(getApiUrl('user', { id })).then(data => setUser(data));
   }, []);
 
-  const onSubmit = async values => {
-    try {
-      await axios.put(getApiUrl('user', { id: user!.id }), values);
-      router.push(getUrl('users'));
-    } catch (e: any) {
-      setApiErrors(e.response.data.errors || {});
-    }
-  };
+  const onSubmit = useSubmit(async values => {
+    await axios.put(getApiUrl('user', { id: user!.id }), values);
+    router.push(getUrl('users'));
+  });
 
   return (
     <Layout>
@@ -45,6 +46,6 @@ const EditUser = WithApiErrors(props => {
       {user && <Form onSubmit={onSubmit} user={user} />}
     </Layout>
   );
-});
+};
 
-export default EditUser;
+export default WithApiErrors(EditUser);

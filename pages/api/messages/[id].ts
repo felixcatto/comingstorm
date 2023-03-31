@@ -52,7 +52,7 @@ export default switchHttpMethod({
         res.status(403).json({ message: 'Forbidden' });
       }
     },
-    async (req, res, ctx: ICtx) => {
+    async (req, res) => {
       const id = req.query.id!;
       await objection.Message.query().deleteById(id);
       res.status(201).json({ id });

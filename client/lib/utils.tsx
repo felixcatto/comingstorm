@@ -2,7 +2,7 @@ import { Side } from '@floating-ui/react';
 import cn from 'classnames';
 import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
-import { isFunction, isString, omit } from 'lodash-es';
+import { isFunction, omit } from 'lodash-es';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -12,7 +12,10 @@ import {
   IApiErrors,
   IContext,
   IEmptyObject,
-  IUseImmerState,
+  IFMultiSelectProps,
+  ISelectedOption,
+  IUseMergeState,
+  IUseSubmit,
   IUsualSelect,
   IWSDecodeReturn,
 } from '../../lib/types.js';
@@ -58,7 +61,7 @@ export const userRolesToIcons = {
   [roles.guest]: 'fa fa-ghost',
 };
 
-export const useImmerState: IUseImmerState = initialState => {
+export const useMergeState: IUseMergeState = initialState => {
   const [state, setState] = React.useState(initialState);
 
   const setImmerState = React.useCallback(fnOrObject => {
@@ -78,7 +81,6 @@ export const useImmerState: IUseImmerState = initialState => {
 };
 
 type ITooltipContext = {
-  setIsOpen;
   x;
   y;
   strategy;
@@ -98,13 +100,28 @@ export const FormWrapper = ({ apiErrors, setApiErrors, children }) => (
   <FormContext.Provider value={{ apiErrors, setApiErrors }}>{children}</FormContext.Provider>
 );
 
+// eslint-disable-next-line
 export const WithApiErrors = (Component: React.ComponentType<IApiErrors>) => props => {
-  const [apiErrors, setApiErrors] = React.useState({});
+  const [apiErrors, setApiErrors] = React.useState({}); // eslint-disable-line
   return (
     <FormContext.Provider value={{ apiErrors, setApiErrors }}>
       <Component {...props} apiErrors={apiErrors} setApiErrors={setApiErrors} />
     </FormContext.Provider>
   );
+};
+
+export const useSubmit: IUseSubmit = onSubmit => {
+  const { setApiErrors } = React.useContext(FormContext);
+
+  const wrappedSubmit = async (values, actions) => {
+    try {
+      await onSubmit(values, actions);
+    } catch (e: any) {
+      if (e.errors) setApiErrors(e.errors);
+    }
+  };
+
+  return wrappedSubmit;
 };
 
 export const ErrorMessage = ({ name }) => {
@@ -136,35 +153,39 @@ export const SubmitBtn = ({ children, ...props }) => {
   );
 };
 
-export const UsualSelect: IUsualSelect = ({ name, data, defaultItem }) => {
+export const UsualSelect: IUsualSelect = ({ name, options, defaultItem }) => {
   const { setFieldValue } = useFormikContext();
+  const [selectedOption, setSelectedOption] = React.useState<ISelectedOption>(null);
+  const computedOption = selectedOption || defaultItem;
+
   return (
     <Select
-      data={data}
+      options={options}
+      selectedOption={computedOption}
       placeholder=""
-      defaultItem={defaultItem}
       searchable={false}
-      onSelect={selectedItem => {
-        if (isString(selectedItem)) {
-          setFieldValue(name, selectedItem, false);
-        } else {
-          setFieldValue(name, selectedItem.value, false);
-        }
+      onSelect={selectedOption => {
+        setFieldValue(name, selectedOption.value, false);
+        setSelectedOption(selectedOption);
       }}
     />
   );
 };
 
-export const FMultiSelect = ({ name, data, defaultItems }) => {
+export const FMultiSelect = (props: IFMultiSelectProps) => {
+  const { name, options, defaultOptions = [] } = props;
   const { setFieldValue } = useFormikContext();
+  const [selectedOptions, setSelectedOptions] = React.useState(defaultOptions);
+
   return (
     <MultiSelect
-      data={data}
-      defaultItems={defaultItems}
-      onSelect={selectedItems => {
+      options={options}
+      selectedOptions={selectedOptions}
+      onSelect={newSelectedOptions => {
+        setSelectedOptions(newSelectedOptions);
         setFieldValue(
           name,
-          selectedItems.map(el => (isString(el) ? el : el.value)),
+          newSelectedOptions.map(el => el.value),
           false
         );
       }}
@@ -201,3 +222,8 @@ export const Portal = ({ children, selector }) => {
 };
 
 export const fmtISO = (isoDate, formatStr) => format(parseISO(isoDate), formatStr);
+
+export const makeCaseInsensitiveRegex = str =>
+  new RegExp(str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
+
+export const toSelectOptions = values => values.map(value => ({ value, label: value }));

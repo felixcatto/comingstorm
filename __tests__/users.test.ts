@@ -1,15 +1,14 @@
-import originalAxios, { AxiosError } from 'axios';
 import { omit } from 'lodash-es';
-import { getApiUrl, getUrl } from '../lib/utils.js';
-import usersFixture from './fixtures/users.js';
-import { encrypt } from '../lib/secure.js';
 import { objection } from '../lib/init.js';
-import { getLoginCookie } from './fixtures/utils.js';
+import { encrypt } from '../lib/secure.js';
+import { getApiUrl, getUrl, makeNonThrowAxios } from '../lib/utils.js';
 import avatarsFixture from './fixtures/avatars.js';
+import usersFixture from './fixtures/users.js';
+import { getLoginOptions } from './fixtures/utils.js';
 
 describe('users', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
-  const axios = originalAxios.create({ baseURL });
+  const axios = makeNonThrowAxios(baseURL);
   const { User, Avatar } = objection;
   let loginOptions;
 
@@ -19,8 +18,7 @@ describe('users', () => {
     await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await User.query().insert(admin as any);
-    const loginCookie = await getLoginCookie(axios, getApiUrl);
-    loginOptions = { headers: { Cookie: loginCookie } };
+    loginOptions = await getLoginOptions(axios);
   });
 
   beforeEach(async () => {
@@ -41,12 +39,8 @@ describe('users', () => {
   });
 
   it('POST /api/users without admin rights', async () => {
-    expect.assertions(1);
-    try {
-      await axios.post(getApiUrl('users'), { vasa: 'eto boroda' });
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(403);
-    }
+    const res = await axios.post(getApiUrl('users'), { vasa: 'eto boroda' });
+    expect(res.status).toBe(403);
   });
 
   it('POST /api/users', async () => {
@@ -70,13 +64,9 @@ describe('users', () => {
   });
 
   it('POST /api/users (unique email)', async () => {
-    expect.assertions(1);
-    try {
-      const user = omit(usersFixture[0], 'id');
-      const res = await axios.post(getApiUrl('users'), user, loginOptions);
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(400);
-    }
+    const user = omit(usersFixture[0], 'id');
+    const res = await axios.post(getApiUrl('users'), user, loginOptions);
+    expect(res.status).toBe(400);
   });
 
   it('PUT /api/users/:id', async () => {

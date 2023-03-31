@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -11,6 +10,7 @@ import {
   isSignedIn,
   SubmitBtn,
   useContext,
+  useSubmit,
   WithApiErrors,
 } from '../../client/lib/utils.js';
 import { keygrip, objection } from '../../lib/init.js';
@@ -27,19 +27,14 @@ export async function getServerSideProps({ req, res }) {
   };
 }
 
-const LoginForm = WithApiErrors(props => {
+const LoginForm = () => {
   const { actions } = useContext();
   const router = useRouter();
-  const { setApiErrors } = props;
 
-  const onSubmit = async values => {
-    try {
-      await actions.signIn(values);
-      router.push(getUrl('home'));
-    } catch (e: any) {
-      setApiErrors(e.response.data.errors);
-    }
-  };
+  const onSubmit = useSubmit(async values => {
+    await actions.signIn(values);
+    router.push(getUrl('home'));
+  });
 
   return (
     <Layout>
@@ -64,12 +59,12 @@ const LoginForm = WithApiErrors(props => {
             <div className="col-6">
               <div className="mb-4">
                 <label>Email</label>
-                <Field className="form-control" name="email" />
+                <Field className="input" name="email" />
                 <ErrorMessage name="email" />
               </div>
               <div>
                 <label>Password</label>
-                <Field className="form-control" type="password" name="password" />
+                <Field className="input" type="password" name="password" />
                 <ErrorMessage name="password" />
               </div>
             </div>
@@ -82,6 +77,6 @@ const LoginForm = WithApiErrors(props => {
       </Formik>
     </Layout>
   );
-});
+};
 
-export default LoginForm;
+export default WithApiErrors(LoginForm);

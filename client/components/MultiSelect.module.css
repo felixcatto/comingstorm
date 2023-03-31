@@ -11,6 +11,8 @@
   flex-wrap: wrap;
   margin-right: -5px;
   margin-left: -5px;
+  margin-top: -4px;
+  margin-bottom: -4px;
 }
 
 .selectedItem {
@@ -49,12 +51,15 @@
   cursor: default;
   &_active {
     height: auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
   }
 }
 
 .list {
   @apply shadow;
   z-index: 1;
+  display: inline-block;
   min-width: 250px;
   padding: 4px;
   border: 1px solid #e9ecef;

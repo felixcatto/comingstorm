@@ -9,7 +9,7 @@ interface IForm {
   article?: IArticle | IEmptyObject;
 }
 
-export default (props: IForm) => {
+const ArticlesForm = (props: IForm) => {
   const { onSubmit, tags, article = emptyObject } = props;
   const transformTag = tag => ({ value: tag.id, label: tag.name });
   const tagsForSelect = tags.map(transformTag);
@@ -31,16 +31,16 @@ export default (props: IForm) => {
           <div className="col-6">
             <div className="mb-4">
               <label>Title</label>
-              <Field className="form-control" name="title" />
+              <Field className="input" name="title" />
               <ErrorMessage name="title" />
             </div>
             <div className="mb-4">
               <label>Text</label>
-              <Field className="form-control" as="textarea" name="text" />
+              <Field className="input" as="textarea" name="text" />
             </div>
             <div>
               <label>Tags</label>
-              <FMultiSelect name="tagIds" data={tagsForSelect} defaultItems={selectedTags} />
+              <FMultiSelect name="tagIds" options={tagsForSelect} defaultOptions={selectedTags} />
             </div>
           </div>
         </div>
@@ -53,3 +53,5 @@ export default (props: IForm) => {
     </Formik>
   );
 };
+
+export default ArticlesForm;

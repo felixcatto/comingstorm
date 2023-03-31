@@ -11,7 +11,7 @@ import babelConfig from './babelconfig.js';
 const __dirname = dirname(import.meta.url);
 dotenv.config({ path: path.resolve(__dirname, '.env.development') });
 
-const { series, parallel } = gulp;
+const { series } = gulp;
 
 const paths = {
   serverJs: {

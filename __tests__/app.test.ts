@@ -1,4 +1,4 @@
-import originalAxios, { AxiosError } from 'axios';
+import originalAxios from 'axios';
 import { getUrl } from '../lib/utils.js';
 
 describe('requests', () => {

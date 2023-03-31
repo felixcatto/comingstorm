@@ -1,28 +1,17 @@
-import {
-  autoUpdate,
-  flip,
-  offset as offsetMiddleware,
-  Placement,
-  shift,
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useMergeRefs,
-} from '@floating-ui/react';
+import { Placement } from '@floating-ui/react';
 import cn from 'classnames';
-import { difference, differenceBy, isEmpty, isFunction, isString, isUndefined } from 'lodash-es';
+import { differenceBy, isEmpty, isFunction, isNull, isString, isUndefined } from 'lodash-es';
 import React from 'react';
-import { ISelectedItems, ISelectItem } from '../../lib/types.js';
-import { Portal, useImmerState } from '../lib/utils.js';
+import { ISelectOption } from '../../lib/types.js';
+import { makeCaseInsensitiveRegex, useMergeState } from '../lib/utils.js';
 import s from './MultiSelect.module.css';
+import { Popup, usePopup } from './Popup.js';
 
 type ISelectProps = {
-  data: ISelectItem[];
-  defaultItems?: ISelectItem[];
-  onSelect?: (selectedItems: ISelectItem[]) => void;
+  options: ISelectOption[];
+  selectedOptions?: ISelectOption[];
+  onSelect?: (selectedOptions: ISelectOption[]) => void;
   placeholder?: string;
-  maxDropdownHeight?: number;
   nothingFound?: string | (() => JSX.Element);
   offset?: number;
   placement?: Placement;
@@ -30,117 +19,70 @@ type ISelectProps = {
 
 type IState = {
   inputValue: string;
-  filteredData: ISelectItem[];
-  selectedItems: ISelectedItems;
   keyboardChoosenIndex: number | null;
   isFocused: boolean;
-  dropdownWidth: number;
 };
 
 export const MultiSelect = (props: ISelectProps) => {
   const {
-    data,
+    options,
     nothingFound,
-    defaultItems = [],
+    selectedOptions = [],
     placeholder = 'Select...',
     offset = 10,
     placement = 'bottom-start',
-    onSelect = null,
-    maxDropdownHeight = 420,
+    onSelect = () => {},
   } = props;
 
-  const tooltipRootSelector = '#popoverRoot';
   const inputRef = React.useRef<any>(null);
-  const selectRootRef = React.useRef<any>(null);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const { x, y, strategy, refs, context } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
-    middleware: [offsetMiddleware(offset), flip(), shift()],
-    whileElementsMounted: autoUpdate,
-    placement,
-  });
-  const click = useClick(context);
-  const dismiss = useDismiss(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss]);
 
-  const getItemValue = (item: ISelectItem) => (isString(item) ? item : item.value);
-  const getItemLabel = (item: ISelectItem) => (isString(item) ? item : item.label);
-  const getAvailableData = (data: ISelectItem[], selectedItems: ISelectItem[]) => {
-    if (isString(data[0])) {
-      return difference(data, selectedItems);
-    }
-    return differenceBy(data, selectedItems, 'value');
-  };
-
-  const [state, setState] = useImmerState<IState>({
+  const [state, setState] = useMergeState<IState>({
     inputValue: '',
-    filteredData: getAvailableData(data, defaultItems),
-    selectedItems: defaultItems,
     keyboardChoosenIndex: null,
     isFocused: false,
-    dropdownWidth: 250,
   });
-  const {
-    inputValue,
-    filteredData,
-    selectedItems,
-    keyboardChoosenIndex,
-    isFocused,
-    dropdownWidth,
-  } = state;
+  const { inputValue, keyboardChoosenIndex, isFocused } = state;
+
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { refs, getReferenceProps, popupProps } = usePopup({
+    isOpen,
+    setIsOpen,
+    offset,
+    placement,
+  });
+
+  const filteredOptions = React.useMemo(() => {
+    const regex = makeCaseInsensitiveRegex(inputValue);
+    return differenceBy(options, selectedOptions, 'value').filter(el => el.label.match(regex));
+  }, [selectedOptions, inputValue]);
 
   const onChange = e => {
-    const { value } = e.target;
-    const regex = new RegExp(value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
-    const availableData = getAvailableData(data, selectedItems);
     if (!isOpen) {
       setIsOpen(true);
     }
-    setState({
-      inputValue: value,
-      filteredData: availableData.filter(el => getItemLabel(el).match(regex)),
-      keyboardChoosenIndex: null,
-    });
+    setState({ inputValue: e.target.value, keyboardChoosenIndex: null });
   };
 
-  const selectItem = (el: ISelectItem) => () => {
-    const newSelectedItems = selectedItems.concat(el);
-    if (onSelect) {
-      onSelect(newSelectedItems);
-    }
+  const selectItem = (el: ISelectOption) => () => {
+    const newSelectedOptions = selectedOptions.concat(el);
+    onSelect(newSelectedOptions);
     setIsOpen(false);
-    setState({
-      inputValue: '',
-      filteredData: getAvailableData(data, newSelectedItems),
-      selectedItems: newSelectedItems,
-      keyboardChoosenIndex: null,
-    });
+    setState({ inputValue: '', keyboardChoosenIndex: null });
   };
 
-  const removeItem = newSelectedItems => {
-    if (onSelect) {
-      onSelect(newSelectedItems);
-    }
-    setState({
-      filteredData: getAvailableData(data, newSelectedItems),
-      selectedItems: newSelectedItems,
-    });
-  };
-  const removeItemOnClick = el => e => {
+  const removeOption = el => e => {
     e.stopPropagation();
-    const newSelectedItems = selectedItems.filter(item => getItemValue(item) !== getItemValue(el));
-    removeItem(newSelectedItems);
+    const newSelectedOptions = selectedOptions.filter(item => item.value !== el.value);
+    onSelect(newSelectedOptions);
   };
 
-  const myOnKeyDown = e => {
-    if (isEmpty(filteredData)) return;
+  const onKeyDown = e => {
     const i = keyboardChoosenIndex;
     switch (e.code) {
       case 'Backspace':
         if (inputValue) return;
-        const newSelectedItems = selectedItems.slice(0, -1);
-        removeItem(newSelectedItems);
+        const newSelectedOptions = selectedOptions.slice(0, -1);
+        onSelect(newSelectedOptions);
         break;
       case 'ArrowUp':
         if (!isOpen) {
@@ -149,7 +91,7 @@ export const MultiSelect = (props: ISelectProps) => {
         }
         e.preventDefault(); // stop input cursor from moving left and right
         if (i === null || i === 0) {
-          setState({ keyboardChoosenIndex: filteredData.length - 1 });
+          setState({ keyboardChoosenIndex: filteredOptions.length - 1 });
         } else {
           setState({ keyboardChoosenIndex: i - 1 });
         }
@@ -163,14 +105,13 @@ export const MultiSelect = (props: ISelectProps) => {
         if (i === null) {
           setState({ keyboardChoosenIndex: 0 });
         } else {
-          setState({ keyboardChoosenIndex: (i + 1) % filteredData.length });
+          setState({ keyboardChoosenIndex: (i + 1) % filteredOptions.length });
         }
         break;
       case 'Enter':
         e.preventDefault(); // stop form submitting
-        if (i !== null) {
-          selectItem(filteredData[i || 0])();
-        }
+        if (isEmpty(filteredOptions) || isNull(i)) return;
+        selectItem(filteredOptions[i])();
         break;
       case 'Escape':
         setState({ keyboardChoosenIndex: null });
@@ -178,7 +119,7 @@ export const MultiSelect = (props: ISelectProps) => {
     }
   };
 
-  const myOnClick = e => {
+  const myOnClick = () => {
     inputRef.current.focus();
     setState({ isFocused: true });
   };
@@ -190,38 +131,28 @@ export const MultiSelect = (props: ISelectProps) => {
       [s.item_keyboardChoosen]: i === keyboardChoosenIndex,
     });
 
-  const { onKeyDown, onClick, ...referenceProps } = getReferenceProps() as any;
-  const referenceRef = useMergeRefs([selectRootRef, refs.setReference]);
-  const mergedOnKeyDown = e => {
-    myOnKeyDown(e);
-    onKeyDown(e);
-  };
+  const { onClick, ...referenceProps } = getReferenceProps() as any;
   const mergedOnClick = e => {
-    myOnClick(e);
+    myOnClick();
     onClick(e);
   };
-
-  React.useEffect(() => {
-    setState({ dropdownWidth: selectRootRef.current.offsetWidth });
-  }, []);
 
   return (
     <div>
       <div
-        className={cn(s.selectRoot, 'form-control', { [s.selectRoot_focused]: isFocused })}
-        onKeyDown={mergedOnKeyDown}
+        className={cn(s.selectRoot, 'input', { [s.selectRoot_focused]: isFocused })}
         onClick={mergedOnClick}
         onBlur={onBlur}
-        ref={referenceRef}
+        ref={refs.setReference}
         {...referenceProps}
       >
         <div className={cn(s.selectRow)}>
-          {selectedItems.map(el => (
-            <div key={getItemValue(el)} className={s.selectedItem}>
-              <div>{getItemLabel(el)}</div>
+          {selectedOptions.map(el => (
+            <div key={el.value} className={s.selectedItem}>
+              <div>{el.label}</div>
               <i
                 className={cn('fa fa-circle-xmark ml-1', s.removeIcon)}
-                onClick={removeItemOnClick(el)}
+                onClick={removeOption(el)}
                 onMouseDown={preventFocusLoosing}
               ></i>
             </div>
@@ -230,48 +161,36 @@ export const MultiSelect = (props: ISelectProps) => {
             ref={inputRef}
             type="text"
             autoComplete="off"
-            className={cn(s.input, { [s.input_active]: isFocused || isEmpty(selectedItems) })}
-            placeholder={isEmpty(selectedItems) ? placeholder : ''}
+            className={cn(s.input, { [s.input_active]: isFocused || isEmpty(selectedOptions) })}
+            placeholder={isEmpty(selectedOptions) ? placeholder : ''}
+            onKeyDown={onKeyDown}
             onChange={onChange}
             value={inputValue}
           />
         </div>
       </div>
-      {isOpen && (
-        <Portal selector={tooltipRootSelector}>
-          <div
-            style={{
-              position: strategy,
-              top: y ?? 0,
-              left: x ?? 0,
-              width: dropdownWidth,
-              maxHeight: maxDropdownHeight,
-            }}
-            className={s.list}
-            ref={refs.setFloating}
-            onMouseDown={preventFocusLoosing}
-            {...getFloatingProps()}
-          >
-            {filteredData.map((el, i) => (
-              <div key={getItemValue(el)} className={itemClass(el, i)} onClick={selectItem(el)}>
-                {getItemLabel(el)}
-              </div>
-            ))}
-            {isEmpty(filteredData) && (
-              <div className={cn(s.item, s.item_nothingFound)}>
-                {isUndefined(nothingFound) && (
-                  <div>
-                    <span className="text-slate-500">Nothing found</span>
-                    <i className="far fa-sad-tear ml-2 text-lg"></i>
-                  </div>
-                )}
-                {isFunction(nothingFound) && React.createElement(nothingFound)}
-                {isString(nothingFound) && <div>{nothingFound}</div>}
-              </div>
-            )}
-          </div>
-        </Portal>
-      )}
+
+      <Popup {...popupProps} shouldSkipCloseAnimation>
+        <div className={s.list} onMouseDown={preventFocusLoosing}>
+          {filteredOptions.map((el, i) => (
+            <div key={el.value} className={itemClass(el, i)} onClick={selectItem(el)}>
+              {el.label}
+            </div>
+          ))}
+          {isEmpty(filteredOptions) && (
+            <div className={cn(s.item, s.item_nothingFound)}>
+              {isUndefined(nothingFound) && (
+                <div>
+                  <span className="text-slate-500">Nothing found</span>
+                  <i className="far fa-sad-tear ml-2 text-lg"></i>
+                </div>
+              )}
+              {isFunction(nothingFound) && React.createElement(nothingFound)}
+              {isString(nothingFound) && <div>{nothingFound}</div>}
+            </div>
+          )}
+        </div>
+      </Popup>
     </div>
   );
 };

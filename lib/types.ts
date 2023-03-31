@@ -1,11 +1,16 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Store } from 'effector';
+import { FormikHelpers } from 'formik';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ModelObject } from 'objection';
 import wsWebSocket from 'ws';
 import * as y from 'yup';
-import { makeSession, makeSessionActions } from '../client/common/sessionSlice.js';
-import { makeSignedInUsersIds, makeWs, makeWsClientActions } from '../client/common/wsSlice.js';
+import {
+  makeActions,
+  makeCurrentUser,
+  makeIsSignedInWss,
+  makeSession,
+  makeSignedInUsersIds,
+  makeWs,
+} from '../client/lib/effectorStore.js';
 import {
   Article,
   articleSchema,
@@ -59,13 +64,23 @@ export type IValidate<T> = {
 export type IValidateQuery<T> = {
   query: T;
 };
-export type INullable<T> = T | null;
 
 export interface IEmptyObject {
   [key: string]: undefined;
 }
 
-export type IUser = Omit<ModelObject<User>, 'password'>;
+export type IUser = {
+  id: number;
+  name: string;
+  role: IRole;
+  email: string;
+  password_digest: string;
+  isDeleted: boolean;
+  avatar_id: number;
+  articles?: IArticle[];
+  comments?: IComment[];
+  avatar?: IAvatar;
+};
 export type IUserClass = typeof User;
 export type IUserSchema = y.InferType<typeof userSchema>;
 export type IUserLoginSchema = y.InferType<typeof userLoginSchema>;
@@ -148,29 +163,22 @@ export type IAvatar = {
 export type IAvatarClass = typeof Avatar;
 
 export type IUserWithAvatar = IUser & { avatar: IAvatar };
-export type ISession = {
-  currentUser: IUserWithAvatar;
-  isAdmin: boolean;
-  isSignedIn: boolean;
-  isBelongsToUser: (resourceAuthorId: string) => boolean;
-  status: IAsyncState;
-  errors: any;
-};
+
+export type IActions = ReturnType<typeof makeActions>;
+export type ICurrentUserStore = ReturnType<typeof makeCurrentUser>;
 export type IWsStore = ReturnType<typeof makeWs>;
-export type IWsClientActions = ReturnType<typeof makeWsClientActions>;
-export type ISessionStore = ReturnType<typeof makeSession>;
-export type ISessionActions = ReturnType<typeof makeSessionActions>;
 export type ISignedInUsersIdsStore = ReturnType<typeof makeSignedInUsersIds>;
-export type IActions = ISessionActions & IWsClientActions;
+export type ISession = ReturnType<typeof makeSession>;
+export type IIsSignedInWss = ReturnType<typeof makeIsSignedInWss>;
 
 export type IContext = {
-  getApiUrl: IGetApiUrl;
   axios: IAxiosInstance;
   actions: IActions;
-  $ws: IWsStore;
-  $session: ISessionStore;
-  $signedInUsersIds: ISignedInUsersIdsStore;
-  $isSignedInWss: Store<boolean>;
+  [makeCurrentUser.key]: ICurrentUserStore;
+  [makeWs.key]: IWsStore;
+  [makeSignedInUsersIds.key]: ISignedInUsersIdsStore;
+  [makeSession.key]: ISession;
+  [makeIsSignedInWss.key]: IIsSignedInWss;
   unreadMessages: IUnreadMessage[];
 };
 
@@ -194,11 +202,7 @@ export type IEchoMessage = { type: typeof wsEvents.echo; payload: any };
 export type ISignOutMessage = { type: typeof wsEvents.signOut; payload: { id: any } };
 export type ISignInMessage = {
   type: typeof wsEvents.signIn;
-  payload: {
-    cookieName: any;
-    cookieValue: any;
-    signature: any;
-  };
+  payload: IGetSessionResponse;
 };
 export type IGetSignedInUsersIds = { type: typeof wsEvents.getSignedInUsersIds; payload: any[] };
 export type INotifyNewMessage = {
@@ -235,33 +239,43 @@ export interface IAxiosInstance extends AxiosInstance {
   patch<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
 }
 
-export type IPostSessionResponse = IUser;
+export type IPostSessionResponse = IUserWithAvatar;
+export type IGetSessionResponse = {
+  userId: number;
+  signature: string;
+};
 export type IDeleteSessionResponse = {
-  currentUser: IUser;
+  currentUser: IUserWithAvatar;
   signOutUserId: any;
 };
 
-export type ISelectItem =
-  | string
-  | {
-      value: any;
-      label: string;
-      [key: string]: any;
-    };
-export type ISelectedItem = ISelectItem | null;
-export type ISelectedItems = ISelectItem[];
+export type IOnSubmit = (values, actions: FormikHelpers<any>) => Promise<any>;
+export type IUseSubmit = (onSubmit: IOnSubmit) => IOnSubmit;
+
+export type ISelectOption = {
+  value: any;
+  label: string;
+  [key: string]: any;
+};
+export type ISelectedOption = ISelectOption | null;
 
 export type IUsualSelect = (props: {
   name: string;
-  data: ISelectItem[];
-  defaultItem: ISelectItem;
+  options: ISelectOption[];
+  defaultItem?: ISelectedOption;
 }) => JSX.Element;
+
+export type IFMultiSelectProps = {
+  name: string;
+  options: ISelectOption[];
+  defaultOptions?: ISelectOption[];
+};
 
 export type IPayloadTypes = 'query' | 'body';
 export type IValidateFn = (schema, payloadType?: IPayloadTypes) => (req, res) => any;
 
 export type IPageProps = {
-  currentUser: IUser;
+  currentUser: IUserWithAvatar;
   unreadMessages: IUnreadMessage[];
 };
 
@@ -273,4 +287,10 @@ export type IUnreadMessagesDict = {
 
 type IFn<T> = (freshState: T) => Partial<T>;
 type ISetState<T> = (fnOrObject: Partial<T> | IFn<T>) => void;
-export type IUseImmerState = <T>(initialState: T) => [state: T, setState: ISetState<T>];
+export type IUseMergeState = <T>(initialState: T) => [state: T, setState: ISetState<T>];
+
+export type IAuthenticate = (
+  rawCookies,
+  keygrip,
+  fetchUser: (id) => Promise<IUser | undefined>
+) => Promise<[currentUser: IUser, shouldRemoveSession: boolean]>;

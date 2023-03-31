@@ -8,6 +8,7 @@ import {
   getUrl,
   roles,
   SubmitBtn,
+  toSelectOptions,
   UsualSelect,
 } from '../lib/utils.js';
 
@@ -33,26 +34,26 @@ const UserForm = (props: IForm) => {
           <div className="col-6">
             <div className="mb-4">
               <label>Name</label>
-              <Field className="form-control" name="name" />
+              <Field className="input" name="name" />
               <ErrorMessage name="name" />
             </div>
             <div className="mb-4">
               <label>Role</label>
               <UsualSelect
                 name="role"
-                data={Object.values(roles).filter(el => el !== roles.guest)}
-                defaultItem={roles.user}
+                options={toSelectOptions(Object.values(roles).filter(el => el !== roles.guest))}
+                defaultItem={{ label: roles.user, value: roles.user }}
               />
               <ErrorMessage name="role" />
             </div>
             <div className="mb-4">
               <label>Email</label>
-              <Field className="form-control" name="email" />
+              <Field className="input" name="email" />
               <ErrorMessage name="email" />
             </div>
             <div>
               <label>Password</label>
-              <Field className="form-control" type="password" name="password" />
+              <Field className="input" type="password" name="password" />
               <ErrorMessage name="password" />
             </div>
           </div>

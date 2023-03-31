@@ -66,6 +66,7 @@ test-once:
 	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand
 
 lint:
+	npx eslint .
 	npx tsc
 
 css-styles:

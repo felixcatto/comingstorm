@@ -1,14 +1,7 @@
 import { jest } from '@jest/globals';
 import makeKeygrip from 'keygrip';
 import WebSocket from 'ws';
-import {
-  decode,
-  encode,
-  makeSignature,
-  makeWsData,
-  waitForSocketState,
-  wsEvents,
-} from '../lib/utils.js';
+import { decode, encode, makeWsData, waitForSocketState, wsEvents } from '../lib/utils.js';
 import { closeServer, startServer } from '../services/webSocketServer/main.js';
 import usersFixture from './fixtures/users.js';
 
@@ -49,9 +42,8 @@ describe('wss', () => {
     await waitForSocketState(client2, client2.OPEN);
     client1.send(
       encode(wsEvents.signIn, {
-        cookieName: 'userId',
-        cookieValue: user.id,
-        signature: makeSignature(keygrip, 'userId', user.id),
+        userId: user.id,
+        signature: keygrip.sign(String(user.id)),
       })
     );
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -84,16 +76,14 @@ describe('wss', () => {
     await waitForSocketState(client2, client2.OPEN);
     client1.send(
       encode(wsEvents.signIn, {
-        cookieName: 'userId',
-        cookieValue: vasa.id,
-        signature: makeSignature(keygrip, 'userId', vasa.id),
+        userId: vasa.id,
+        signature: keygrip.sign(String(vasa.id)),
       })
     );
     client2.send(
       encode(wsEvents.signIn, {
-        cookieName: 'userId',
-        cookieValue: tom.id,
-        signature: makeSignature(keygrip, 'userId', tom.id),
+        userId: tom.id,
+        signature: keygrip.sign(String(tom.id)),
       })
     );
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -120,16 +110,14 @@ describe('wss', () => {
     await waitForSocketState(client2, client2.OPEN);
     client1.send(
       encode(wsEvents.signIn, {
-        cookieName: 'userId',
-        cookieValue: vasa.id,
-        signature: makeSignature(keygrip, 'userId', vasa.id),
+        userId: vasa.id,
+        signature: keygrip.sign(String(vasa.id)),
       })
     );
     client2.send(
       encode(wsEvents.signIn, {
-        cookieName: 'userId',
-        cookieValue: tom.id,
-        signature: makeSignature(keygrip, 'userId', tom.id),
+        userId: tom.id,
+        signature: keygrip.sign(String(tom.id)),
       })
     );
     await new Promise(resolve => setTimeout(resolve, 300));

@@ -1,14 +1,13 @@
-import originalAxios from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl, getUrl } from '../lib/utils.js';
+import { getApiUrl, getUrl, makeNonThrowAxios } from '../lib/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 import tagsFixture from './fixtures/tags.js';
 import usersFixture from './fixtures/users.js';
-import { getLoginCookie } from './fixtures/utils.js';
-import avatarsFixture from './fixtures/avatars.js';
+import { getLoginOptions } from './fixtures/utils.js';
 
 describe('tags', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
-  const axios = originalAxios.create({ baseURL });
+  const axios = makeNonThrowAxios(baseURL);
   const { User, Tag, Avatar } = objection;
   let loginOptions;
 
@@ -17,8 +16,7 @@ describe('tags', () => {
     await Avatar.query().insertGraph(avatarsFixture);
     await User.query().delete();
     await User.query().insertGraph(usersFixture as any);
-    const loginCookie = await getLoginCookie(axios, getApiUrl);
-    loginOptions = { headers: { Cookie: loginCookie } };
+    loginOptions = await getLoginOptions(axios);
   });
 
   beforeEach(async () => {

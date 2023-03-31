@@ -8,7 +8,7 @@ interface IForm {
   tag?: ITag | IEmptyObject;
 }
 
-export default (props: IForm) => {
+const TagsForm = (props: IForm) => {
   const { onSubmit, tag = emptyObject } = props;
   return (
     <Formik initialValues={{ name: tag.name }} onSubmit={onSubmit}>
@@ -17,7 +17,7 @@ export default (props: IForm) => {
           <div className="col-6">
             <div>
               <label>Name</label>
-              <Field className="form-control" name="name" />
+              <Field className="input" name="name" />
               <ErrorMessage name="name" />
             </div>
           </div>
@@ -31,3 +31,5 @@ export default (props: IForm) => {
     </Formik>
   );
 };
+
+export default TagsForm;

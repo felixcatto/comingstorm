@@ -1,16 +1,15 @@
-import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl } from '../lib/utils.js';
+import { getApiUrl, makeNonThrowAxios } from '../lib/utils.js';
 import articlesFixture from './fixtures/articles.js';
+import avatarsFixture from './fixtures/avatars.js';
 import commentsFixture from './fixtures/comments.js';
 import usersFixture from './fixtures/users.js';
 import { getLoginOptions } from './fixtures/utils.js';
-import avatarsFixture from './fixtures/avatars.js';
 
 describe('articles', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
-  const axios = originalAxios.create({ baseURL });
-  const { User, Comment, Article, Avatar, knex } = objection;
+  const axios = makeNonThrowAxios(baseURL);
+  const { User, Comment, Article, Avatar } = objection;
   let loginOptions;
 
   beforeAll(async () => {
@@ -20,7 +19,7 @@ describe('articles', () => {
     await Article.query().delete();
     await User.query().insertGraph(usersFixture as any);
     await Article.query().insertGraph(articlesFixture as any);
-    loginOptions = await getLoginOptions(axios, getApiUrl);
+    loginOptions = await getLoginOptions(axios);
   });
 
   beforeEach(async () => {
@@ -55,22 +54,18 @@ describe('articles', () => {
   });
 
   it('PUT /api/articles/:id/comments/:id - comment does not belong to user', async () => {
-    expect.assertions(1);
     const vasaComment = {
       ...commentsFixture[0],
       text: '(edited)',
     };
     const [, tomUser] = usersFixture;
-    const tomLoginOptions = await getLoginOptions(axios, getApiUrl, tomUser);
-    try {
-      const res = await axios.put(
-        getApiUrl('comment', { id: vasaComment.article_id, commentId: vasaComment.id }),
-        vasaComment,
-        tomLoginOptions
-      );
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(403);
-    }
+    const tomLoginOptions = await getLoginOptions(axios, tomUser);
+    const res = await axios.put(
+      getApiUrl('comment', { id: vasaComment.article_id, commentId: vasaComment.id }),
+      vasaComment,
+      tomLoginOptions
+    );
+    expect(res.status).toBe(403);
   });
 
   it('PUT /api/articles/:id/comments/:commentId', async () => {
@@ -90,18 +85,14 @@ describe('articles', () => {
   });
 
   it('DELETE /api/articles/:id/comments/:id - comment does not belong to user', async () => {
-    expect.assertions(1);
     const [vasaComment] = commentsFixture;
     const [, tomUser] = usersFixture;
-    const tomLoginOptions = await getLoginOptions(axios, getApiUrl, tomUser);
-    try {
-      const res = await axios.delete(
-        getApiUrl('comment', { id: vasaComment.article_id, commentId: vasaComment.id }),
-        tomLoginOptions
-      );
-    } catch (e) {
-      expect((e as AxiosError).response?.status).toBe(403);
-    }
+    const tomLoginOptions = await getLoginOptions(axios, tomUser);
+    const res = await axios.delete(
+      getApiUrl('comment', { id: vasaComment.article_id, commentId: vasaComment.id }),
+      tomLoginOptions
+    );
+    expect(res.status).toBe(403);
   });
 
   it('DELETE /api/articles/:id/comments/:id', async () => {

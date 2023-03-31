@@ -1,11 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import './bootstrap-grid.css';
 @import './fontawesome.min.css';
 @import './regular.css';
 @import './solid.css';
+@tailwind base;
 
 :root {
   --headerHeight: 70px;
@@ -103,23 +100,44 @@ h3 {
     box-shadow: 0 0 0 3.2px var(--primary-rgba-50);
   }
 
-  &_outline {
-    color: var(--primary);
-    background-color: #fff;
-    border-color: var(--primary);
-    &:hover {
-      color: #fff;
-      background-color: var(--primary);
-      border-color: var(--primary);
-    }
-    &:active,
-    &:focus {
-      color: #fff;
-      background-color: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3.2px var(--primary-rgba-50);
-    }
+  &_sm {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    border-radius: 4px;
   }
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  line-height: 1.3;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  vertical-align: middle;
+  text-decoration: none;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  color: var(--primary);
+  background-color: #fff;
+  border-color: var(--primary);
+  &:hover {
+    @apply shadow;
+    color: #fff;
+    background-color: var(--primary);
+    text-decoration: none;
+  }
+  &:active,
+  &:focus {
+    @apply shadow;
+    color: #fff;
+    background-color: var(--primary);
+    box-shadow: 0 0 0 3.2px var(--primary-rgba-50);
+  }
+
   &_sm {
     padding: 4px 8px;
     font-size: 0.875rem;
@@ -134,21 +152,21 @@ a {
   }
 }
 
-input.form-control,
-input.form-control:focus,
-textarea.form-control,
-textarea.form-control:focus,
-select.form-control,
-select.form-control:focus {
+input.input,
+input.input:focus,
+textarea.input,
+textarea.input:focus,
+select.input,
+select.input:focus {
   color: #222;
 }
-.form-control {
+.input {
+  @apply border border-slate-300;
   display: block;
   width: 100%;
   padding: 6px 12px;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #dee2e6;
   appearance: none;
   border-radius: 6px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -222,13 +240,14 @@ table {
 }
 
 .splash-screen {
-  display: block;
-  width: 100%;
+  position: relative;
   height: calc(100vh - 20px * 2 - 70px);
-  border-radius: 10px;
-  background: url('/img/s2.png');
-  background-size: cover;
-  background-position: center;
+
+  &__img {
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .nav-link {

@@ -50,7 +50,6 @@ export const Tooltip = ({
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, dismiss]);
 
   const ctx = {
-    setIsOpen,
     x,
     y,
     strategy,
@@ -67,7 +66,7 @@ export const Tooltip = ({
 };
 
 export const TTrigger = ({ children }) => {
-  const { setIsOpen, refs, getReferenceProps, className } = React.useContext(TooltipContext);
+  const { refs, getReferenceProps, className } = React.useContext(TooltipContext);
   return (
     <div className={className || 'inline-block'} ref={refs.setReference} {...getReferenceProps()}>
       {children}

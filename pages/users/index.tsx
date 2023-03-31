@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
 import {
   dedup,
+  getApiUrl,
   getUrl,
   isSignedIn,
   unwrap,
@@ -36,7 +37,7 @@ export async function getServerSideProps({ req, res }) {
 const userIconClass = role => cn('mr-1', userRolesToIcons[role]);
 
 const Users = ({ users }: IUsersProps) => {
-  const { $session, getApiUrl, axios, $signedInUsersIds } = useContext();
+  const { $session, axios, $signedInUsersIds } = useContext();
   const signedInUsersIds = useStore($signedInUsersIds);
   const { isAdmin } = useStore($session);
   const refreshPage = useRefreshPage();
@@ -90,11 +91,11 @@ const Users = ({ users }: IUsersProps) => {
                   <div className="flex justify-end">
                     <Link
                       href={getUrl('editUser', { id: user.id })}
-                      className="btn btn_sm btn_outline mr-2"
+                      className="btn-outline btn_sm mr-2"
                     >
                       Edit user
                     </Link>
-                    <div className="btn btn_sm btn_outline" onClick={deleteUser(user.id)}>
+                    <div className="btn-outline btn_sm" onClick={deleteUser(user.id)}>
                       Remove user
                     </div>
                   </div>

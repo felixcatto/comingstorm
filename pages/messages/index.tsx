@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useStore } from 'effector-react';
 import { isNull } from 'lodash-es';
+import Image from 'next/image';
 import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
@@ -8,12 +9,13 @@ import { Select } from '../../client/components/Select.js';
 import {
   decode,
   fmtISO,
+  getApiUrl,
   isSignedIn,
   send,
   socketStates,
   unwrap,
   useContext,
-  useImmerState,
+  useMergeState,
   useRefreshPage,
   wsEvents,
 } from '../../client/lib/utils.js';
@@ -57,12 +59,12 @@ type IState = {
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, getApiUrl, axios, $signedInUsersIds, $ws, unreadMessages } = useContext();
+  const { $session, axios, $signedInUsersIds, $ws, unreadMessages } = useContext();
   const refreshPage = useRefreshPage();
   const { isSignedIn, currentUser } = useStore($session);
   const { webSocket, webSocketState } = useStore($ws);
   const signedInUsersIds = useStore($signedInUsersIds);
-  const [state, setState] = useImmerState<IState>({
+  const [state, setState] = useMergeState<IState>({
     usersNewlySelectedToChat: [],
     selectedFriendId: null,
     inputValue: '',
@@ -186,7 +188,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
     cn(s.messageContent, { [s.messageContent_own]: senderId === currentUser.id });
   const messageAuthorClass = senderId =>
     cn(s.messageAuthor, { [s.messageAuthor_own]: senderId === currentUser.id });
-  const messageInputClass = cn('form-control form-control_secondary', s.messageInput, {
+  const messageInputClass = cn('input input_secondary', s.messageInput, {
     [s.messageInput_editMode]: !isNull(editingMessageId),
   });
 
@@ -221,18 +223,17 @@ const Messages = ({ messages, users }: IMessagesProps) => {
         <div className="col-4">
           <div className="mb-6">
             <Select
-              data={transformToSelect(usersAvailbleToChat)}
+              options={transformToSelect(usersAvailbleToChat)}
               onSelect={selectNewUserToChat}
-              shouldClearOnSelect
-              itemComponent={({ item, isSelected }) => (
+              optionComponent={({ option, isSelected }) => (
                 <div className="flex">
-                  <div className="w-16 mr-2">
-                    <img src={item.avatar.path} />
+                  <div className="mr-2">
+                    <Image src={option.avatar.path} width={64} height={64} alt="" />
                   </div>
                   <div>
-                    <div className="text-lg">{item.name}</div>
+                    <div className="text-lg">{option.name}</div>
                     <div className={cn('text-sm', { 'text-slate-500': !isSelected })}>
-                      {item.email}
+                      {option.email}
                     </div>
                   </div>
                 </div>
@@ -243,8 +244,8 @@ const Messages = ({ messages, users }: IMessagesProps) => {
           <div>
             {contacts.map(el => (
               <div className={friendClass(el.id)} key={el.id} onClick={selectFriendToChat(el.id)}>
-                <div className="w-16 mr-2 flex-none">
-                  <img src={el.avatar!.path} />
+                <div className="mr-2 flex-none">
+                  <Image src={el.avatar!.path} width={64} height={64} alt="" />
                 </div>
                 <div>
                   <div className="flex items-center">
@@ -304,8 +305,8 @@ const Messages = ({ messages, users }: IMessagesProps) => {
 
             {dialog.map(el => (
               <div className="flex mb-2" key={el.id}>
-                <div className="w-16 mr-1 flex items-end flex-none">
-                  <img src={el.sender?.avatar?.path} />
+                <div className="mr-1 flex items-end flex-none">
+                  <Image src={el.sender!.avatar!.path} width={64} height={64} alt="" />
                 </div>
                 <div className={messageContentClass(el.sender_id)}>
                   <div className="flex items-center">

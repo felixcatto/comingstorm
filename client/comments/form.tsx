@@ -30,13 +30,13 @@ const CommentsForm = (props: IForm, ref) => {
             {canShowGuestName && (
               <div className="mb-4">
                 <label>Guest name</label>
-                <Field className="form-control" name="guest_name" />
+                <Field className="input" name="guest_name" />
                 <ErrorMessage name="guest_name" />
               </div>
             )}
             <div>
               {isNewCommentForm && <label>Text</label>}
-              <Field as="textarea" className="form-control" name="text" />
+              <Field as="textarea" className="input" name="text" />
               <ErrorMessage name="text" />
             </div>
           </div>

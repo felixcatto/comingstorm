@@ -7,10 +7,11 @@ import Layout from '../../client/common/Layout.js';
 import {
   fmtISO,
   FormWrapper,
+  getApiUrl,
   isSignedIn,
   roles,
   useContext,
-  useImmerState,
+  useMergeState,
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils.js';
@@ -130,10 +131,10 @@ const ShowArticle = ({ article }: IArticleProps) => {
   const router = useRouter();
   const { id: articleId } = router.query;
 
-  const { $session, axios, getApiUrl } = useContext();
-  const { isBelongsToUser, isSignedIn } = useStore($session);
+  const { $session, axios } = useContext();
+  const { isBelongsToUser } = useStore($session);
   const refreshPage = useRefreshPage();
-  const [{ editedCommentId }, setState] = useImmerState({ editedCommentId: null });
+  const [{ editedCommentId }, setState] = useMergeState({ editedCommentId: null });
   const [apiErrorsForNewCommentForm, setApiErrorsForNewCommentForm] = React.useState({});
   const [apiErrorsForEditCommentForm, setApiErrorsForEditCommentForm] = React.useState({});
 

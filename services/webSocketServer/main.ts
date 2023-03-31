@@ -1,9 +1,8 @@
-import fy, { FastifyInstance } from 'fastify';
 import fastifyWs from '@fastify/websocket';
+import fy, { FastifyInstance } from 'fastify';
 import makeKeygrip from 'keygrip';
-import { decode, encode, wsEvents, verifySignature, findKeyByValue } from '../../lib/utils.js';
-import cookie from 'cookie';
 import { WebSocket } from 'ws';
+import { decode, encode, findKeyByValue, getUserId, wsEvents } from '../../lib/utils.js';
 
 type UserID = number;
 type ISignedInUsers = Map<UserID, WebSocket>;
@@ -22,19 +21,10 @@ const wss = async (fastify: FastifyInstance) => {
         socket.send(encode(eventType, payload));
       });
     };
-    const getUserInfo = () => {
-      const guestInfo = { userId: null, isSignedIn: false };
-      if (!req.headers.cookie) return guestInfo;
-      const { userId, userIdSig } = cookie.parse(req.headers.cookie) || {};
-      if (!userId || !userIdSig) return guestInfo;
-      const isSignatureCorrect = verifySignature(keygrip, 'userId', userId, userIdSig);
-      return { userId: Number(userId), isSignedIn: isSignatureCorrect };
-    };
 
-    const userInfo = getUserInfo();
-    if (userInfo.isSignedIn) {
-      const userId = userInfo.userId!;
-      signedInUsers.set(userId, connection.socket);
+    const userInfo = getUserId(req.headers.cookie, keygrip);
+    if (userInfo.isSignatureCorrect) {
+      signedInUsers.set(Number(userInfo.userId), connection.socket);
       broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
     }
 
@@ -45,10 +35,10 @@ const wss = async (fastify: FastifyInstance) => {
           connection.socket.send(encode(wsEvents.echo, payload));
           break;
         case wsEvents.signIn:
-          const { cookieName, cookieValue, signature } = payload;
-          const isSignatureCorrect = verifySignature(keygrip, cookieName, cookieValue, signature);
+          const { userId, signature } = payload;
+          const isSignatureCorrect = keygrip.verify(String(userId), signature);
+
           if (isSignatureCorrect) {
-            const userId = cookieValue;
             signedInUsers.set(userId, connection.socket);
             broadcast(wsEvents.signedInUsersIds, getUsersIds(signedInUsers));
           }
@@ -100,7 +90,7 @@ fastify.register(healthCheck);
 const startServer = async (opts?) =>
   new Promise(resolve => {
     const port = opts?.port || process.env.WSS_PORT;
-    fastify.listen({ port }, (err, address) => {
+    fastify.listen({ port }, err => {
       if (err) {
         console.log(err);
         process.exit(1);

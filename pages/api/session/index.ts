@@ -1,17 +1,24 @@
 import { keygrip, objection } from '../../../lib/init.js';
 import { encrypt } from '../../../lib/secure.js';
 import {
+  ICurrentUser,
+  IGetSessionResponse,
+  IUserLoginSchema,
+  IValidate,
+} from '../../../lib/types.js';
+import {
   checkSignedIn,
+  decomposeValue,
   getCurrentUser,
   guestUser,
   makeErrors,
-  removeCookie,
-  setCookie,
+  removeSessionCookie,
+  sessionName,
+  setSessionCookie,
   switchHttpMethod,
   validate,
 } from '../../../lib/utils.js';
 import { userLoginSchema } from '../../../models/User.js';
-import { IValidate, IUserLoginSchema, ICurrentUser } from '../../../lib/types.js';
 
 type ICtx = ICurrentUser;
 
@@ -19,9 +26,11 @@ export default switchHttpMethod({
   get: [
     getCurrentUser(objection, keygrip),
     checkSignedIn,
-    async (req, res, ctx: ICtx) => {
-      const { userIdSig } = req.cookies;
-      res.json({ cookieName: 'userId', cookieValue: ctx.currentUser.id, signature: userIdSig });
+    async (req, res) => {
+      const sessionValue = req.cookies[sessionName]!;
+      const [userId, signature] = decomposeValue(sessionValue);
+      const data: IGetSessionResponse = { userId: Number(userId), signature };
+      res.json(data);
     },
   ],
   post: [
@@ -37,14 +46,14 @@ export default switchHttpMethod({
         return res.status(400).json(makeErrors({ password: 'Wrong password' }));
       }
 
-      setCookie(res, keygrip, 'userId', user.id);
+      setSessionCookie(res, keygrip, user.id);
       res.status(201).json(user);
     },
   ],
   delete: [
     getCurrentUser(objection, keygrip),
     (req, res, ctx: ICtx) => {
-      removeCookie(res, 'userId');
+      removeSessionCookie(res);
       res.status(201).json({ currentUser: guestUser, signOutUserId: ctx.currentUser.id });
     },
   ],

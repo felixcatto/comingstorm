@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { useStore } from 'effector-react';
 import { isEmpty } from 'lodash-es';
 import Head from 'next/head';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils.js';
 import s from './Layout.module.css';
@@ -23,7 +24,7 @@ const Layout = ({ children }: any) => {
         <div className={s.header}>
           <div className={cn('container', s.headerFg)}>
             <div className="flex items-center">
-              <img src="/img/storm.svg" className={cn('mr-7', s.logo)} />
+              <Image src="/img/storm.svg" className="mr-7" width={66} height={50} alt="" />
               <div className="flex">
                 <NavLink href={getUrl('home')}>Home</NavLink>
                 <NavLink href={getUrl('users')}>Users</NavLink>
@@ -46,8 +47,8 @@ const Layout = ({ children }: any) => {
                 <div className="flex items-center mr-1">
                   <i className={userIconClass(currentUser.role)}></i>
                   <div className={s.userName}>{currentUser.name}</div>
-                  <div className="w-12 ml-1 flex-none">
-                    <img src={currentUser.avatar.path} />
+                  <div className="ml-1 flex-none">
+                    <Image src={currentUser.avatar.path} width={48} height={48} alt="" />
                   </div>
                 </div>
                 <i

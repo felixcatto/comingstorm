@@ -24,7 +24,7 @@ export default switchHttpMethod({
         return res.status(400).json({ errors });
       }
 
-      const [guestAvatar, ...userAvatars] = avatars;
+      const [_guestAvatar, ...userAvatars] = avatars;
       const existedUserAvatars = await objection.knex
         .select('a.id')
         .from('avatars as a')

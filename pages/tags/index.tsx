@@ -1,7 +1,14 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
-import { getUrl, isSignedIn, unwrap, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import {
+  getApiUrl,
+  getUrl,
+  isSignedIn,
+  unwrap,
+  useContext,
+  useRefreshPage,
+} from '../../client/lib/utils.js';
 import { keygrip, objection } from '../../lib/init.js';
 import { ITag } from '../../lib/types.js';
 import { getUserFromRequest } from '../../lib/utils.js';
@@ -24,7 +31,7 @@ export async function getServerSideProps({ req, res }) {
 }
 
 const Tags = ({ tags }: ITagsProps) => {
-  const { $session, getApiUrl, axios } = useContext();
+  const { $session, axios } = useContext();
   const { isSignedIn } = useStore($session);
   const refreshPage = useRefreshPage();
 
@@ -59,11 +66,11 @@ const Tags = ({ tags }: ITagsProps) => {
                   <div className="flex justify-end">
                     <Link
                       href={getUrl('editTag', { id: tag.id })}
-                      className="btn btn_sm btn_outline mr-2"
+                      className="btn-outline btn_sm mr-2"
                     >
                       Edit Tag
                     </Link>
-                    <div className="btn btn_sm btn_outline" onClick={deleteTag(tag.id)}>
+                    <div className="btn-outline btn_sm" onClick={deleteTag(tag.id)}>
                       Remove Tag
                     </div>
                   </div>

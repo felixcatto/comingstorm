@@ -14,13 +14,6 @@ export const isAdmin = currentUser => currentUser.role === roles.admin;
 export const isBelongsToUser = currentUser => resourceAuthorId =>
   currentUser.id === resourceAuthorId || currentUser.role === roles.admin;
 
-export const makeSessionInfo: any = currentUser => ({
-  currentUser,
-  isSignedIn: isSignedIn(currentUser),
-  isAdmin: isAdmin(currentUser),
-  isBelongsToUser: isBelongsToUser(currentUser),
-});
-
 export const unwrap = value => JSON.parse(JSON.stringify(value));
 
 const [guestAvatar] = avatars;
@@ -32,6 +25,7 @@ export const guestUser = {
   password_digest: '',
   avatar_id: guestAvatar.id,
   avatar: guestAvatar,
+  isDeleted: false,
 } as const;
 
 const qs = {

@@ -1,7 +1,14 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
-import { getUrl, isSignedIn, unwrap, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import {
+  getApiUrl,
+  getUrl,
+  isSignedIn,
+  unwrap,
+  useContext,
+  useRefreshPage,
+} from '../../client/lib/utils.js';
 import { keygrip, objection } from '../../lib/init.js';
 import { IArticle } from '../../lib/types.js';
 import { getUserFromRequest } from '../../lib/utils.js';
@@ -24,7 +31,7 @@ export async function getServerSideProps({ req, res }) {
 }
 
 const Articles = ({ articles }: IArticlesProps) => {
-  const { $session, getApiUrl, axios } = useContext();
+  const { $session, axios } = useContext();
   const { isSignedIn, isBelongsToUser } = useStore($session);
   const refreshPage = useRefreshPage();
 
@@ -64,7 +71,7 @@ const Articles = ({ articles }: IArticlesProps) => {
                 <div className="flex justify-end">
                   <Link
                     href={getUrl('article', { id: article.id })}
-                    className="btn btn_sm btn_outline mr-2"
+                    className="btn-outline btn_sm  mr-2"
                   >
                     Show Article
                   </Link>
@@ -72,11 +79,11 @@ const Articles = ({ articles }: IArticlesProps) => {
                     <>
                       <Link
                         href={getUrl('editArticle', { id: article.id })}
-                        className="btn btn_sm btn_outline mr-2"
+                        className="btn-outline btn_sm mr-2"
                       >
                         Edit Article
                       </Link>
-                      <div className="btn btn_sm btn_outline" onClick={deleteArticle(article.id)}>
+                      <div className="btn-outline btn_sm" onClick={deleteArticle(article.id)}>
                         Remove Article
                       </div>
                     </>

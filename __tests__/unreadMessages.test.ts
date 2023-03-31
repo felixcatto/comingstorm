@@ -1,15 +1,14 @@
-import originalAxios, { AxiosError } from 'axios';
 import { objection } from '../lib/init.js';
-import { getApiUrl } from '../lib/utils.js';
+import { getApiUrl, makeNonThrowAxios } from '../lib/utils.js';
+import avatarsFixture from './fixtures/avatars.js';
 import messagesFixture from './fixtures/messages.js';
+import unreadMessagesFixture from './fixtures/unreadMessages.js';
 import usersFixture from './fixtures/users.js';
 import { getLoginOptions } from './fixtures/utils.js';
-import avatarsFixture from './fixtures/avatars.js';
-import unreadMessagesFixture from './fixtures/unreadMessages.js';
 
 describe('messages', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
-  const axios = originalAxios.create({ baseURL });
+  const axios = makeNonThrowAxios(baseURL);
   const { User, Message, Avatar, UnreadMessage } = objection;
   let loginOptions;
 
@@ -18,7 +17,7 @@ describe('messages', () => {
     await User.query().delete();
     await Avatar.query().insertGraph(avatarsFixture);
     await User.query().insertGraph(usersFixture as any);
-    loginOptions = await getLoginOptions(axios, getApiUrl);
+    loginOptions = await getLoginOptions(axios);
   });
 
   beforeEach(async () => {
@@ -28,8 +27,8 @@ describe('messages', () => {
   });
 
   it('DELETE /api/unread-messages?sender_id&receiver_id removes unread messages from sender_id', async () => {
-    const [msg1, msg2] = unreadMessagesFixture;
-    const { sender_id, receiver_id } = msg1;
+    const [msg] = unreadMessagesFixture;
+    const { sender_id, receiver_id } = msg;
     await UnreadMessage.query().insertGraph(unreadMessagesFixture);
     const res = await axios.delete(
       getApiUrl('unreadMessages', {}, { sender_id, receiver_id }),
@@ -66,7 +65,7 @@ describe('messages', () => {
       text: '(edited)',
     };
     const [, tomUser] = usersFixture;
-    const tomLoginOptions = await getLoginOptions(axios, getApiUrl, tomUser);
+    const tomLoginOptions = await getLoginOptions(axios, tomUser);
     const res = await axios.put(getApiUrl('message', { id: message.id }), message, tomLoginOptions);
 
     const expectedMessage = {
