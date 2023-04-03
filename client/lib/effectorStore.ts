@@ -1,12 +1,10 @@
-import { combine, createEffect, createEvent, createStore } from 'effector';
+import { createEffect, createEvent, createStore } from 'effector';
 import {
   IActions,
   IAsyncState,
   ICurrentUserStore,
   IDeleteSessionResponse,
-  INativeWebSocket,
   IPostSessionResponse,
-  ISignedInUsersIdsStore,
   IUserLoginCreds,
   IUserWithAvatar,
 } from '../../lib/types.js';
@@ -17,7 +15,6 @@ import {
   isAdmin,
   isBelongsToUser,
   isSignedIn,
-  socketStates,
 } from '../lib/utils.js';
 
 type ISignIn = (arg: IUserLoginCreds) => Promise<IPostSessionResponse>;
@@ -29,19 +26,6 @@ type ICurrentUserInitialState = {
   errors: object | null;
 };
 
-type IWsInitialState =
-  | {
-      webSocket: null;
-      webSocketState: typeof socketStates.unset;
-    }
-  | {
-      webSocket: INativeWebSocket;
-      webSocketState:
-        | typeof socketStates.open
-        | typeof socketStates.connecting
-        | typeof socketStates.closed;
-    };
-
 export const makeActions = ({ axios }) => ({
   signIn: createEffect<ISignIn>(async userCredentials =>
     axios({ method: 'post', url: getApiUrl('session'), data: userCredentials })
@@ -49,8 +33,6 @@ export const makeActions = ({ axios }) => ({
   signOut: createEffect<ISignOut>(async () =>
     axios({ method: 'delete', url: getApiUrl('session') })
   ),
-  setWebSocket: createEvent<INativeWebSocket | null>(),
-  updateWsState: createEvent<INativeWebSocket>(),
   wssUpdateSignedUsers: createEvent<any[]>(),
 });
 
@@ -83,28 +65,6 @@ export const makeCurrentUser = (
 
 makeCurrentUser.key = '$currentUser' as const;
 
-const wsInitialState: IWsInitialState = {
-  webSocket: null,
-  webSocketState: socketStates.unset,
-};
-
-export const makeWs = (actions: IActions, initialState: IWsInitialState = wsInitialState) =>
-  createStore(initialState)
-    .on(actions.setWebSocket, (state, webSocket) => {
-      if (webSocket) {
-        return { webSocket, webSocketState: socketStates.connecting };
-      }
-      return { webSocket, webSocketState: socketStates.unset };
-    })
-    .on(actions.updateWsState, (state, webSocket) => {
-      if (webSocket.readyState === 1) {
-        return { webSocket, webSocketState: socketStates.open };
-      }
-      return state;
-    });
-
-makeWs.key = '$ws' as const;
-
 export const makeSignedInUsersIds = (actions: IActions, initialState: any[] = []) =>
   createStore(initialState).on(actions.wssUpdateSignedUsers, (state, payload) => {
     if (state.length !== payload.length) return payload;
@@ -125,16 +85,3 @@ export const makeSession = ($currentUser: ICurrentUserStore) =>
   }));
 
 makeSession.key = '$session' as const;
-
-export const makeIsSignedInWss = (
-  $currentUser: ICurrentUserStore,
-  $signedInUsersIds: ISignedInUsersIdsStore
-) =>
-  combine(
-    $currentUser,
-    $signedInUsersIds,
-    (currentUser, signedInUsersIds) =>
-      signedInUsersIds.findIndex(userId => currentUser.data === userId) !== -1
-  );
-
-makeIsSignedInWss.key = '$isSignedInWss' as const;

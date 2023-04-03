@@ -2,14 +2,13 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { FormikHelpers } from 'formik';
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import wsWebSocket from 'ws';
+import { Interpreter } from 'xstate';
 import * as y from 'yup';
 import {
   makeActions,
   makeCurrentUser,
-  makeIsSignedInWss,
   makeSession,
   makeSignedInUsersIds,
-  makeWs,
 } from '../client/lib/effectorStore.js';
 import {
   Article,
@@ -170,21 +169,20 @@ export type IAvatarClass = typeof Avatar;
 
 export type IUserWithAvatar = IUser & { avatar: IAvatar };
 
+export type IWSActor = Interpreter<any, any, any>;
+
 export type IActions = ReturnType<typeof makeActions>;
 export type ICurrentUserStore = ReturnType<typeof makeCurrentUser>;
-export type IWsStore = ReturnType<typeof makeWs>;
 export type ISignedInUsersIdsStore = ReturnType<typeof makeSignedInUsersIds>;
 export type ISession = ReturnType<typeof makeSession>;
-export type IIsSignedInWss = ReturnType<typeof makeIsSignedInWss>;
 
 export type IContext = {
   axios: IAxiosInstance;
   actions: IActions;
+  wsActor: IWSActor;
   [makeCurrentUser.key]: ICurrentUserStore;
-  [makeWs.key]: IWsStore;
   [makeSignedInUsersIds.key]: ISignedInUsersIdsStore;
   [makeSession.key]: ISession;
-  [makeIsSignedInWss.key]: IIsSignedInWss;
   unreadMessages: IUnreadMessage[];
 };
 
@@ -197,12 +195,8 @@ export type IWsEvents = typeof wsEvents;
 export type IWsEvent = keyof IWsEvents;
 export type IWsGeneralEvents = typeof wsGeneralEvents;
 export type IWsGeneralEvent = keyof IWsGeneralEvents;
-export type IEncode = (wsEvent: IWsEvent, message?: string | object) => string;
-export type ISend = (
-  webSocket: INativeWebSocket,
-  wsEvent: IWsEvent,
-  message?: string | object
-) => void;
+export type IEncode = (wsEvent: IWsEvent, payload?: string | object) => string;
+export type ISend = (wsActor: IWSActor, wsEvent: IWsEvent, payload?: string | object) => void;
 
 export type IEchoMessage = { type: typeof wsEvents.echo; payload: any };
 export type ISignOutMessage = { type: typeof wsEvents.signOut; payload: { id: any } };
@@ -217,7 +211,7 @@ export type INotifyNewMessage = {
 };
 export type ISignedInUsersIds = {
   type: typeof wsEvents.signedInUsersIds;
-  payload: any[];
+  payload: number[];
 };
 export type INewMessagesArrived = {
   type: typeof wsEvents.newMessagesArrived;
@@ -314,3 +308,8 @@ export type IGetGenericProps = <T extends object>(
   },
   otherProps?: T
 ) => Promise<T & IGenericProps>;
+
+export type IGetUserId = (
+  rawCookies,
+  keygrip: IKeygrip
+) => { userId: null; isSignatureCorrect: false } | { userId: string; isSignatureCorrect: boolean };

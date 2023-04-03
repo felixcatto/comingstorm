@@ -207,7 +207,7 @@ export const emptyObject: IEmptyObject = new Proxy(
   }
 );
 
-export const decode = objBuffer => JSON.parse(objBuffer.data.toString()) as IWSDecodeReturn;
+export const decode = (message: string) => JSON.parse(message) as IWSDecodeReturn;
 
 export const Portal = ({ children, selector }) => {
   const ref: any = React.useRef();

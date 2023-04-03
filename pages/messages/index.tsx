@@ -7,16 +7,14 @@ import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
 import { Select } from '../../client/components/Select.js';
 import {
-  decode,
   fmtISO,
   getApiUrl,
-  send,
-  socketStates,
   useContext,
   useMergeState,
   useRefreshPage,
   wsEvents,
 } from '../../client/lib/utils.js';
+import { onMessageEvent, send } from '../../client/lib/wsActor.js';
 import { getUsersInfo } from '../../client/messages/utils.js';
 import { keygrip, orm } from '../../lib/init.js';
 import { IMessage, IUnreadMessagesDict, IUser } from '../../lib/types.js';
@@ -53,10 +51,9 @@ type IState = {
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, axios, $signedInUsersIds, $ws, unreadMessages } = useContext();
+  const { $session, axios, $signedInUsersIds, wsActor, unreadMessages } = useContext();
   const refreshPage = useRefreshPage();
   const { isSignedIn, currentUser } = useStore($session);
-  const { webSocket, webSocketState } = useStore($ws);
   const signedInUsersIds = useStore($signedInUsersIds);
   const [state, setState] = useMergeState<IState>({
     usersNewlySelectedToChat: [],
@@ -128,12 +125,11 @@ const Messages = ({ messages, users }: IMessagesProps) => {
 
     setState({ isMessageSending: false });
 
-    if (webSocketState === socketStates.open) {
-      send(webSocket, wsEvents.notifyNewMessage, {
-        receiverId: newMessageBody.receiver_id,
-        senderId: currentUser.id,
-      });
-    }
+    send(wsActor, wsEvents.notifyNewMessage, {
+      receiverId: newMessageBody.receiver_id,
+      senderId: currentUser.id,
+    });
+
     refreshPage();
   };
 
@@ -154,9 +150,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
   const onCancelEditMessage = () => setState({ editingMessageId: null, inputValue: '' });
   const deleteMessage = (id, receiverId) => async () => {
     await axios.delete(getApiUrl('message', { id }));
-    if (webSocketState === socketStates.open) {
-      send(webSocket, wsEvents.notifyNewMessage, { receiverId, senderId: currentUser.id });
-    }
+    send(wsActor, wsEvents.notifyNewMessage, { receiverId, senderId: currentUser.id });
     refreshPage();
   };
 
@@ -187,14 +181,12 @@ const Messages = ({ messages, users }: IMessagesProps) => {
   });
 
   React.useEffect(() => {
-    if (!webSocket) return;
     if (isNull(selectedFriendId)) return;
 
     // on newMessagesArrived we need refreshUnreadMsgs() & refreshMessages()
     // but both of this handled via refreshPage in WssConnect,
     //   although it only wants refreshUnreadMsgs()
-    const removeUnreadMessages = async wsData => {
-      const { type, payload } = decode(wsData);
+    const removeUnreadMessages = onMessageEvent(async ({ type, payload }) => {
       if (wsEvents.newMessagesArrived !== type) return;
 
       const isNewMessageInActiveChat = payload.senderId === selectedFriendId;
@@ -203,11 +195,13 @@ const Messages = ({ messages, users }: IMessagesProps) => {
       const data = { receiver_id: currentUser.id, sender_id: selectedFriendId };
       await axios.delete(getApiUrl('unreadMessages', {}, data));
       refreshPage();
-    };
+    });
 
-    webSocket.addEventListener('message', removeUnreadMessages);
-    return () => webSocket.removeEventListener('message', removeUnreadMessages);
-  }, [webSocket, selectedFriendId]);
+    wsActor.onEvent(removeUnreadMessages);
+    return () => {
+      wsActor.off(removeUnreadMessages);
+    };
+  }, [selectedFriendId]);
 
   if (!isSignedIn) return <Layout>403 frobidden</Layout>;
 
@@ -241,7 +235,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                 <div className="mr-2 flex-none">
                   <Image src={el.avatar!.path} width={64} height={64} alt="" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <div className="flex items-center">
                     <div className={friendNameClass(el.id)}>{el.name}</div>
                     {signedInUsersIds.includes(el.id) && <i className={onlineIconClass(el.id)}></i>}

@@ -1,18 +1,18 @@
-import '../client/css/index.css';    // Import FIRST
+import '../client/css/index.css'; // Import FIRST
 import originalAxios from 'axios';
 import { AppProps } from 'next/app';
 import React from 'react';
+import { interpret } from 'xstate';
 import WssConnect from '../client/common/WssConnect.js';
 import {
   currentUserInitialState,
   makeActions,
   makeCurrentUser,
-  makeIsSignedInWss,
   makeSession,
   makeSignedInUsersIds,
-  makeWs,
 } from '../client/lib/effectorStore.js';
 import { Context, guestUser } from '../client/lib/utils.js';
+import { makeSocketMachine, webSocketTypes } from '../client/lib/wsActor.js';
 import { IContext, IPageProps } from '../lib/types.js';
 import '../client/css/tailwind.css'; // Import LAST
 
@@ -39,16 +39,17 @@ function App(appProps: AppProps<IPageProps>) {
       ...currentUserInitialState,
       data: currentUser,
     });
-    const $signedInUsersIds = makeSignedInUsersIds(actions);
+
+    const connectToWss = () => new WebSocket(process.env.NEXT_PUBLIC_WSS_URL!);
+    const wsActor: any = interpret(makeSocketMachine(connectToWss, webSocketTypes.browser));
 
     return {
       axios,
       actions,
+      wsActor,
       [makeCurrentUser.key]: $currentUser,
-      [makeWs.key]: makeWs(actions),
-      [makeSignedInUsersIds.key]: $signedInUsersIds,
+      [makeSignedInUsersIds.key]: makeSignedInUsersIds(actions),
       [makeSession.key]: makeSession($currentUser),
-      [makeIsSignedInWss.key]: makeIsSignedInWss($currentUser, $signedInUsersIds),
     };
   }, []);
 

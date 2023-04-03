@@ -25,7 +25,7 @@ describe('wss', () => {
     socket.send(encode(wsEvents.echo, testMessage));
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const data = decode(callback.mock.calls[0][0]);
+    const data = decode(callback.mock.calls[0][0] as any);
     expect(data).toMatchObject(makeWsData(wsEvents.echo, testMessage));
   });
 
@@ -52,15 +52,15 @@ describe('wss', () => {
     );
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const data1 = decode(callback1.mock.calls[0][0]);
-    const data2 = decode(callback2.mock.calls[0][0]);
+    const data1 = decode(callback1.mock.calls[0][0] as any);
+    const data2 = decode(callback2.mock.calls[0][0] as any);
     expect(data1).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [user.id]));
     expect(data2).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [user.id]));
 
     client1.close();
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const data22 = decode(callback2.mock.calls[1][0]);
+    const data22 = decode(callback2.mock.calls[1][0] as any);
     expect(callback1.mock.calls).toHaveLength(1);
     expect(callback2.mock.calls).toHaveLength(2);
     expect(data22).toMatchObject(makeWsData(wsEvents.signedInUsersIds, []));
@@ -94,8 +94,8 @@ describe('wss', () => {
     client1.send(encode(wsEvents.signOut, { id: vasa.id }));
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const data1 = decode(callback1.mock.lastCall![0]);
-    const data2 = decode(callback2.mock.lastCall![0]);
+    const data1 = decode(callback1.mock.lastCall![0] as any);
+    const data2 = decode(callback2.mock.lastCall![0] as any);
     expect(data1).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
     expect(data2).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
   });
@@ -132,7 +132,7 @@ describe('wss', () => {
 
     expect(vasaCallback.mock.calls).toHaveLength(0);
     expect(tomCallback.mock.calls).toHaveLength(1);
-    const tomData = decode(tomCallback.mock.calls[0][0]);
+    const tomData = decode(tomCallback.mock.calls[0][0] as any);
     expect(tomData).toMatchObject(makeWsData(wsEvents.newMessagesArrived, { senderId: vasa.id }));
   });
 

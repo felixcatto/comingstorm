@@ -5,6 +5,7 @@ import { guestUser, isAdmin, isSignedIn } from './sharedUtils.js';
 import {
   IAuthenticate,
   IGetGenericProps,
+  IGetUserId,
   IHandler,
   IMixHandler,
   IOrm,
@@ -114,18 +115,7 @@ export const waitForSocketState = async (socket, state) => {
 // not including "n"
 export const getRandomNumUpTo = n => Math.floor(Math.random() * n);
 
-export const findKeyByValue = <K, V>(map: Map<K, V>, value: V): K | null => {
-  let key = null as any;
-  for (const [mapKey, mapValue] of map) {
-    if (mapValue === value) {
-      key = mapKey;
-      break;
-    }
-  }
-  return key;
-};
-
-export const decode = buffer => JSON.parse(buffer.toString()) as IWSSDecodeReturn;
+export const decode = (message: string) => JSON.parse(message) as IWSSDecodeReturn;
 
 export const makeWsData = (type, payload) => ({ type, payload });
 
@@ -177,7 +167,7 @@ export const removeSessionCookie = res => {
   );
 };
 
-export const getUserId = (rawCookies, keygrip) => {
+export const getUserId: IGetUserId = (rawCookies, keygrip) => {
   let cookies;
   if (isString(rawCookies)) {
     cookies = cookie.parse(rawCookies);

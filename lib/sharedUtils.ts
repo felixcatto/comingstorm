@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash-es';
 import { compile } from 'path-to-regexp';
 import avatars from './avatars.js';
-import { IEncode, IMakeEnum, IMakeUrlFor, ISend } from './types.js';
+import { IEncode, IMakeEnum, IMakeUrlFor } from './types.js';
 
 export const makeEnum: IMakeEnum = (...args) =>
   args.reduce((acc, key) => ({ ...acc, [key]: key }), {} as any);
@@ -80,6 +80,8 @@ export const wsGeneralEvents = makeEnum('open', 'close', 'message');
 export const wsEvents = makeEnum(
   'error',
   'echo',
+  'ping',
+  'pong',
   'signIn',
   'signOut',
   'signedInUsersIds',
@@ -87,8 +89,5 @@ export const wsEvents = makeEnum(
   'notifyNewMessage',
   'newMessagesArrived'
 );
-export const encode: IEncode = (wsEvent, message = '') =>
-  JSON.stringify({ type: wsEvent, payload: message });
-
-export const send: ISend = (webSocket, wsEvent, message = '') =>
-  webSocket.send(encode(wsEvent, message));
+export const encode: IEncode = (wsEvent, payload = '') =>
+  JSON.stringify({ type: wsEvent, payload });
