@@ -150,7 +150,6 @@ export const TContent = ({ children }) => {
         <div className={s.carets} style={caretStyles}>
           <i
             className={cn(s.caretInner, {
-              [s.caretInner_outline]: theme === 'outline',
               [s.caretInner_top]: placement === 'top',
               [s.caretInner_bottom]: placement === 'bottom',
               [s.caretInner_left]: placement === 'left',

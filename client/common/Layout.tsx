@@ -46,7 +46,7 @@ const Layout = ({ children }: any) => {
               <div className="flex items-center">
                 <div className="flex items-center mr-1">
                   <i className={userIconClass(currentUser.role)}></i>
-                  <div className={s.userName}>{currentUser.name}</div>
+                  <div>{currentUser.name}</div>
                   <div className="ml-1 flex-none">
                     <Image src={currentUser.avatar.path} width={48} height={48} alt="" />
                   </div>

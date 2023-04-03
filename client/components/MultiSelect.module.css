@@ -1,4 +1,5 @@
 .selectRoot {
+  display: block;
   &_focused {
     border-color: var(--primary);
     outline: 0;

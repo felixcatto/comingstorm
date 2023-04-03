@@ -1,12 +1,14 @@
-import path from 'path';
 import { spawn } from 'child_process';
 import { deleteAsync } from 'del';
 import dotenv from 'dotenv';
 import gulp from 'gulp';
-import waitOn from 'wait-on';
-import { dirname } from './lib/devUtils.js';
 import babel from 'gulp-babel';
+import path from 'path';
+import waitOn from 'wait-on';
+import webpack from 'webpack';
 import babelConfig from './babelconfig.js';
+import { dirname } from './lib/devUtils.js';
+import webpackConfig from './webpack.config.js';
 
 const __dirname = dirname(import.meta.url);
 dotenv.config({ path: path.resolve(__dirname, '.env.development') });
@@ -45,6 +47,9 @@ process.on('exit', () => server && server.kill());
 
 const clean = async () => deleteAsync(['dist']);
 
+const compiler = webpack(webpackConfig);
+const makeCssModulesTypings = done => compiler.watch({}, () => done());
+
 const transpileServerJs = () =>
   gulp
     .src(paths.serverJs.src, { base: '.', since: gulp.lastRun(transpileServerJs) })
@@ -66,4 +71,4 @@ const watch = async () => {
 
 const startWsServer = series(clean, transpileServerJs, startServer, watch);
 
-export { startWsServer };
+export { startWsServer, makeCssModulesTypings };

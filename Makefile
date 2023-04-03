@@ -2,6 +2,7 @@ install:
 	npm i
 
 start:
+	npx gulp makeCssModulesTypings &
 	npx next dev
 
 start-test-server:
