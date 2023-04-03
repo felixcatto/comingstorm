@@ -11,4 +11,4 @@ export const keygrip = makeKeygrip(keys);
 
 const knex = knexConnect(knexConfig[mode]);
 Model.knex(knex);
-export const objection = { ...models, knex };
+export const orm = { ...models, knex };

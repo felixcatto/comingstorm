@@ -1,4 +1,4 @@
-import { keygrip, objection } from '../../../../../lib/init.js';
+import { keygrip, orm } from '../../../../../lib/init.js';
 import { ICommentSchema, ICurrentUser, IValidate } from '../../../../../lib/types.js';
 import { getCurrentUser, isSignedIn, switchHttpMethod, validate } from '../../../../../lib/utils.js';
 import { commentsSchema } from '../../../../../models/index.js';
@@ -6,7 +6,7 @@ import { commentsSchema } from '../../../../../models/index.js';
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   post: [
     validate(commentsSchema),
     async (req, res, ctx: ICtx) => {
@@ -18,7 +18,7 @@ export default switchHttpMethod({
       }
 
       const articleId = req.query.id!;
-      const { Comment } = objection;
+      const { Comment } = orm;
       const comment = await Comment.query().insert(ctx.body);
       await comment.$relatedQuery<any>('article').relate(articleId);
       if (isSignedIn(currentUser)) {

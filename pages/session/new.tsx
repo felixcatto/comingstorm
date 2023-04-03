@@ -7,24 +7,17 @@ import {
   ErrorMessage,
   Field,
   getUrl,
-  isSignedIn,
   SubmitBtn,
   useContext,
   useSubmit,
   WithApiErrors,
 } from '../../client/lib/utils.js';
-import { keygrip, objection } from '../../lib/init.js';
-import { getUserFromRequest, unwrap } from '../../lib/utils.js';
+import { keygrip, orm } from '../../lib/init.js';
+import { getGenericProps } from '../../lib/utils.js';
 
-export async function getServerSideProps({ req, res }) {
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  return {
-    props: unwrap({ currentUser, unreadMessages }),
-  };
+export async function getServerSideProps(ctx) {
+  const props = await getGenericProps({ ctx, keygrip, orm });
+  return { props };
 }
 
 const LoginForm = () => {

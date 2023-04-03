@@ -1,4 +1,4 @@
-import { objection } from '../lib/init.js';
+import { orm } from '../lib/init.js';
 import { getApiUrl, makeNonThrowAxios } from '../lib/utils.js';
 import avatarsFixture from './fixtures/avatars.js';
 import messagesFixture from './fixtures/messages.js';
@@ -8,7 +8,7 @@ import { getLoginOptions } from './fixtures/utils.js';
 describe('messages', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = makeNonThrowAxios(baseURL);
-  const { User, Message, Avatar } = objection;
+  const { User, Message, Avatar } = orm;
   let loginOptions;
 
   beforeAll(async () => {
@@ -88,6 +88,6 @@ describe('messages', () => {
   });
 
   afterAll(async () => {
-    await objection.knex.destroy();
+    await orm.knex.destroy();
   });
 });

@@ -14,8 +14,6 @@ export const isAdmin = currentUser => currentUser.role === roles.admin;
 export const isBelongsToUser = currentUser => resourceAuthorId =>
   currentUser.id === resourceAuthorId || currentUser.role === roles.admin;
 
-export const unwrap = value => JSON.parse(JSON.stringify(value));
-
 const [guestAvatar] = avatars;
 export const guestUser = {
   id: -111,

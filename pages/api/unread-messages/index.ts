@@ -1,4 +1,4 @@
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import { ICurrentUser, IUnreadMessageSchema, IValidateQuery } from '../../../lib/types.js';
 import { checkSignedIn, getCurrentUser, switchHttpMethod, validate } from '../../../lib/utils.js';
 import { unreadMessageSchema } from '../../../models/index.js';
@@ -6,7 +6,7 @@ import { unreadMessageSchema } from '../../../models/index.js';
 type ICtx = ICurrentUser & IValidateQuery<IUnreadMessageSchema>;
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   delete: [
     checkSignedIn,
     validate(unreadMessageSchema, 'query'),
@@ -17,7 +17,7 @@ export default switchHttpMethod({
         return res.status(403).json({ message: 'Forbidden' });
       }
 
-      const { UnreadMessage } = objection;
+      const { UnreadMessage } = orm;
       await UnreadMessage.query().delete().where({ receiver_id, sender_id });
       res.status(201).json({});
     },

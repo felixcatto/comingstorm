@@ -1,33 +1,19 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
-import {
-  getApiUrl,
-  getUrl,
-  isSignedIn,
-  unwrap,
-  useContext,
-  useRefreshPage,
-} from '../../client/lib/utils.js';
-import { keygrip, objection } from '../../lib/init.js';
+import { getApiUrl, getUrl, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import { keygrip, orm } from '../../lib/init.js';
 import { IArticle } from '../../lib/types.js';
-import { getUserFromRequest } from '../../lib/utils.js';
+import { getGenericProps } from '../../lib/utils.js';
 
 type IArticlesProps = {
   articles: IArticle[];
 };
 
-export async function getServerSideProps({ req, res }) {
-  const { Article, User } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  const articles = await Article.query().withGraphFetched('[author, tags]').orderBy('id');
-  return {
-    props: unwrap({ currentUser, unreadMessages, articles }),
-  };
+export async function getServerSideProps(ctx) {
+  const articles = await orm.Article.query().withGraphFetched('[author, tags]').orderBy('id');
+  const props = await getGenericProps({ ctx, keygrip, orm }, { articles });
+  return { props };
 }
 
 const Articles = ({ articles }: IArticlesProps) => {

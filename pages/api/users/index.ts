@@ -1,6 +1,6 @@
 import { differenceBy, isEmpty } from 'lodash-es';
 import avatars from '../../../lib/avatars.js';
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import { IUserSchema, IValidate } from '../../../lib/types.js';
 import {
   checkAdmin,
@@ -13,19 +13,19 @@ import {
 import { userSchema } from '../../../models/index.js';
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   post: [
     checkAdmin,
     validate(userSchema),
     async (req, res, ctx: IValidate<IUserSchema>) => {
-      const { User } = objection;
+      const { User } = orm;
       const { isUnique, errors } = await checkValueUnique(User, 'email', ctx.body.email);
       if (!isUnique) {
         return res.status(400).json({ errors });
       }
 
       const [_guestAvatar, ...userAvatars] = avatars;
-      const existedUserAvatars = await objection.knex
+      const existedUserAvatars = await orm.knex
         .select('a.id')
         .from('avatars as a')
         .join('users as u', 'u.avatar_id', '=', 'a.id')

@@ -1,5 +1,5 @@
 import { omit } from 'lodash-es';
-import { objection } from '../lib/init.js';
+import { orm } from '../lib/init.js';
 import { encrypt } from '../lib/secure.js';
 import { getApiUrl, getUrl, makeNonThrowAxios } from '../lib/utils.js';
 import avatarsFixture from './fixtures/avatars.js';
@@ -9,7 +9,7 @@ import { getLoginOptions } from './fixtures/utils.js';
 describe('users', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = makeNonThrowAxios(baseURL);
-  const { User, Avatar } = objection;
+  const { User, Avatar } = orm;
   let loginOptions;
 
   beforeAll(async () => {
@@ -92,6 +92,6 @@ describe('users', () => {
   });
 
   afterAll(async () => {
-    await objection.knex.destroy();
+    await orm.knex.destroy();
   });
 });

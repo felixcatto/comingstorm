@@ -10,19 +10,17 @@ import {
   decode,
   fmtISO,
   getApiUrl,
-  isSignedIn,
   send,
   socketStates,
-  unwrap,
   useContext,
   useMergeState,
   useRefreshPage,
   wsEvents,
 } from '../../client/lib/utils.js';
 import { getUsersInfo } from '../../client/messages/utils.js';
-import { keygrip, objection } from '../../lib/init.js';
+import { keygrip, orm } from '../../lib/init.js';
 import { IMessage, IUnreadMessagesDict, IUser } from '../../lib/types.js';
-import { getUserFromRequest } from '../../lib/utils.js';
+import { getGenericProps, unwrap } from '../../lib/utils.js';
 import s from './styles.module.css';
 
 type IMessagesProps = {
@@ -30,13 +28,11 @@ type IMessagesProps = {
   users: IUser[];
 };
 
-export async function getServerSideProps({ req, res }) {
-  const { Message, User } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
+export async function getServerSideProps(ctx) {
+  const { Message, User } = orm;
+  const props = await getGenericProps({ ctx, keygrip, orm });
+  const { currentUser } = props;
+
   const messages = await Message.query()
     .withGraphFetched('[receiver.avatar, sender.avatar]')
     .where('receiver_id', '=', currentUser.id)
@@ -44,9 +40,7 @@ export async function getServerSideProps({ req, res }) {
     .orderBy('created_at', 'desc');
 
   const users = await User.query().withGraphFetched('avatar');
-  return {
-    props: unwrap({ currentUser, messages, users, unreadMessages }),
-  };
+  return { props: { ...props, ...unwrap({ messages, users }) } };
 }
 
 type IState = {

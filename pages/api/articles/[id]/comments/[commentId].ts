@@ -1,5 +1,5 @@
-import { keygrip, objection } from '../../../../../lib/init.js';
-import { ICommentSchema, ICurrentUser, IObjection, IValidate } from '../../../../../lib/types.js';
+import { keygrip, orm } from '../../../../../lib/init.js';
+import { ICommentSchema, ICurrentUser, IOrm, IValidate } from '../../../../../lib/types.js';
 import {
   checkSignedIn,
   getCurrentUser,
@@ -12,16 +12,16 @@ import { commentsSchema } from '../../../../../models/index.js';
 
 type ICtx = IValidate<ICommentSchema> & ICurrentUser;
 
-const getCommentAuthorId = async ({ Comment }: IObjection, commentId) => {
+const getCommentAuthorId = async ({ Comment }: IOrm, commentId) => {
   const comment = await Comment.query().findById(commentId);
   return comment?.author_id;
 };
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   get: async (req, res) => {
     const commentId = req.query.commentId!;
-    const comment = await objection.Comment.query().findById(commentId);
+    const comment = await orm.Comment.query().findById(commentId);
     if (!comment) {
       return res.status(400).json({ message: `Entity with id '${commentId}' not found` });
     }
@@ -32,9 +32,9 @@ export default switchHttpMethod({
     validate(commentsSchema),
     async (req, res, ctx: ICtx) => {
       const commentId = req.query.commentId!;
-      const { Comment } = objection;
+      const { Comment } = orm;
 
-      const commentAuthorId = await getCommentAuthorId(objection, req.query.commentId!);
+      const commentAuthorId = await getCommentAuthorId(orm, req.query.commentId!);
       if (commentAuthorId) {
         if (!isBelongsToUser(ctx.currentUser)(commentAuthorId)) {
           return res.status(403).json({ message: 'Forbidden' });
@@ -58,14 +58,14 @@ export default switchHttpMethod({
   delete: [
     checkSignedIn,
     async (req, res, ctx: ICtx) => {
-      const commentAuthorId = await getCommentAuthorId(objection, req.query.commentId!);
+      const commentAuthorId = await getCommentAuthorId(orm, req.query.commentId!);
       if (!isBelongsToUser(ctx.currentUser)(commentAuthorId)) {
         res.status(403).json({ message: 'Forbidden' });
       }
     },
     async (req, res) => {
       const commentId = req.query.commentId!;
-      await objection.Comment.query().deleteById(commentId);
+      await orm.Comment.query().deleteById(commentId);
       res.status(201).json({ id: commentId });
     },
   ],

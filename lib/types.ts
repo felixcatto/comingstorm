@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { FormikHelpers } from 'formik';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import wsWebSocket from 'ws';
 import * as y from 'yup';
 import {
@@ -26,10 +26,16 @@ import {
   userLoginSchema,
   userSchema,
 } from '../models/index.js';
-import { objection } from './init.js';
+import { orm } from './init.js';
 import { asyncStates, getApiUrl, roles, socketStates, wsEvents, wsGeneralEvents } from './utils.js';
 
-export type IObjection = typeof objection;
+export type IOrm = typeof orm;
+
+export type IKeygrip = {
+  sign: (data) => string;
+  index: (data, digest) => number;
+  verify: (data, digest) => boolean;
+};
 
 export type IMakeEnum = <T extends ReadonlyArray<string>>(
   ...args: T
@@ -294,3 +300,17 @@ export type IAuthenticate = (
   keygrip,
   fetchUser: (id) => Promise<IUser | undefined>
 ) => Promise<[currentUser: IUser, shouldRemoveSession: boolean]>;
+
+type IGenericProps = {
+  currentUser: IUserWithAvatar;
+  unreadMessages: IUnreadMessage[];
+};
+
+export type IGetGenericProps = <T extends object>(
+  props: {
+    ctx: GetServerSidePropsContext;
+    keygrip: IKeygrip;
+    orm: IOrm;
+  },
+  otherProps?: T
+) => Promise<T & IGenericProps>;

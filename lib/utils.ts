@@ -4,9 +4,10 @@ import { isNull, isObject, isString } from 'lodash-es';
 import { guestUser, isAdmin, isSignedIn } from './sharedUtils.js';
 import {
   IAuthenticate,
+  IGetGenericProps,
   IHandler,
   IMixHandler,
-  IObjection,
+  IOrm,
   ISwitchHttpMethod,
   IUserClass,
   IValidateFn,
@@ -219,8 +220,22 @@ export const getUserFromRequest = async (res, cookies, keygrip, User: IUserClass
   return currentUser;
 };
 
-export const getCurrentUser = (objection: IObjection, keygrip) => async (req, res) => {
-  const { User } = objection;
+export const getCurrentUser = (orm: IOrm, keygrip) => async (req, res) => {
+  const { User } = orm;
   const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
   return { currentUser };
+};
+
+export const unwrap = value => JSON.parse(JSON.stringify(value));
+
+export const getGenericProps: IGetGenericProps = async (props, otherProps: any = {}) => {
+  const { ctx, keygrip, orm } = props;
+  const { req, res } = ctx;
+  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, orm.User);
+  let unreadMessages: any = [];
+  if (isSignedIn(currentUser)) {
+    unreadMessages = await orm.UnreadMessage.query().where('receiver_id', currentUser.id);
+  }
+
+  return unwrap({ ...otherProps, currentUser, unreadMessages });
 };

@@ -1,5 +1,5 @@
 import { omit } from 'lodash-es';
-import { keygrip, objection } from '../lib/init.js';
+import { keygrip, orm } from '../lib/init.js';
 import {
   authenticate,
   composeValue,
@@ -17,7 +17,7 @@ describe('session', () => {
   const baseURL = process.env.HTTP_SERVER_URL;
   const axios = makeNonThrowAxios(baseURL);
 
-  const { User, Avatar } = objection;
+  const { User, Avatar } = orm;
   const fetchUser = async userId => User.query().findById(userId);
 
   beforeAll(async () => {
@@ -79,6 +79,6 @@ describe('session', () => {
   });
 
   afterAll(async () => {
-    await objection.knex.destroy();
+    await orm.knex.destroy();
   });
 });

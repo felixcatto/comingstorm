@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash-es';
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import { IArticleSchema, ICurrentUser, IValidate } from '../../../lib/types.js';
 import {
   checkSignedIn,
@@ -13,12 +13,12 @@ import { articleSchema } from '../../../models/index.js';
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   post: [
     checkSignedIn,
     validate(articleSchema),
     async (req, res, ctx: ICtx) => {
-      const { Article } = objection;
+      const { Article } = orm;
       const { currentUser } = ctx;
       const { tagIds, ...articleData } = ctx.body;
 

@@ -1,33 +1,19 @@
 import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
-import {
-  getApiUrl,
-  getUrl,
-  isSignedIn,
-  unwrap,
-  useContext,
-  useRefreshPage,
-} from '../../client/lib/utils.js';
-import { keygrip, objection } from '../../lib/init.js';
+import { getApiUrl, getUrl, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import { keygrip, orm } from '../../lib/init.js';
 import { ITag } from '../../lib/types.js';
-import { getUserFromRequest } from '../../lib/utils.js';
+import { getGenericProps } from '../../lib/utils.js';
 
 type ITagsProps = {
   tags: ITag[];
 };
 
-export async function getServerSideProps({ req, res }) {
-  const { Tag, User } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  const tags = await Tag.query();
-  return {
-    props: unwrap({ currentUser, tags, unreadMessages }),
-  };
+export async function getServerSideProps(ctx) {
+  const tags = await orm.Tag.query();
+  const props = await getGenericProps({ ctx, keygrip, orm }, { tags });
+  return { props };
 }
 
 const Tags = ({ tags }: ITagsProps) => {

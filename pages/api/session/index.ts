@@ -1,4 +1,4 @@
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import { encrypt } from '../../../lib/secure.js';
 import {
   ICurrentUser,
@@ -24,7 +24,7 @@ type ICtx = ICurrentUser;
 
 export default switchHttpMethod({
   get: [
-    getCurrentUser(objection, keygrip),
+    getCurrentUser(orm, keygrip),
     checkSignedIn,
     async (req, res) => {
       const sessionValue = req.cookies[sessionName]!;
@@ -36,7 +36,7 @@ export default switchHttpMethod({
   post: [
     validate(userLoginSchema),
     async (req, res, ctx: IValidate<IUserLoginSchema>) => {
-      const { User } = objection;
+      const { User } = orm;
       const user = await User.query().findOne('email', ctx.body.email).withGraphFetched('avatar');
       if (!user) {
         return res.status(400).json(makeErrors({ email: 'User with such email not found' }));
@@ -51,7 +51,7 @@ export default switchHttpMethod({
     },
   ],
   delete: [
-    getCurrentUser(objection, keygrip),
+    getCurrentUser(orm, keygrip),
     (req, res, ctx: ICtx) => {
       removeSessionCookie(res);
       res.status(201).json({ currentUser: guestUser, signOutUserId: ctx.currentUser.id });

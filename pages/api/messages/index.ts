@@ -1,4 +1,4 @@
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import { ICurrentUser, IMessageSchema, IValidate } from '../../../lib/types.js';
 import {
   checkSignedIn,
@@ -12,9 +12,9 @@ import { messageSchema } from '../../../models/index.js';
 type ICtx = ICurrentUser & IValidate<IMessageSchema>;
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   get: async (req, res) => {
-    const { Message } = objection;
+    const { Message } = orm;
     const messages = await Message.query();
     res.status(200).json(messages);
   },
@@ -23,7 +23,7 @@ export default switchHttpMethod({
     validate(messageSchema),
     async (req, res, ctx: ICtx) => {
       const sender_id = ctx.currentUser.id;
-      const { Message, UnreadMessage, User } = objection;
+      const { Message, UnreadMessage, User } = orm;
       const receiver = await User.query().findById(ctx.body.receiver_id);
       if (!receiver) {
         return res.status(400).json(makeErrors({ receiver_id: 'user does not exist' }));

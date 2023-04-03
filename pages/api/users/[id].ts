@@ -1,4 +1,4 @@
-import { keygrip, objection } from '../../../lib/init.js';
+import { keygrip, orm } from '../../../lib/init.js';
 import {
   checkAdmin,
   checkValueUnique,
@@ -10,10 +10,10 @@ import { userSchema } from '../../../models/index.js';
 import { IValidate, IUserSchema } from '../../../lib/types.js';
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   get: async (req, res) => {
     const id = req.query.id!;
-    const user = await objection.User.query().findById(id);
+    const user = await orm.User.query().findById(id);
     if (!user) {
       return res.status(400).json({ message: `Entity with id '${id}' not found` });
     }
@@ -24,7 +24,7 @@ export default switchHttpMethod({
     validate(userSchema),
     async (req, res, ctx: IValidate<IUserSchema>) => {
       const id = req.query.id as string;
-      const { User } = objection;
+      const { User } = orm;
       const { isUnique, errors } = await checkValueUnique(User, 'email', ctx.body.email, id);
       if (!isUnique) {
         return res.status(400).json({ errors });
@@ -38,7 +38,7 @@ export default switchHttpMethod({
     checkAdmin,
     async (req, res) => {
       const id = req.query.id!;
-      await objection.User.query().delete().where('id', id);
+      await orm.User.query().delete().where('id', id);
       res.status(201).json({ id });
     },
   ],

@@ -1,18 +1,11 @@
-import { GetServerSidePropsContext } from 'next';
 import Image from 'next/image.js';
 import Layout from '../client/common/Layout.js';
-import { keygrip, objection } from '../lib/init.js';
-import { getUserFromRequest, isSignedIn, unwrap } from '../lib/utils.js';
+import { keygrip, orm } from '../lib/init.js';
+import { getGenericProps } from '../lib/utils.js';
 
-export async function getServerSideProps({ req, res }: GetServerSidePropsContext) {
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, objection.User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  return {
-    props: unwrap({ currentUser, unreadMessages }),
-  };
+export async function getServerSideProps(ctx) {
+  const props = await getGenericProps({ ctx, keygrip, orm });
+  return { props };
 }
 
 export default function Home() {

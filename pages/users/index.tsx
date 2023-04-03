@@ -6,32 +6,23 @@ import {
   dedup,
   getApiUrl,
   getUrl,
-  isSignedIn,
-  unwrap,
   useContext,
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils.js';
-import s from './styles.module.css';
-import { keygrip, objection } from '../../lib/init.js';
+import { keygrip, orm } from '../../lib/init.js';
 import { IUser } from '../../lib/types.js';
-import { getUserFromRequest } from '../../lib/utils.js';
+import { getGenericProps } from '../../lib/utils.js';
+import s from './styles.module.css';
 
 type IUsersProps = {
   users: IUser[];
 };
 
-export async function getServerSideProps({ req, res }) {
-  const { User } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  const users = await User.query();
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  return {
-    props: unwrap({ currentUser, unreadMessages, users }),
-  };
+export async function getServerSideProps(ctx) {
+  const users = await orm.User.query();
+  const props = await getGenericProps({ ctx, keygrip, orm }, { users });
+  return { props };
 }
 
 const userIconClass = role => cn('mr-1', userRolesToIcons[role]);

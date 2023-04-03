@@ -8,17 +8,20 @@ import {
   fmtISO,
   FormWrapper,
   getApiUrl,
-  isSignedIn,
   roles,
   useContext,
   useMergeState,
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils.js';
-import { keygrip, objection } from '../../lib/init.js';
+import { keygrip, orm } from '../../lib/init.js';
 import { IArticle, IComment } from '../../lib/types.js';
-import { getUserFromRequest, unwrap } from '../../lib/utils.js';
+import { getGenericProps } from '../../lib/utils.js';
 import s from './styles.module.css';
+
+type IArticleProps = {
+  article: IArticle | null;
+};
 
 type IShowComment = {
   comment: IComment;
@@ -27,6 +30,13 @@ type IShowComment = {
   editComment: any;
   deleteComment: any;
 };
+
+type IEditComment = {
+  comment: IComment;
+  cancelEditingComment: any;
+  saveEditedComment: any;
+};
+
 const ShowComment = (props: IShowComment) => {
   const { comment, articleId, isBelongsToUser, editComment, deleteComment } = props;
   return (
@@ -66,11 +76,6 @@ const ShowComment = (props: IShowComment) => {
   );
 };
 
-type IEditComment = {
-  comment: IComment;
-  cancelEditingComment: any;
-  saveEditedComment: any;
-};
 const EditComment = (props: IEditComment) => {
   const { comment, cancelEditingComment, saveEditedComment } = props;
   const formRef: any = React.useRef(null);
@@ -107,24 +112,13 @@ const EditComment = (props: IEditComment) => {
   );
 };
 
-type IArticleProps = {
-  article: IArticle | null;
-};
-
-export async function getServerSideProps({ req, res, params }) {
-  const { id } = params;
-  const { User, Article } = objection;
-  const currentUser = await getUserFromRequest(res, req.cookies, keygrip, User);
-  let unreadMessages: any = [];
-  if (isSignedIn(currentUser)) {
-    unreadMessages = await objection.UnreadMessage.query().where('receiver_id', currentUser.id);
-  }
-  const article = await Article.query()
+export async function getServerSideProps(ctx) {
+  const { id } = ctx.params;
+  const article = await orm.Article.query()
     .findById(id)
     .withGraphFetched('[author, comments(orderByCreated).author, tags]');
-  return {
-    props: unwrap({ currentUser, unreadMessages, article }),
-  };
+  const props = await getGenericProps({ ctx, keygrip, orm }, { article });
+  return { props };
 }
 
 const ShowArticle = ({ article }: IArticleProps) => {

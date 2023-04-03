@@ -1,6 +1,6 @@
 import { difference } from 'lodash-es';
-import { keygrip, objection } from '../../../lib/init.js';
-import { IArticleSchema, ICurrentUser, IObjection, IValidate } from '../../../lib/types.js';
+import { keygrip, orm } from '../../../lib/init.js';
+import { IArticleSchema, ICurrentUser, IOrm, IValidate } from '../../../lib/types.js';
 import {
   checkSignedIn,
   getCurrentUser,
@@ -12,16 +12,16 @@ import { articleSchema } from '../../../models/index.js';
 
 type ICtx = IValidate<IArticleSchema> & ICurrentUser;
 
-const getArticleAuthorId = async ({ Article }: IObjection, articleId) => {
+const getArticleAuthorId = async ({ Article }: IOrm, articleId) => {
   const article = await Article.query().findById(articleId);
   return article?.author_id;
 };
 
 export default switchHttpMethod({
-  preHandler: getCurrentUser(objection, keygrip),
+  preHandler: getCurrentUser(orm, keygrip),
   get: async (req, res) => {
     const id = req.query.id!;
-    const { Article } = objection;
+    const { Article } = orm;
     const article = await Article.query().findById(id).withGraphFetched('[author, tags]');
     if (!article) {
       return res.status(400).json({ message: `Entity with id '${id}' not found` });
@@ -31,7 +31,7 @@ export default switchHttpMethod({
   put: [
     checkSignedIn,
     async (req, res, ctx: ICtx) => {
-      const articleAuthorId = await getArticleAuthorId(objection, req.query.id!);
+      const articleAuthorId = await getArticleAuthorId(orm, req.query.id!);
       if (!isBelongsToUser(ctx.currentUser)(articleAuthorId)) {
         res.status(403).json({ message: 'Forbidden' });
       }
@@ -39,7 +39,7 @@ export default switchHttpMethod({
     validate(articleSchema),
     async (req, res, ctx: ICtx) => {
       const id = req.query.id!;
-      const { Article } = objection;
+      const { Article } = orm;
       const { tagIds, ...articleData } = ctx.body;
       const article = await Article.query()
         .updateAndFetchById(id, articleData)
@@ -58,14 +58,14 @@ export default switchHttpMethod({
   delete: [
     checkSignedIn,
     async (req, res, ctx: ICtx) => {
-      const articleAuthorId = await getArticleAuthorId(objection, req.query.id!);
+      const articleAuthorId = await getArticleAuthorId(orm, req.query.id!);
       if (!isBelongsToUser(ctx.currentUser)(articleAuthorId)) {
         res.status(403).json({ message: 'Forbidden' });
       }
     },
     async (req, res) => {
       const id = req.query.id!;
-      const { Article } = objection;
+      const { Article } = orm;
       await Article.query().deleteById(id);
       res.status(201).json({ id });
     },
