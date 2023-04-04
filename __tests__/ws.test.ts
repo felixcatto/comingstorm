@@ -21,6 +21,7 @@ describe('wss', () => {
     socket.on('message', callback);
 
     await waitForSocketState(socket, socket.OPEN);
+    callback.mockClear();
     socket.send(encode(wsEvents.echo, testMessage));
     await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -40,6 +41,9 @@ describe('wss', () => {
 
     await waitForSocketState(client1, client1.OPEN);
     await waitForSocketState(client2, client2.OPEN);
+
+    callback1.mockClear();
+    callback2.mockClear();
     client1.send(
       encode(wsEvents.signIn, {
         userId: user.id,

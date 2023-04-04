@@ -2,11 +2,10 @@ import { spawn } from 'child_process';
 import { deleteAsync } from 'del';
 import dotenv from 'dotenv';
 import gulp from 'gulp';
-import babel from 'gulp-babel';
+import swc from 'gulp-swc';
 import path from 'path';
 import waitOn from 'wait-on';
 import webpack from 'webpack';
-import babelConfig from './babelconfig.js';
 import { dirname } from './lib/devUtils.js';
 import webpackConfig from './webpack.config.js';
 
@@ -53,7 +52,7 @@ const makeCssModulesTypings = done => compiler.watch({}, () => done());
 const transpileServerJs = () =>
   gulp
     .src(paths.serverJs.src, { base: '.', since: gulp.lastRun(transpileServerJs) })
-    .pipe(babel(babelConfig.server))
+    .pipe(swc({ jsc: { target: 'es2022' } }))
     .pipe(gulp.dest(paths.serverJs.dest));
 
 const trackChangesInDist = () => {

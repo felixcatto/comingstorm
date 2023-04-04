@@ -20,8 +20,8 @@ const config = {
         test: /(\.js$|\.ts$|\.tsx)/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-          options: { presets: ['@babel/preset-react', '@babel/preset-typescript'] },
+          loader: 'swc-loader',
+          options: { jsc: { target: 'es2022' } },
         },
       },
       {
