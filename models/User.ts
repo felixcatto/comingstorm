@@ -68,3 +68,7 @@ export const userLoginSchema = y.object({
   email: y.string().email().required('required'),
   password: y.string().required('required'),
 });
+
+export const getUserQuerySchema = y.object({
+  withAvatar: y.boolean(),
+});

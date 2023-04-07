@@ -1,9 +1,14 @@
-import { createEffect, createEvent, createStore } from 'effector';
+import { createEffect, createEvent, createStore, sample } from 'effector';
+import produce from 'immer';
+import { isNull } from 'lodash-es';
+import { delay } from 'patronum';
 import {
   IActions,
   IAsyncState,
   ICurrentUserStore,
   IDeleteSessionResponse,
+  IMakeNotificationAnimationDuration,
+  INotification,
   IPostSessionResponse,
   IUserLoginCreds,
   IUserWithAvatar,
@@ -34,6 +39,9 @@ export const makeActions = ({ axios }) => ({
     axios({ method: 'delete', url: getApiUrl('session') })
   ),
   wssUpdateSignedUsers: createEvent<any[]>(),
+  addNotification: createEvent<INotification>(),
+  removeNotification: createEvent<string>(),
+  setNotificationAnimationDuration: createEvent<number>(),
 });
 
 export const currentUserInitialState = {
@@ -75,6 +83,81 @@ export const makeSignedInUsersIds = (actions: IActions, initialState: any[] = []
   });
 
 makeSignedInUsersIds.key = '$signedInUsersIds' as const;
+
+export const makeNotificationAnimationDuration = (actions: IActions, initialState = 0) =>
+  createStore(initialState).on(
+    actions.setNotificationAnimationDuration,
+    (state, animationDuration) => animationDuration
+  );
+
+makeNotificationAnimationDuration.key = '$notificationAnimationDuration' as const;
+
+export const makeNotifications = (
+  actions: IActions,
+  $notificationAnimationDuration: IMakeNotificationAnimationDuration,
+  initialState: INotification[] = []
+) => {
+  const $notifications = createStore(initialState);
+
+  // AddFlow
+  sample({
+    source: $notifications,
+    clock: actions.addNotification,
+    fn: (state, newNotification) => [newNotification].concat(state),
+    target: $notifications,
+  });
+
+  sample({
+    source: $notifications,
+    clock: delay({ source: actions.addNotification, timeout: 50 }),
+    fn: (state, newNotification) =>
+      produce(state, draft => {
+        const item = draft.find(el => el.id === newNotification.id);
+        if (!item) return;
+        item.isHidden = false;
+      }),
+    target: $notifications,
+  });
+
+  sample({
+    source: $notifications,
+    clock: delay({
+      source: actions.addNotification,
+      timeout: ({ autoremoveTimeout }) => autoremoveTimeout ?? 0,
+    }),
+    fn: (state, newNotification) => newNotification.id,
+    filter: (_, { autoremoveTimeout }) => !isNull(autoremoveTimeout),
+    target: actions.removeNotification,
+  });
+
+  // RemoveFlow
+  sample({
+    source: $notifications,
+    clock: actions.removeNotification,
+    fn: (state, id) =>
+      produce(state, draft => {
+        const item = draft.find(el => el.id === id);
+        if (!item) return;
+        item.isHidden = true;
+        item.isInverseAnimation = true;
+      }),
+    target: $notifications,
+  });
+
+  sample({
+    source: $notifications,
+    clock: delay({
+      source: actions.removeNotification,
+      timeout: $notificationAnimationDuration,
+    }),
+    fn: (state, id) => state.filter(el => el.id !== id),
+    target: $notifications,
+  });
+
+  return $notifications;
+};
+
+makeNotifications.key = '$notifications' as const;
 
 export const makeSession = ($currentUser: ICurrentUserStore) =>
   $currentUser.map(({ data: currentUser }) => ({

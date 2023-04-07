@@ -1,10 +1,13 @@
+import { useRouter } from 'next/router.js';
 import React from 'react';
-import { getApiUrl, useContext, useRefreshPage, wsEvents } from '../lib/utils.js';
+import { makeNotification, messageNotification } from '../components/Notifications.jsx';
+import { getApiUrl, getUrl, useContext, useRefreshPage, wsEvents } from '../lib/utils.js';
 import { onMessageEvent, send } from '../lib/wsActor.js';
 
 const WssConnect = () => {
   const { wsActor, actions, axios } = useContext();
   const refreshPage = useRefreshPage();
+  const router = useRouter();
 
   React.useEffect(() => {
     wsActor.start();
@@ -24,14 +27,24 @@ const WssConnect = () => {
   React.useEffect(() => {
     const updateUnreadMessages = refreshPage;
 
-    const onMessage = onMessageEvent(({ type, payload }) => {
+    const onMessage = onMessageEvent(async ({ type, payload }) => {
       switch (type) {
         case wsEvents.signedInUsersIds:
           actions.wssUpdateSignedUsers(payload);
           break;
+
         case wsEvents.newMessagesArrived:
+          if (getUrl('messages') === router.asPath) return; // we have custom logic on this page
+
           updateUnreadMessages();
+
+          const { senderId } = payload;
+          const sender = await axios.get(getApiUrl('user', { id: senderId }, { withAvatar: true }));
+          actions.addNotification(
+            makeNotification({ title: 'New Message From', component: messageNotification(sender) })
+          );
           break;
+
         default:
           console.log(`receive event with type "${type}", but have no handler -> ${payload}`);
           break;

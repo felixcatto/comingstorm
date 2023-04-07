@@ -8,6 +8,8 @@ import {
   currentUserInitialState,
   makeActions,
   makeCurrentUser,
+  makeNotificationAnimationDuration,
+  makeNotifications,
   makeSession,
   makeSignedInUsersIds,
 } from '../client/lib/effectorStore.js';
@@ -39,6 +41,7 @@ function App(appProps: AppProps<IPageProps>) {
       ...currentUserInitialState,
       data: currentUser,
     });
+    const $notificationAnimationDuration = makeNotificationAnimationDuration(actions);
 
     const connectToWss = () => new WebSocket(process.env.NEXT_PUBLIC_WSS_URL!);
     const wsActor: any = interpret(makeSocketMachine(connectToWss, webSocketTypes.browser));
@@ -49,6 +52,8 @@ function App(appProps: AppProps<IPageProps>) {
       wsActor,
       [makeCurrentUser.key]: $currentUser,
       [makeSignedInUsersIds.key]: makeSignedInUsersIds(actions),
+      [makeNotificationAnimationDuration.key]: makeNotificationAnimationDuration(actions),
+      [makeNotifications.key]: makeNotifications(actions, $notificationAnimationDuration),
       [makeSession.key]: makeSession($currentUser),
     };
   }, []);

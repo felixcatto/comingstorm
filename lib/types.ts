@@ -7,6 +7,8 @@ import * as y from 'yup';
 import {
   makeActions,
   makeCurrentUser,
+  makeNotificationAnimationDuration,
+  makeNotifications,
   makeSession,
   makeSignedInUsersIds,
 } from '../client/lib/effectorStore.js';
@@ -15,6 +17,7 @@ import {
   articleSchema,
   Avatar,
   commentsSchema,
+  getUserQuerySchema,
   Message,
   messageSchema,
   Tag,
@@ -89,6 +92,7 @@ export type IUser = {
 export type IUserClass = typeof User;
 export type IUserSchema = y.InferType<typeof userSchema>;
 export type IUserLoginSchema = y.InferType<typeof userLoginSchema>;
+export type IGetUserQuerySchema = y.InferType<typeof getUserQuerySchema>;
 
 export type ICurrentUser = {
   currentUser: IUser;
@@ -174,6 +178,10 @@ export type IWSActor = Interpreter<any, any, any>;
 export type IActions = ReturnType<typeof makeActions>;
 export type ICurrentUserStore = ReturnType<typeof makeCurrentUser>;
 export type ISignedInUsersIdsStore = ReturnType<typeof makeSignedInUsersIds>;
+export type IMakeNotificationAnimationDuration = ReturnType<
+  typeof makeNotificationAnimationDuration
+>;
+export type IMakeNotifications = ReturnType<typeof makeNotifications>;
 export type ISession = ReturnType<typeof makeSession>;
 
 export type IContext = {
@@ -182,6 +190,8 @@ export type IContext = {
   wsActor: IWSActor;
   [makeCurrentUser.key]: ICurrentUserStore;
   [makeSignedInUsersIds.key]: ISignedInUsersIdsStore;
+  [makeNotificationAnimationDuration.key]: IMakeNotificationAnimationDuration;
+  [makeNotifications.key]: IMakeNotifications;
   [makeSession.key]: ISession;
   unreadMessages: IUnreadMessage[];
 };
@@ -313,3 +323,19 @@ export type IGetUserId = (
   rawCookies,
   keygrip: IKeygrip
 ) => { userId: null; isSignatureCorrect: false } | { userId: string; isSignatureCorrect: boolean };
+
+type INotificationText = { text: string; component?: undefined };
+type INotificationComponent = { text?: undefined; component: () => JSX.Element };
+export type INotification = {
+  id: string;
+  title: string;
+  isHidden: boolean;
+  isInverseAnimation: boolean;
+  autoremoveTimeout: number | null;
+} & (INotificationText | INotificationComponent);
+
+type IMakeNotificationOpts = {
+  title: INotification['title'];
+  autoremoveTimeout?: INotification['autoremoveTimeout'];
+} & (INotificationText | INotificationComponent);
+export type IMakeNotification = (opts: IMakeNotificationOpts) => INotification;

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
+import { makeNotification, messageNotification } from '../../client/components/Notifications.jsx';
 import { Select } from '../../client/components/Select.js';
 import {
   fmtISO,
@@ -17,13 +18,13 @@ import {
 import { onMessageEvent, send } from '../../client/lib/wsActor.js';
 import { getUsersInfo } from '../../client/messages/utils.js';
 import { keygrip, orm } from '../../lib/init.js';
-import { IMessage, IUnreadMessagesDict, IUser } from '../../lib/types.js';
+import { IMessage, IUnreadMessagesDict, IUser, IUserWithAvatar } from '../../lib/types.js';
 import { getGenericProps, unwrap } from '../../lib/utils.js';
 import s from './styles.module.css';
 
 type IMessagesProps = {
   messages: IMessage[];
-  users: IUser[];
+  users: IUserWithAvatar[];
 };
 
 export async function getServerSideProps(ctx) {
@@ -51,7 +52,7 @@ type IState = {
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, axios, $signedInUsersIds, wsActor, unreadMessages } = useContext();
+  const { $session, axios, $signedInUsersIds, wsActor, unreadMessages, actions } = useContext();
   const refreshPage = useRefreshPage();
   const { isSignedIn, currentUser } = useStore($session);
   const signedInUsersIds = useStore($signedInUsersIds);
@@ -181,25 +182,28 @@ const Messages = ({ messages, users }: IMessagesProps) => {
   });
 
   React.useEffect(() => {
-    if (isNull(selectedFriendId)) return;
-
-    // on newMessagesArrived we need refreshUnreadMsgs() & refreshMessages()
-    // but both of this handled via refreshPage in WssConnect,
-    //   although it only wants refreshUnreadMsgs()
-    const removeUnreadMessages = onMessageEvent(async ({ type, payload }) => {
+    const onNewMessageArrived = onMessageEvent(async ({ type, payload }) => {
       if (wsEvents.newMessagesArrived !== type) return;
 
-      const isNewMessageInActiveChat = payload.senderId === selectedFriendId;
-      if (!isNewMessageInActiveChat) return;
-
-      const data = { receiver_id: currentUser.id, sender_id: selectedFriendId };
-      await axios.delete(getApiUrl('unreadMessages', {}, data));
       refreshPage();
+      const isNewMessageInActiveChat = payload.senderId === selectedFriendId;
+
+      if (isNewMessageInActiveChat) {
+        const data = { receiver_id: currentUser.id, sender_id: selectedFriendId };
+        await axios.delete(getApiUrl('unreadMessages', {}, data));
+        setTimeout(refreshPage, 200);
+      } else {
+        const { senderId } = payload;
+        const sender = users.find(el => el.id === senderId)!;
+        actions.addNotification(
+          makeNotification({ title: 'New Message From', component: messageNotification(sender) })
+        );
+      }
     });
 
-    wsActor.onEvent(removeUnreadMessages);
+    wsActor.onEvent(onNewMessageArrived);
     return () => {
-      wsActor.off(removeUnreadMessages);
+      wsActor.off(onNewMessageArrived);
     };
   }, [selectedFriendId]);
 

@@ -1,4 +1,5 @@
 import { keygrip, orm } from '../../../lib/init.js';
+import { IGetUserQuerySchema, IUserSchema, IValidate, IValidateQuery } from '../../../lib/types.js';
 import {
   checkAdmin,
   checkValueUnique,
@@ -6,19 +7,28 @@ import {
   switchHttpMethod,
   validate,
 } from '../../../lib/utils.js';
-import { userSchema } from '../../../models/index.js';
-import { IValidate, IUserSchema } from '../../../lib/types.js';
+import { getUserQuerySchema, userSchema } from '../../../models/index.js';
 
 export default switchHttpMethod({
   preHandler: getCurrentUser(orm, keygrip),
-  get: async (req, res) => {
-    const id = req.query.id!;
-    const user = await orm.User.query().findById(id);
-    if (!user) {
-      return res.status(400).json({ message: `Entity with id '${id}' not found` });
-    }
-    return res.json(user);
-  },
+  get: [
+    validate(getUserQuerySchema, 'query'),
+    async (req, res, ctx: IValidateQuery<IGetUserQuerySchema>) => {
+      const id = req.query.id!;
+
+      const { withAvatar } = ctx.query;
+      const userQuery = orm.User.query().findById(id);
+      if (withAvatar) {
+        userQuery.withGraphFetched('avatar');
+      }
+
+      const user = await userQuery;
+      if (!user) {
+        return res.status(400).json({ message: `Entity with id '${id}' not found` });
+      }
+      return res.json(user);
+    },
+  ],
   put: [
     checkAdmin,
     validate(userSchema),

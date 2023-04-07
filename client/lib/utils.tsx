@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { createPortal } from 'react-dom';
+import stringMath from 'string-math';
 import { roles } from '../../lib/sharedUtils.js';
 import {
   IApiErrors,
@@ -100,7 +101,6 @@ export const FormWrapper = ({ apiErrors, setApiErrors, children }) => (
   <FormContext.Provider value={{ apiErrors, setApiErrors }}>{children}</FormContext.Provider>
 );
 
-// eslint-disable-next-line
 export const WithApiErrors = (Component: React.ComponentType<IApiErrors>) => props => {
   const [apiErrors, setApiErrors] = React.useState({}); // eslint-disable-line
   return (
@@ -227,3 +227,6 @@ export const makeCaseInsensitiveRegex = str =>
   new RegExp(str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
 
 export const toSelectOptions = values => values.map(value => ({ value, label: value }));
+
+export const getCssValue = (cssValue: string) =>
+  stringMath(cssValue.trim().replaceAll('calc', '').replaceAll('s', ''));

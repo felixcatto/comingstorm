@@ -4,8 +4,11 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 const nextConfig = {
   reactStrictMode: false,
   webpack: config => {
-    // allow import ".js" files in next app, which are required with "type: module"
-    config.resolve.extensionAlias = { '.js': ['.ts', '.tsx', '.js'] };
+    // allow import ".jsx?" files in next app, which are required with "type: module"
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js'],
+      '.jsx': ['.ts', '.tsx', '.js'],
+    };
     return config;
   },
 };

@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash-es';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Notifications } from '../components/Notifications.jsx';
 import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils.js';
 import s from './Layout.module.css';
 
@@ -69,6 +70,7 @@ const Layout = ({ children }: any) => {
       </div>
       <div id="tooltipRoot"></div>
       <div id="popoverRoot"></div>
+      <Notifications />
     </>
   );
 };
