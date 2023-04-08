@@ -4,7 +4,7 @@ import { uniqueId } from 'lodash-es';
 import Image from 'next/image.js';
 import React from 'react';
 import { IMakeNotification, IUserWithAvatar } from '../../lib/types.js';
-import { getCssValue, useContext } from '../lib/utils.jsx';
+import { getCssValue, getUrl, isTabActive, useContext } from '../lib/utils.jsx';
 import s from './Notifications.module.css';
 
 export const Notifications = () => {
@@ -16,6 +16,13 @@ export const Notifications = () => {
     const animationDuration =
       getCssValue(rootStyles.getPropertyValue('--animationDuration')) * 1000;
     actions.setNotificationAnimationDuration(animationDuration);
+  }, []);
+
+  React.useEffect(() => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'default') return;
+
+    setTimeout(() => Notification.requestPermission(), 30_000);
   }, []);
 
   return (
@@ -68,3 +75,29 @@ export const messageNotification = (sender: IUserWithAvatar) => () =>
       <div className="ml-1 text-primary font-bold">{sender.name}</div>
     </div>
   );
+
+export const showMessageBrowserNotification = (router, sender: IUserWithAvatar) => {
+  const notification = new Notification('New Message', {
+    body: `From ${sender.name}`,
+    icon: '/favicon.ico',
+    requireInteraction: true,
+  });
+
+  notification.addEventListener('click', () => {
+    window.focus();
+    router.push(getUrl('messages'));
+  });
+};
+
+export const showMessageNotification = (actions, router, sender: IUserWithAvatar) => {
+  if (isTabActive()) {
+    actions.addNotification(
+      makeNotification({
+        title: 'New Message From',
+        component: messageNotification(sender),
+      })
+    );
+  } else {
+    showMessageBrowserNotification(router, sender);
+  }
+};

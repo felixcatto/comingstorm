@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router.js';
 import React from 'react';
-import { makeNotification, messageNotification } from '../components/Notifications.jsx';
+import { showMessageNotification } from '../components/Notifications.jsx';
 import { getApiUrl, getUrl, useContext, useRefreshPage, wsEvents } from '../lib/utils.js';
 import { onMessageEvent, send } from '../lib/wsActor.js';
 
@@ -40,9 +40,7 @@ const WssConnect = () => {
 
           const { senderId } = payload;
           const sender = await axios.get(getApiUrl('user', { id: senderId }, { withAvatar: true }));
-          actions.addNotification(
-            makeNotification({ title: 'New Message From', component: messageNotification(sender) })
-          );
+          showMessageNotification(actions, router, sender);
           break;
 
         default:

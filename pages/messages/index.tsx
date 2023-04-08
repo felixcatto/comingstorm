@@ -2,14 +2,19 @@ import cn from 'classnames';
 import { useStore } from 'effector-react';
 import { isNull } from 'lodash-es';
 import Image from 'next/image';
+import { useRouter } from 'next/router.js';
 import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
-import { makeNotification, messageNotification } from '../../client/components/Notifications.jsx';
+import {
+  showMessageBrowserNotification,
+  showMessageNotification,
+} from '../../client/components/Notifications.jsx';
 import { Select } from '../../client/components/Select.js';
 import {
   fmtISO,
   getApiUrl,
+  isTabActive,
   useContext,
   useMergeState,
   useRefreshPage,
@@ -54,8 +59,10 @@ type IState = {
 const Messages = ({ messages, users }: IMessagesProps) => {
   const { $session, axios, $signedInUsersIds, wsActor, unreadMessages, actions } = useContext();
   const refreshPage = useRefreshPage();
+  const router = useRouter();
   const { isSignedIn, currentUser } = useStore($session);
   const signedInUsersIds = useStore($signedInUsersIds);
+
   const [state, setState] = useMergeState<IState>({
     usersNewlySelectedToChat: [],
     selectedFriendId: null,
@@ -186,18 +193,20 @@ const Messages = ({ messages, users }: IMessagesProps) => {
       if (wsEvents.newMessagesArrived !== type) return;
 
       refreshPage();
-      const isNewMessageInActiveChat = payload.senderId === selectedFriendId;
+
+      const { senderId } = payload;
+      const isNewMessageInActiveChat = senderId === selectedFriendId;
+      const sender = users.find(el => el.id === senderId)!;
 
       if (isNewMessageInActiveChat) {
+        if (!isTabActive()) {
+          showMessageBrowserNotification(router, sender);
+        }
         const data = { receiver_id: currentUser.id, sender_id: selectedFriendId };
         await axios.delete(getApiUrl('unreadMessages', {}, data));
         setTimeout(refreshPage, 200);
       } else {
-        const { senderId } = payload;
-        const sender = users.find(el => el.id === senderId)!;
-        actions.addNotification(
-          makeNotification({ title: 'New Message From', component: messageNotification(sender) })
-        );
+        showMessageNotification(actions, router, sender);
       }
     });
 

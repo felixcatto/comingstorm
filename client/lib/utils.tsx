@@ -230,3 +230,5 @@ export const toSelectOptions = values => values.map(value => ({ value, label: va
 
 export const getCssValue = (cssValue: string) =>
   stringMath(cssValue.trim().replaceAll('calc', '').replaceAll('s', ''));
+
+export const isTabActive = () => document.visibilityState === 'visible';
