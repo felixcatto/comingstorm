@@ -1,7 +1,7 @@
 export default [
   {
     id: -1,
-    name: 'vasa',
+    name: 'Vasa',
     role: 'admin',
     email: 'vasa@yandex.ru',
     password: '1',
@@ -9,7 +9,7 @@ export default [
   },
   {
     id: -2,
-    name: 'tom',
+    name: 'Tom',
     role: 'user',
     email: 'tom@thunderstorm.com',
     password: '1',
@@ -17,10 +17,18 @@ export default [
   },
   {
     id: -3,
-    name: 'fedya',
+    name: 'Fedya',
     role: 'user',
     email: 'fedya@yandex.ru',
     password: '1',
     avatar_id: -3,
+  },
+  {
+    id: -4,
+    name: 'ImbaQ',
+    role: 'user',
+    email: 'ImbaQ@yandex.ru',
+    password: '1',
+    avatar_id: -4,
   },
 ];

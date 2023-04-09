@@ -12,7 +12,7 @@ const config = {
   entry: { index: getPagesPaths().map(el => path.resolve(__dirname, el)) },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    extensionAlias: { '.js': ['.ts', '.tsx', '.js'] },
+    extensionAlias: { '.js': ['.ts', '.tsx', '.js'], '.jsx': ['.ts', '.tsx', '.js'] },
   },
   module: {
     rules: [

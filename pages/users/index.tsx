@@ -82,11 +82,11 @@ const Users = ({ users }: IUsersProps) => {
                   <div className="flex justify-end">
                     <Link
                       href={getUrl('editUser', { id: user.id })}
-                      className="btn-outline btn_sm mr-2"
+                      className="btn-outline btn-outline_sm mr-2"
                     >
                       Edit user
                     </Link>
-                    <div className="btn-outline btn_sm" onClick={deleteUser(user.id)}>
+                    <div className="btn-outline btn-outline_sm" onClick={deleteUser(user.id)}>
                       Remove user
                     </div>
                   </div>

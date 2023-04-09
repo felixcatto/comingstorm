@@ -1,9 +1,20 @@
 import { useStore } from 'effector-react';
+import { isEmpty, isNull, uniqBy } from 'lodash-es';
 import Link from 'next/link';
+import React from 'react';
 import Layout from '../../client/common/Layout.js';
-import { getApiUrl, getUrl, useContext, useRefreshPage } from '../../client/lib/utils.js';
+import { HeaderCell } from '../../client/components/HeaderCell.jsx';
+import { Pagination } from '../../client/components/Pagination.jsx';
+import {
+  filterTypes,
+  getApiUrl,
+  getUrl,
+  useContext,
+  useRefreshPage,
+  useTable,
+} from '../../client/lib/utils.js';
 import { keygrip, orm } from '../../lib/init.js';
-import { IArticle } from '../../lib/types.js';
+import { IArticle, IFiltersMap, ISelectFilter, ITag } from '../../lib/types.js';
 import { getGenericProps } from '../../lib/utils.js';
 
 type IArticlesProps = {
@@ -21,6 +32,56 @@ const Articles = ({ articles }: IArticlesProps) => {
   const { isSignedIn, isBelongsToUser } = useStore($session);
   const refreshPage = useRefreshPage();
 
+  const defaultFilters: IFiltersMap = React.useMemo(() => {
+    const rawTags = articles.flatMap(el => el.tags!);
+    const existedTagsFilterOptions = uniqBy(rawTags, 'id').map(el => ({
+      value: el.id,
+      label: el.name,
+    }));
+    const tagsFilterOptions = [{ value: null, label: '' }].concat(existedTagsFilterOptions);
+
+    return {
+      title: {
+        filterBy: 'title',
+        filterType: filterTypes.search,
+        filter: '',
+      },
+      text: {
+        filterBy: 'text',
+        filterType: filterTypes.search,
+        filter: '',
+      },
+      'author.name': {
+        filterBy: 'author.name',
+        filterType: filterTypes.search,
+        filter: '',
+      },
+      tags: {
+        filterBy: 'tags',
+        filterType: filterTypes.select,
+        filter: [],
+        filterOptions: tagsFilterOptions,
+        customFilterFn: (rowValue: ITag[], filter: ISelectFilter) => {
+          const tagsIds = rowValue.map(el => el.id);
+          return filter.some(
+            selectFilter =>
+              tagsIds.includes(selectFilter.value) ||
+              (isEmpty(tagsIds) && isNull(selectFilter.value))
+          );
+        },
+      },
+    };
+  }, [articles]);
+
+  const { rows, paginationProps, headerCellProps } = useTable({
+    rows: articles,
+    page: 0,
+    size: 3,
+    sortBy: null,
+    sortOrder: null,
+    filters: defaultFilters,
+  });
+
   const deleteArticle = id => async () => {
     await axios.delete(getApiUrl('article', { id }));
     refreshPage();
@@ -36,18 +97,34 @@ const Articles = ({ articles }: IArticlesProps) => {
         </Link>
       )}
 
-      <table className="table">
+      {rows && (
+        <Pagination
+          {...paginationProps}
+          className="mb-3 justify-end"
+          availableSizes={[3, 5, 10, 20]}
+        />
+      )}
+
+      <table className="table table-fixed">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Text</th>
-            <th>Author</th>
-            <th>Tags</th>
-            <th>Actions</th>
+            <HeaderCell {...headerCellProps} name="title" className="w-32" sortable>
+              <div>Title</div>
+            </HeaderCell>
+            <HeaderCell {...headerCellProps} name="text" sortable>
+              <div>Text</div>
+            </HeaderCell>
+            <HeaderCell {...headerCellProps} name="author.name" className="w-32" sortable>
+              <div>Author</div>
+            </HeaderCell>
+            <HeaderCell {...headerCellProps} name="tags" className="w-32">
+              <div>Tags</div>
+            </HeaderCell>
+            <th className="w-56">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {articles?.map(article => (
+          {rows.map(article => (
             <tr key={article.id}>
               <td>{article.title}</td>
               <td className="text-justify">{article.text}</td>
@@ -57,7 +134,7 @@ const Articles = ({ articles }: IArticlesProps) => {
                 <div className="flex justify-end">
                   <Link
                     href={getUrl('article', { id: article.id })}
-                    className="btn-outline btn_sm  mr-2"
+                    className="btn-outline btn-outline_sm  mr-2"
                   >
                     Show Article
                   </Link>
@@ -65,11 +142,14 @@ const Articles = ({ articles }: IArticlesProps) => {
                     <>
                       <Link
                         href={getUrl('editArticle', { id: article.id })}
-                        className="btn-outline btn_sm mr-2"
+                        className="btn-outline btn-outline_sm mr-2"
                       >
                         Edit Article
                       </Link>
-                      <div className="btn-outline btn_sm" onClick={deleteArticle(article.id)}>
+                      <div
+                        className="btn-outline btn-outline_sm"
+                        onClick={deleteArticle(article.id)}
+                      >
                         Remove Article
                       </div>
                     </>

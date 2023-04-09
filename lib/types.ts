@@ -29,7 +29,16 @@ import {
   userSchema,
 } from '../models/index.js';
 import { orm } from './init.js';
-import { asyncStates, getApiUrl, roles, socketStates, wsEvents, wsGeneralEvents } from './utils.js';
+import {
+  asyncStates,
+  filterTypes,
+  getApiUrl,
+  roles,
+  socketStates,
+  sortOrders,
+  wsEvents,
+  wsGeneralEvents,
+} from './utils.js';
 
 export type IOrm = typeof orm;
 
@@ -339,3 +348,90 @@ type IMakeNotificationOpts = {
   autoremoveTimeout?: INotification['autoremoveTimeout'];
 } & (INotificationText | INotificationComponent);
 export type IMakeNotification = (opts: IMakeNotificationOpts) => INotification;
+
+type Anyify<T> = { [K in keyof T]: any };
+
+export type ISortOrder = keyof typeof sortOrders | null;
+export type IFilterTypes = typeof filterTypes;
+
+export type ISelectFilter = ISelectOption[];
+export type ISearchFilter = string;
+
+type ISelectFilterObj = {
+  filterBy: string;
+  filterType: IFilterTypes['select'];
+  filter: ISelectFilter;
+  filterOptions: ISelectFilter;
+  customFilterFn?: (rowValue, filter: IMixedFilter) => boolean;
+};
+
+type ISearchFilterObj = {
+  filterBy: string;
+  filterType: IFilterTypes['search'];
+  filter: ISearchFilter;
+  customFilterFn?: (rowValue, filter: IMixedFilter) => boolean;
+};
+
+export type IFilter = ISelectFilterObj | ISearchFilterObj;
+
+export type IMixedFilter = ISearchFilter | ISelectFilter;
+export type IFiltersMap = Record<string, Anyify<IFilter> & { filterOptions?: any }>;
+
+export type ISelectFilterProps = {
+  name: string;
+  setIsOpen: any;
+  filterOptions: ISelectFilter;
+  filter: ISelectFilter;
+  onFilter: (filter: ISelectFilter, filterBy: string) => void;
+};
+
+export type ISearchFilterProps = {
+  name: string;
+  setIsOpen: any;
+  filter: ISearchFilter;
+  onFilter: (filter: ISearchFilter, filterBy: string) => void;
+};
+
+export type IHeaderCellProps = {
+  children: any;
+  name: string;
+  onSortChange: (sortOrder: ISortOrder, sortBy: string) => void;
+  onFilterChange: (filter: IMixedFilter, filterBy: string) => void;
+  filters: IFiltersMap;
+  sortable?: boolean;
+  sortBy?: string;
+  sortOrder?: ISortOrder;
+  className?: string;
+};
+
+export type IUseTableProps<T = any> = {
+  rows: T;
+  page: number;
+  size: number;
+  sortBy: string | null;
+  sortOrder: ISortOrder;
+  filters: IFiltersMap;
+};
+
+export type IUseTableState = Omit<IUseTableProps, 'rows'>;
+
+export type IUseTable = <T extends any[]>(
+  props: IUseTableProps<T>
+) => {
+  rows: T;
+  totalRows: number;
+  paginationProps: {
+    totalRows;
+    page;
+    size;
+    onPageChange;
+    onSizeChange;
+  };
+  headerCellProps: {
+    sortBy;
+    sortOrder;
+    filters;
+    onSortChange;
+    onFilterChange;
+  };
+};

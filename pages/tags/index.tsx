@@ -52,11 +52,11 @@ const Tags = ({ tags }: ITagsProps) => {
                   <div className="flex justify-end">
                     <Link
                       href={getUrl('editTag', { id: tag.id })}
-                      className="btn-outline btn_sm mr-2"
+                      className="btn-outline btn-outline_sm mr-2"
                     >
                       Edit Tag
                     </Link>
-                    <div className="btn-outline btn_sm" onClick={deleteTag(tag.id)}>
+                    <div className="btn-outline btn-outline_sm" onClick={deleteTag(tag.id)}>
                       Remove Tag
                     </div>
                   </div>

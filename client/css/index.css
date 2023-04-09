@@ -145,10 +145,69 @@ h3 {
   }
 }
 
-a {
+.btn-light {
+  @apply border border-slate-300;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  line-height: 1.3;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  vertical-align: middle;
+  text-decoration: none;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  color: black;
+  background-color: white;
+  &:hover {
+    background-color: #f2f2f2;
+  }
+
+  &_sm {
+    font-size: 0.875rem;
+  }
+
+  &_active {
+    color: white;
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: var(--secondary);
+      border-color: var(--secondary);
+    }
+  }
+
+  &_disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      @apply border-slate-300;
+      background-color: white;
+    }
+  }
+}
+
+a,
+.link {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
   color: var(--secondary);
+  transition: 0.15s;
   &:hover {
     text-decoration: underline;
+  }
+  &_disabled {
+    color: black;
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
@@ -185,6 +244,29 @@ select.input:focus {
   }
 }
 
+.input-secondary {
+  @apply border border-slate-300;
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  background-color: #fff;
+  background-clip: padding-box;
+  appearance: none;
+  border-radius: 6px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  &_hover:hover {
+    border-color: var(--secondary);
+  }
+  &:focus {
+    border-color: var(--secondary);
+    outline: 0;
+    box-shadow: 0 0 0 4px var(--secondary-rgba-25);
+  }
+  &_inline {
+    width: auto;
+  }
+}
+
 .fa,
 .far {
   color: var(--primary);
@@ -207,6 +289,9 @@ select.input:focus {
   }
   &_secondary {
     color: var(--secondary);
+  }
+  &_noColor {
+    color: inherit;
   }
 }
 

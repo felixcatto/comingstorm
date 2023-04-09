@@ -2,21 +2,26 @@ import { Side } from '@floating-ui/react';
 import cn from 'classnames';
 import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
-import { isFunction, omit } from 'lodash-es';
+import produce from 'immer';
+import { get, isEmpty, isFunction, isNull, isNumber, omit, orderBy } from 'lodash-es';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { createPortal } from 'react-dom';
 import stringMath from 'string-math';
-import { roles } from '../../lib/sharedUtils.js';
+import { filterTypes, roles, sortOrders } from '../../lib/sharedUtils.js';
 import {
   IApiErrors,
   IContext,
   IEmptyObject,
   IFMultiSelectProps,
+  IMixedFilter,
   ISelectedOption,
+  ISortOrder,
   IUseMergeState,
   IUseSubmit,
+  IUseTable,
+  IUseTableState,
   IUsualSelect,
   IWSDecodeReturn,
 } from '../../lib/types.js';
@@ -232,3 +237,78 @@ export const getCssValue = (cssValue: string) =>
   stringMath(cssValue.trim().replaceAll('calc', '').replaceAll('s', ''));
 
 export const isTabActive = () => document.visibilityState === 'visible';
+
+export const useTable: IUseTable = props => {
+  const { rows: originalRows } = props;
+
+  const [state, setState] = useMergeState<IUseTableState>({
+    page: props.page,
+    size: props.size,
+    sortBy: props.sortBy,
+    sortOrder: props.sortOrder,
+    filters: props.filters,
+  });
+  const { page, size, sortBy, sortOrder, filters } = state;
+
+  const filtersList = React.useMemo(() => Object.values(filters), [filters]);
+
+  const onPageChange = newPage => setState({ page: newPage });
+  const onSizeChange = newSize => setState({ size: newSize, page: 0 });
+
+  const onSortChange = (sortOrder, sortBy) => {
+    let newSortOrder: ISortOrder = null;
+    if (isNull(sortOrder)) newSortOrder = sortOrders.asc;
+    if (sortOrders.asc === sortOrder) newSortOrder = sortOrders.desc;
+
+    setState({ sortBy, sortOrder: newSortOrder });
+  };
+
+  const onFilterChange = (filter: IMixedFilter, filterBy) =>
+    setState({
+      filters: produce(filters, draft => {
+        draft[filterBy].filter = filter;
+      }),
+      page: 0,
+    });
+
+  const { rows, totalRows } = React.useMemo(() => {
+    let filtered;
+
+    if (isEmpty(filtersList)) {
+      filtered = originalRows;
+    } else {
+      filtered = originalRows.filter(row =>
+        filtersList.every(filterObj => {
+          const { filter, filterBy, filterType, customFilterFn } = filterObj;
+          if (isEmpty(filter)) return true;
+
+          const rowValueOfField = get(row, filterBy);
+          if (customFilterFn) {
+            return customFilterFn(rowValueOfField, filter);
+          }
+
+          if (filterType === filterTypes.search) {
+            const regex = makeCaseInsensitiveRegex(filter);
+            return rowValueOfField.match(regex);
+          }
+
+          if (filterType === filterTypes.select) {
+            return filter.some(selectFilter => selectFilter.value === rowValueOfField);
+          }
+        })
+      );
+    }
+
+    const sorted = sortBy && sortOrder ? orderBy(filtered, sortBy, sortOrder) : filtered;
+
+    const paginated =
+      size && isNumber(page) ? sorted.slice(page * size, page * size + size) : sorted;
+
+    return { rows: paginated, totalRows: sorted.length };
+  }, [originalRows, page, size, sortBy, sortOrder, filters]);
+
+  const paginationProps = { totalRows, page, size, onPageChange, onSizeChange };
+  const headerCellProps = { sortBy, sortOrder, filters, onSortChange, onFilterChange };
+
+  return { rows, totalRows, paginationProps, headerCellProps };
+};

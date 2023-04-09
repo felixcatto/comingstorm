@@ -1,6 +1,6 @@
-import articlesTags from '../__tests__/fixtures/articles_tags.js';
+import { full } from '../__tests__/fixtures/articles_tags.js';
 
 export const seed = async knex => {
   await knex('articles_tags').delete();
-  await knex('articles_tags').insert(articlesTags);
+  await knex('articles_tags').insert(full);
 };
