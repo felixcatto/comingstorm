@@ -14,14 +14,14 @@ start-prod-server:
 start-ws-server:
 	npx gulp startWsServer
 
-start-prod-ws-server: build-wss
+start-prod-ws-server:
 	node dist/services/webSocketServer/bin.js
 
 build:
 	npx next build
 
 build-wss:
-	NODE_ENV=production npx webpack
+	npx gulp buildWsServer
 
 analyze-bundle:
 	ANALYZE=true npx next build
@@ -72,3 +72,24 @@ lint:
 
 css-styles:
 	npx sass --no-source-map public/css/src/bootstrap-grid.scss public/css/bootstrap-grid.css
+
+caddy-reload-config:
+	docker compose exec caddy caddy reload --config="/etc/caddy/Caddyfile"
+
+compose-build:
+	docker compose build
+
+compose-up:
+	docker compose up -d
+
+compose-down:
+	docker compose down
+
+compose-log:
+	docker compose logs -f
+
+compose-migrate:
+	docker compose exec app make migrate
+
+compose-seed:
+	docker compose exec app make database-seed

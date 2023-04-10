@@ -7,20 +7,24 @@ import {
   ErrorMessage,
   Field,
   getUrl,
+  roles,
   SubmitBtn,
   useContext,
   useSubmit,
   WithApiErrors,
 } from '../../client/lib/utils.js';
 import { keygrip, orm } from '../../lib/init.js';
+import { IUser } from '../../lib/types.js';
 import { getGenericProps } from '../../lib/utils.js';
 
 export async function getServerSideProps(ctx) {
-  const props = await getGenericProps({ ctx, keygrip, orm });
+  const adminUser = await orm.User.query().findOne('role', roles.admin);
+  const props = await getGenericProps({ ctx, keygrip, orm }, { adminUser });
   return { props };
 }
 
-const LoginForm = () => {
+const LoginForm = props => {
+  const adminUser: IUser = props.adminUser;
   const { actions } = useContext();
   const router = useRouter();
 
@@ -46,7 +50,7 @@ const LoginForm = () => {
         </Tooltip>
       </h3>
 
-      <Formik initialValues={{ email: '', password: '' }} onSubmit={onSubmit}>
+      <Formik initialValues={{ email: adminUser.email, password: '1' }} onSubmit={onSubmit}>
         <Form>
           <div className="row mb-5">
             <div className="col-6">
@@ -62,7 +66,7 @@ const LoginForm = () => {
               </div>
             </div>
           </div>
-          <Link href={getUrl('home')} className="mr-2">
+          <Link href={getUrl('home')} className="mr-4">
             Cancel
           </Link>
           <SubmitBtn className="btn">Sign in</SubmitBtn>
