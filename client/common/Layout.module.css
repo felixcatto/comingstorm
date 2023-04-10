@@ -22,6 +22,11 @@
   color: #fff;
 }
 
+.logoImg {
+  width: 66px;
+  height: 50px;
+}
+
 .messagesWrap {
   position: relative;
 }

@@ -93,3 +93,14 @@ export const wsEvents = makeEnum(
 );
 export const encode: IEncode = (wsEvent, payload = '') =>
   JSON.stringify({ type: wsEvent, payload });
+
+export const isBrowser = () => typeof window !== 'undefined';
+
+export const makeWssUrl = port => {
+  if (isBrowser()) {
+    const { protocol, hostname } = window.location;
+    return `${protocol.replace('http', 'ws')}//${hostname}:${port}`;
+  }
+
+  return `ws://localhost:${port}`;
+};

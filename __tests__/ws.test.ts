@@ -1,21 +1,28 @@
 import { jest } from '@jest/globals';
 import makeKeygrip from 'keygrip';
 import WebSocket from 'ws';
-import { decode, encode, makeWsData, waitForSocketState, wsEvents } from '../lib/utils.js';
+import {
+  decode,
+  encode,
+  makeWsData,
+  makeWssUrl,
+  waitForSocketState,
+  wsEvents,
+} from '../lib/utils.js';
 import { closeServer, startServer } from '../services/webSocketServer/main.js';
 import usersFixture from './fixtures/users.js';
 
 describe('wss', () => {
   const keys = process.env.KEYS!.split(',');
   const keygrip = makeKeygrip(keys);
-  const wsUrl = process.env.NEXT_PUBLIC_WSS_URL!;
+  const wssUrl = makeWssUrl(process.env.WSS_PORT!);
 
   beforeAll(async () => {
     await startServer();
   });
 
   it('reflect data', async () => {
-    const socket = new WebSocket(wsUrl);
+    const socket = new WebSocket(wssUrl);
     const testMessage = 'This is a test message';
     const callback = jest.fn();
     socket.on('message', callback);
@@ -31,8 +38,8 @@ describe('wss', () => {
 
   it('broadcast signedIn users', async () => {
     const [user] = usersFixture;
-    const client1 = new WebSocket(wsUrl);
-    const client2 = new WebSocket(wsUrl);
+    const client1 = new WebSocket(wssUrl);
+    const client2 = new WebSocket(wssUrl);
 
     const callback1 = jest.fn();
     const callback2 = jest.fn();
@@ -68,8 +75,8 @@ describe('wss', () => {
 
   it('broadcast signedOut users', async () => {
     const [vasa, tom] = usersFixture;
-    const client1 = new WebSocket(wsUrl);
-    const client2 = new WebSocket(wsUrl);
+    const client1 = new WebSocket(wssUrl);
+    const client2 = new WebSocket(wssUrl);
 
     const callback1 = jest.fn();
     const callback2 = jest.fn();
@@ -102,8 +109,8 @@ describe('wss', () => {
 
   it('notifies user about new message', async () => {
     const [vasa, tom] = usersFixture;
-    const client1 = new WebSocket(wsUrl);
-    const client2 = new WebSocket(wsUrl);
+    const client1 = new WebSocket(wssUrl);
+    const client2 = new WebSocket(wssUrl);
 
     const vasaCallback = jest.fn();
     const tomCallback = jest.fn();

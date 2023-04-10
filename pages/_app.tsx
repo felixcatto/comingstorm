@@ -13,7 +13,7 @@ import {
   makeSession,
   makeSignedInUsersIds,
 } from '../client/lib/effectorStore.js';
-import { Context, guestUser } from '../client/lib/utils.js';
+import { Context, guestUser, makeWssUrl } from '../client/lib/utils.js';
 import { makeSocketMachine, webSocketTypes } from '../client/lib/wsActor.js';
 import { IContext, IPageProps } from '../lib/types.js';
 import '../client/css/tailwind.css'; // Import LAST
@@ -42,8 +42,7 @@ function App(appProps: AppProps<IPageProps>) {
       data: currentUser,
     });
     const $notificationAnimationDuration = makeNotificationAnimationDuration(actions);
-
-    const connectToWss = () => new WebSocket(process.env.NEXT_PUBLIC_WSS_URL!);
+    const connectToWss = () => new WebSocket(makeWssUrl(process.env.NEXT_PUBLIC_WSS_PORT!));
     const wsActor: any = interpret(makeSocketMachine(connectToWss, webSocketTypes.browser));
 
     return {

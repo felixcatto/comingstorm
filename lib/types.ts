@@ -404,8 +404,7 @@ export type IHeaderCellProps = {
   className?: string;
 };
 
-export type IUseTableProps<T = any> = {
-  rows: T;
+type IUseTableCommonProps = {
   page: number;
   size: number;
   sortBy: string | null;
@@ -413,15 +412,18 @@ export type IUseTableProps<T = any> = {
   filters: IFiltersMap;
 };
 
-export type IUseTableState = Omit<IUseTableProps, 'rows'>;
+export type IUseTableProps<T = any> = IUseTableCommonProps & {
+  rows?: T;
+};
+
+export type IUseTableState = IUseTableCommonProps;
 
 export type IUseTable = <T extends any[]>(
   props: IUseTableProps<T>
-) => {
+) => IUseTableCommonProps & {
   rows: T;
   totalRows: number;
   paginationProps: {
-    totalRows;
     page;
     size;
     onPageChange;

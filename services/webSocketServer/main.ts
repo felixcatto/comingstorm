@@ -107,7 +107,7 @@ fastify.register(healthCheck);
 export const startServer = async (opts?) =>
   new Promise(resolve => {
     const port = opts?.port || process.env.WSS_PORT;
-    fastify.listen({ port }, err => {
+    fastify.listen({ port, host: '0.0.0.0' }, err => {
       if (err) {
         console.log(err);
         process.exit(1);

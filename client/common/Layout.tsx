@@ -25,7 +25,13 @@ const Layout = ({ children }: any) => {
         <div className={s.header}>
           <div className={cn('container', s.headerFg)}>
             <div className="flex items-center">
-              <Image src="/img/storm.svg" className="mr-7" width={66} height={50} alt="" />
+              <Image
+                src="/img/storm.svg"
+                className={cn('mr-7', s.logoImg)}
+                width={66}
+                height={48}
+                alt=""
+              />
               <div className="flex">
                 <NavLink href={getUrl('home')}>Home</NavLink>
                 <NavLink href={getUrl('users')}>Users</NavLink>

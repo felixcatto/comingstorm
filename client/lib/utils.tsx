@@ -272,6 +272,8 @@ export const useTable: IUseTable = props => {
     });
 
   const { rows, totalRows } = React.useMemo(() => {
+    if (!originalRows) return { rows: [], totalRows: 0 };
+
     let filtered;
 
     if (isEmpty(filtersList)) {
@@ -310,5 +312,15 @@ export const useTable: IUseTable = props => {
   const paginationProps = { totalRows, page, size, onPageChange, onSizeChange };
   const headerCellProps = { sortBy, sortOrder, filters, onSortChange, onFilterChange };
 
-  return { rows, totalRows, paginationProps, headerCellProps };
+  return {
+    rows,
+    totalRows,
+    page,
+    size,
+    sortBy,
+    sortOrder,
+    filters,
+    paginationProps,
+    headerCellProps,
+  };
 };

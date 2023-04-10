@@ -21,7 +21,7 @@ const basic = [
     id: -1,
     title: 'Lead Article',
     text: 'Some really long zzZ text about anything',
-    author_id: -1,
+    author_id: -2,
   },
 ];
 

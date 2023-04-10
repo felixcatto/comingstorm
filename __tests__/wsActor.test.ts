@@ -1,6 +1,7 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import { interpret } from 'xstate';
 import { makeSocketMachine, states, webSocketTypes } from '../client/lib/wsActor.js';
+import { makeWssUrl } from '../lib/utils.js';
 
 const startServer = async wssPort =>
   new Promise(resolve => {
@@ -14,8 +15,8 @@ const startServer = async wssPort =>
   });
 
 describe('wss', () => {
-  const wssUrl = process.env.NEXT_PUBLIC_WSS_URL!;
   const wssPort = process.env.WSS_PORT!;
+  const wssUrl = makeWssUrl(wssPort);
 
   let closeServer;
   const connectToWss = () => new WebSocket(wssUrl);

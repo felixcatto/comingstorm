@@ -73,7 +73,7 @@ const Articles = ({ articles }: IArticlesProps) => {
     };
   }, [articles]);
 
-  const { rows, paginationProps, headerCellProps } = useTable({
+  const { rows, totalRows, paginationProps, headerCellProps } = useTable({
     rows: articles,
     page: 0,
     size: 3,
@@ -97,13 +97,12 @@ const Articles = ({ articles }: IArticlesProps) => {
         </Link>
       )}
 
-      {rows && (
-        <Pagination
-          {...paginationProps}
-          className="mb-3 justify-end"
-          availableSizes={[3, 5, 10, 20]}
-        />
-      )}
+      <Pagination
+        {...paginationProps}
+        totalRows={totalRows}
+        className="mb-3 justify-end"
+        availableSizes={[3, 5, 10, 20]}
+      />
 
       <table className="table table-fixed">
         <thead>
