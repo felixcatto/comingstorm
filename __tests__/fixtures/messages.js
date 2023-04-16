@@ -25,7 +25,7 @@ export default [
   },
   {
     id: -5,
-    text: 'Pls, don\'t ignor me, i really needed it, and i know that you have few spare video cards.',
+    text: "Pls, don't ignor me, i really needed it, and i know that you have few spare video cards.",
     sender_id: -3,
     receiver_id: -1,
   },

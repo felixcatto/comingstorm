@@ -70,6 +70,9 @@ lint:
 	npx eslint .
 	npx tsc
 
+prettify:
+	npx prettier --write .
+
 css-styles:
 	npx sass --no-source-map public/css/src/bootstrap-grid.scss public/css/bootstrap-grid.css
 

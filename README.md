@@ -4,15 +4,16 @@ SPA app using NextJs + TypeScript + Postgress. Traditional CRUD blog with abilit
 
 ### Features
 
-* HTTPS
-* Chat on Websockets
-* One button deploy \*. So you need only Docker and Git installed on server. Node, Postgress and Caddy will be handled via Docker.
-* API tests and database migrations
-* Notable techs - NextJs, TypeScript, ObjectionOrm, WebSockets, Jest, CSS Modules, Tailwind, Docker, Postgress, Caddy.
+- HTTPS
+- Chat on Websockets
+- One button deploy \*. So you need only Docker and Git installed on server. Node, Postgress and Caddy will be handled via Docker.
+- API tests and database migrations
+- Notable techs - NextJs, TypeScript, ObjectionOrm, WebSockets, Jest, CSS Modules, Tailwind, Docker, Postgress, Caddy.
 
 ### Commands
 
-*Development*
+_Development_
+
 ```
 git clone https://github.com/felixcatto/comingstorm.git
 cd comingstorm
@@ -26,7 +27,8 @@ make start
 
 then go to `http://localhost:3000`
 
-*Deploy*
+_Deploy_
+
 ```
 git clone https://github.com/felixcatto/comingstorm.git
 cd comingstorm
@@ -37,15 +39,3 @@ make compose-seed    # only first time, for prepopulate database
 ```
 
 then go to `http://localhost/`
-
-
-
-
-
-
-
-
-
-
-
-

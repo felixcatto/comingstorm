@@ -10,7 +10,7 @@ services:
 
   wss:
     image: storm-wss
-    build: 
+    build:
       context: .
       dockerfile: services/webSocketServer/Dockerfile
 

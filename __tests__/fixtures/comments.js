@@ -2,8 +2,7 @@ export default [
   {
     id: -1,
     guest_name: '',
-    text:
-      'Lead article? huh, what it means? Is somebody knows it? for me it is complete mystery =/',
+    text: 'Lead article? huh, what it means? Is somebody knows it? for me it is complete mystery =/',
     article_id: -1,
     author_id: -1,
   },
