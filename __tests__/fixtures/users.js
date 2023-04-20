@@ -31,4 +31,28 @@ export default [
     password: '1',
     avatar_id: -4,
   },
+  {
+    id: -5,
+    name: 'Ryan Florence',
+    role: 'user',
+    email: 'ryanF@gmail.com',
+    password: '1',
+    avatar_id: -7,
+  },
+  {
+    id: -6,
+    name: 'Iron Man',
+    role: 'user',
+    email: 'i.manD@mail.ru',
+    password: '1',
+    avatar_id: -6,
+  },
+  {
+    id: -7,
+    name: 'Sarah Dayan',
+    role: 'user',
+    email: 'sarahD@gmail.com',
+    password: '1',
+    avatar_id: -9,
+  },
 ];

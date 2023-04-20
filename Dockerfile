@@ -10,7 +10,8 @@ COPY lib ./lib
 COPY models ./models
 COPY pages ./pages
 COPY public ./public
-COPY .env* knexfile.js gulpfile.js Makefile middleware.ts next.config.js tailwind.config.cjs tsconfig.json .
+COPY .env* .sentryclirc gulpfile.js knexfile.js Makefile middleware.ts next.config.js \
+  sentry* tailwind.config.cjs tsconfig.json .
 RUN make build
 COPY migrations ./migrations
 COPY seeds ./seeds
