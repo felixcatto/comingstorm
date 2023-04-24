@@ -13,7 +13,7 @@ import {
   useTransitionStyles,
 } from '@floating-ui/react';
 import React from 'react';
-import { Portal } from '../lib/utils.js';
+import { popoverRootId, Portal } from '../lib/utils.js';
 
 type IUsePopupProps = {
   isOpen: boolean;
@@ -54,7 +54,7 @@ export const usePopup = (props: IUsePopupProps) => {
 };
 
 export const Popup = (props: IPopupProps) => {
-  const tooltipRootSelector = '#popoverRoot';
+  const tooltipRootSelector = `#${popoverRootId}`;
   const {
     children,
     x,
@@ -93,23 +93,23 @@ export const Popup = (props: IPopupProps) => {
     setReferenceWidth(`${reference.offsetWidth}px`);
   }, []);
 
-  if (!isMounted) return null;
-
   return (
     <Portal selector={tooltipRootSelector}>
-      <div
-        style={{
-          ...styles,
-          position: strategy,
-          top: y ?? 0,
-          left: x ?? 0,
-          width: referenceWidth,
-        }}
-        ref={refs.setFloating}
-        {...getFloatingProps()}
-      >
-        {children}
-      </div>
+      {isMounted && (
+        <div
+          style={{
+            ...styles,
+            position: strategy,
+            top: y ?? 0,
+            left: x ?? 0,
+            width: referenceWidth,
+          }}
+          ref={refs.setFloating}
+          {...getFloatingProps()}
+        >
+          {children}
+        </div>
+      )}
     </Portal>
   );
 };

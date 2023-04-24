@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Notifications } from '../components/Notifications.jsx';
-import { getUrl, NavLink, useContext, userRolesToIcons } from '../lib/utils.js';
+import { getUrl, NavLink, popoverRootId, tooltipRootId, useContext, userRolesToIcons } from '../lib/utils.js';
 import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {
@@ -74,8 +74,8 @@ const Layout = ({ children }: any) => {
         </div>
         <div className={cn('container', s.content)}>{children}</div>
       </div>
-      <div id="tooltipRoot"></div>
-      <div id="popoverRoot"></div>
+      <div id={tooltipRootId}></div>
+      <div id={popoverRootId}></div>
       <Notifications />
     </>
   );

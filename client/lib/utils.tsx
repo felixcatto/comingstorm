@@ -214,6 +214,9 @@ export const emptyObject: IEmptyObject = new Proxy(
 
 export const decode = (message: string) => JSON.parse(message) as IWSDecodeReturn;
 
+export const tooltipRootId = 'tooltipRoot';
+export const popoverRootId = 'popoverRoot';
+
 export const Portal = ({ children, selector }) => {
   const ref: any = React.useRef();
   const [mounted, setMounted] = React.useState(false);

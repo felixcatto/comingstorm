@@ -12,7 +12,7 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React from 'react';
-import { Portal, TooltipContext } from '../lib/utils.js';
+import { Portal, TooltipContext, tooltipRootId } from '../lib/utils.js';
 import s from './Tooltip.module.css';
 
 type ITooltipProps = {
@@ -75,7 +75,7 @@ export const TTrigger = ({ children }) => {
 };
 
 export const TContent = ({ children }) => {
-  const tooltipRootSelector = '#tooltipRoot';
+  const tooltipRootSelector = `#${tooltipRootId}`;
   const [caretOffset, setCaretOffset] = React.useState(0);
   const [transitionDuration, setTransitionDuration] = React.useState(0);
 
