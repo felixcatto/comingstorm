@@ -25,8 +25,8 @@ import {
   IUsualSelect,
   IWSDecodeReturn,
 } from '../../lib/types.js';
-import { MultiSelect } from '../components/MultiSelect.js';
-import { Select } from '../components/Select.js';
+import { MultiSelect } from '../ui/MultiSelect.js';
+import { Select } from '../ui/Select.js';
 import Context from './context.js';
 
 export * from '../../lib/sharedUtils.js';

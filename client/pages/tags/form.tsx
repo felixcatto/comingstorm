@@ -1,7 +1,7 @@
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import { IEmptyObject, ITag } from '../../lib/types.js';
-import { emptyObject, ErrorMessage, Field, getUrl, SubmitBtn } from '../lib/utils.js';
+import { IEmptyObject, ITag } from '../../../lib/types.js';
+import { ErrorMessage, Field, SubmitBtn, emptyObject, getUrl } from '../../lib/utils.js';
 
 interface IForm {
   onSubmit: any;

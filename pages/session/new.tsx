@@ -2,7 +2,7 @@ import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout.js';
-import { TContent, Tooltip, TTrigger } from '../../client/components/Tooltip.js';
+import { TContent, Tooltip, TTrigger } from '../../client/ui/Tooltip.js';
 import {
   ErrorMessage,
   Field,

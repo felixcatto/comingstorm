@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../../client/common/Layout.js';
 import { getApiUrl, useContext, useSubmit, WithApiErrors } from '../../../client/lib/utils.js';
-import Form from '../../../client/tags/form.js';
+import Form from '../../../client/pages/tags/form.js';
 import { keygrip, orm } from '../../../lib/init.js';
 import { ITag } from '../../../lib/types.js';
 import { getGenericProps, getUrl } from '../../../lib/utils.js';

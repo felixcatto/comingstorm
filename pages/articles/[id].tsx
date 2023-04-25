@@ -2,7 +2,6 @@ import { useStore } from 'effector-react';
 import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import React from 'react';
-import CommentForm from '../../client/comments/form.js';
 import Layout from '../../client/common/Layout.js';
 import {
   fmtISO,
@@ -14,6 +13,7 @@ import {
   useRefreshPage,
   userRolesToIcons,
 } from '../../client/lib/utils.js';
+import CommentForm from '../../client/pages/comments/form.js';
 import { keygrip, orm } from '../../lib/init.js';
 import { IArticle, IComment } from '../../lib/types.js';
 import { getGenericProps } from '../../lib/utils.js';

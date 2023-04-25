@@ -4,8 +4,15 @@ import { isEmpty } from 'lodash-es';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Notifications } from '../components/Notifications.jsx';
-import { getUrl, NavLink, popoverRootId, tooltipRootId, useContext, userRolesToIcons } from '../lib/utils.js';
+import {
+  getUrl,
+  NavLink,
+  popoverRootId,
+  tooltipRootId,
+  useContext,
+  userRolesToIcons,
+} from '../lib/utils.js';
+import { Notifications } from '../ui/Notifications.jsx';
 import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {

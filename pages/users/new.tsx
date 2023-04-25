@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout.js';
 import { getApiUrl, useContext, useSubmit, WithApiErrors } from '../../client/lib/utils.js';
-import Form from '../../client/users/form.js';
+import Form from '../../client/pages/users/form.js';
 import { keygrip, orm } from '../../lib/init.js';
 import { getGenericProps, getUrl } from '../../lib/utils.js';
 

@@ -3,8 +3,6 @@ import { isEmpty, isNull, uniqBy } from 'lodash-es';
 import Link from 'next/link';
 import React from 'react';
 import Layout from '../../client/common/Layout.js';
-import { HeaderCell } from '../../client/components/HeaderCell.jsx';
-import { Pagination } from '../../client/components/Pagination.jsx';
 import {
   filterTypes,
   getApiUrl,
@@ -13,6 +11,8 @@ import {
   useRefreshPage,
   useTable,
 } from '../../client/lib/utils.js';
+import { HeaderCell } from '../../client/ui/HeaderCell.jsx';
+import { Pagination } from '../../client/ui/Pagination.jsx';
 import { keygrip, orm } from '../../lib/init.js';
 import { IArticle, IFiltersMap, ISelectFilter, ITag } from '../../lib/types.js';
 import { getGenericProps } from '../../lib/utils.js';

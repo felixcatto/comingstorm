@@ -140,7 +140,7 @@ export const MultiSelect = (props: ISelectProps) => {
   return (
     <div>
       <div
-        data-testid="inputWrapper"
+        data-test="inputWrapper"
         className={cn(s.selectRoot, 'input', { [s.selectRoot_focused]: isFocused })}
         onClick={mergedOnClick}
         onBlur={onBlur}
@@ -149,10 +149,10 @@ export const MultiSelect = (props: ISelectProps) => {
       >
         <div className={cn(s.selectRow)}>
           {selectedOptions.map(el => (
-            <div data-testid="selectedOption" key={el.value} className={s.selectedItem}>
-              <div data-testid="selectedOptionLabel">{el.label}</div>
+            <div data-test="selectedOption" key={el.value} className={s.selectedItem}>
+              <div data-test="selectedOptionLabel">{el.label}</div>
               <i
-                data-testid="removeBtn"
+                data-test="removeBtn"
                 className={cn('fa fa-circle-xmark ml-1', s.removeIcon)}
                 onClick={removeOption(el)}
                 onMouseDown={preventFocusLoosing}
@@ -160,7 +160,7 @@ export const MultiSelect = (props: ISelectProps) => {
             </div>
           ))}
           <input
-            data-testid="input"
+            data-test="input"
             ref={inputRef}
             type="text"
             autoComplete="off"
@@ -174,10 +174,10 @@ export const MultiSelect = (props: ISelectProps) => {
       </div>
 
       <Popup {...popupProps} shouldSkipCloseAnimation>
-        <div data-testid="popup" className={s.list} onMouseDown={preventFocusLoosing}>
+        <div data-test="popup" className={s.list} onMouseDown={preventFocusLoosing}>
           {filteredOptions.map((el, i) => (
             <div
-              data-testid="option"
+              data-test="option"
               key={el.value}
               className={itemClass(el, i)}
               onClick={selectItem(el)}

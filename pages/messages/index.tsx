@@ -7,11 +7,6 @@ import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
 import {
-  showMessageBrowserNotification,
-  showMessageNotification,
-} from '../../client/components/Notifications.jsx';
-import { Select } from '../../client/components/Select.js';
-import {
   fmtISO,
   getApiUrl,
   isTabActive,
@@ -21,7 +16,12 @@ import {
   wsEvents,
 } from '../../client/lib/utils.js';
 import { onMessageEvent, send } from '../../client/lib/wsActor.js';
-import { getUsersInfo } from '../../client/messages/utils.js';
+import { getUsersInfo } from '../../client/pages/messages/utils.js';
+import {
+  showMessageBrowserNotification,
+  showMessageNotification,
+} from '../../client/ui/Notifications.jsx';
+import { Select } from '../../client/ui/Select.js';
 import { keygrip, orm } from '../../lib/init.js';
 import { IMessage, IUnreadMessagesDict, IUser, IUserWithAvatar } from '../../lib/types.js';
 import { getGenericProps, unwrap } from '../../lib/utils.js';

@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router.js';
 import React from 'react';
-import { showMessageNotification } from '../components/Notifications.jsx';
 import { getApiUrl, getUrl, useContext, useRefreshPage, wsEvents } from '../lib/utils.js';
 import { onMessageEvent, send } from '../lib/wsActor.js';
+import { showMessageNotification } from '../ui/Notifications.jsx';
 
 const WssConnect = () => {
   const { wsActor, actions, axios } = useContext();

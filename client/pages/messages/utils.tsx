@@ -1,4 +1,4 @@
-import { IMessage, IUser, IUserWithAvatar } from '../../lib/types.js';
+import { IMessage, IUser, IUserWithAvatar } from '../../../lib/types.js';
 
 type IGetUserInfoArgs = {
   messages: IMessage[];

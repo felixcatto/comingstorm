@@ -6,8 +6,8 @@ import { jest } from '@jest/globals';
 import '@testing-library/jest-dom';
 import { getNodeText, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MultiSelect } from '../client/components/MultiSelect.jsx';
-import { Select } from '../client/components/Select.jsx';
+import { MultiSelect } from '../client/ui/MultiSelect.jsx';
+import { Select } from '../client/ui/Select.jsx';
 import { popoverRootId } from '../client/lib/utils.jsx';
 import { ISelectOption, ISelectedOption } from '../lib/types.js';
 
