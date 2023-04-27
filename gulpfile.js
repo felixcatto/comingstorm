@@ -14,7 +14,7 @@ const { series } = gulp;
 const paths = {
   dest: 'dist',
   serverJs: ['services/webSocketServer/*.ts', 'lib/*'],
-  misc: '.env*',
+  misc: ['.env*', 'knexfile.js'],
 };
 
 let server;

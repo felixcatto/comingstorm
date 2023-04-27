@@ -9,17 +9,12 @@ import {
   waitForSocketState,
   wsEvents,
 } from '../lib/utils.js';
-import { closeServer, startServer } from '../services/webSocketServer/main.js';
 import usersFixture from './fixtures/users.js';
 
 describe('wss', () => {
   const keys = process.env.KEYS!.split(',');
   const keygrip = makeKeygrip(keys);
   const wssUrl = makeWssUrl(process.env.WSS_PORT!);
-
-  beforeAll(async () => {
-    await startServer();
-  });
 
   it('reflect data', async () => {
     const socket = new WebSocket(wssUrl);
@@ -34,6 +29,8 @@ describe('wss', () => {
 
     const data = decode(callback.mock.calls[0][0] as any);
     expect(data).toMatchObject(makeWsData(wsEvents.echo, testMessage));
+
+    socket.close();
   });
 
   it('broadcast signedIn users', async () => {
@@ -71,6 +68,9 @@ describe('wss', () => {
     expect(callback1.mock.calls).toHaveLength(1);
     expect(callback2.mock.calls).toHaveLength(2);
     expect(data22).toMatchObject(makeWsData(wsEvents.signedInUsersIds, []));
+
+    client1.close();
+    client2.close();
   });
 
   it('broadcast signedOut users', async () => {
@@ -105,6 +105,9 @@ describe('wss', () => {
     const data2 = decode(callback2.mock.lastCall![0] as any);
     expect(data1).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
     expect(data2).toMatchObject(makeWsData(wsEvents.signedInUsersIds, [tom.id]));
+
+    client1.close();
+    client2.close();
   });
 
   it('notifies user about new message', async () => {
@@ -141,7 +144,8 @@ describe('wss', () => {
     expect(tomCallback.mock.calls).toHaveLength(1);
     const tomData = decode(tomCallback.mock.calls[0][0] as any);
     expect(tomData).toMatchObject(makeWsData(wsEvents.newMessagesArrived, { senderId: vasa.id }));
-  });
 
-  afterAll(closeServer);
+    client1.close();
+    client2.close();
+  });
 });

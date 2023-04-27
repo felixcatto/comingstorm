@@ -3,9 +3,9 @@ import { interpret } from 'xstate';
 import { makeSocketMachine, states, webSocketTypes } from '../client/lib/wsActor.js';
 import { makeWssUrl } from '../lib/utils.js';
 
-const startServer = async wssPort =>
+const startServer = async port =>
   new Promise(resolve => {
-    const wss = new WebSocketServer({ port: Number(wssPort) });
+    const wss = new WebSocketServer({ port });
     const closeServer = async () => new Promise<void>(resolve => wss.close(() => resolve()));
 
     wss.on('listening', () => resolve(closeServer));
@@ -15,7 +15,7 @@ const startServer = async wssPort =>
   });
 
 describe('wss', () => {
-  const wssPort = process.env.WSS_PORT!;
+  const wssPort = 3005;
   const wssUrl = makeWssUrl(wssPort);
 
   let closeServer;

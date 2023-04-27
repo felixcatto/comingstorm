@@ -34,7 +34,7 @@ export { Context };
 
 export const useContext = () => React.useContext<IContext>(Context);
 
-export const NavLink = ({ href, children }) => {
+export const NavLink = ({ href, children, ...restProps }) => {
   const router = useRouter();
   const { pathname } = router;
   const className = cn('nav-link', {
@@ -42,7 +42,7 @@ export const NavLink = ({ href, children }) => {
       (href !== '/' && pathname.startsWith(href)) || (href === '/' && pathname === '/'),
   });
   return (
-    <Link href={href} className={className}>
+    <Link {...restProps} href={href} className={className}>
       {children}
     </Link>
   );

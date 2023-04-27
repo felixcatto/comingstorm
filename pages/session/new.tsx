@@ -56,12 +56,12 @@ const LoginForm = props => {
             <div className="col-6">
               <div className="mb-4">
                 <label>Email</label>
-                <Field className="input" name="email" />
+                <Field className="input" name="email" data-test="email" />
                 <ErrorMessage name="email" />
               </div>
               <div>
                 <label>Password</label>
-                <Field className="input" type="password" name="password" />
+                <Field className="input" type="password" name="password" data-test="password" />
                 <ErrorMessage name="password" />
               </div>
             </div>
@@ -69,7 +69,7 @@ const LoginForm = props => {
           <Link href={getUrl('home')} className="mr-4">
             Cancel
           </Link>
-          <SubmitBtn className="btn">Sign in</SubmitBtn>
+          <SubmitBtn className="btn" data-test="signInFormSubmit">Sign in</SubmitBtn>
         </Form>
       </Formik>
     </Layout>

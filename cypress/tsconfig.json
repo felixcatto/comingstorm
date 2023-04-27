@@ -16,8 +16,8 @@
     "incremental": true,
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "types": ["cypress"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "cypress.config.ts", "cypress"]
+  "include": ["../node_modules/cypress", "./**/*.ts"]
 }

@@ -437,3 +437,5 @@ export type IUseTable = <T extends any[]>(
     onFilterChange;
   };
 };
+
+export type IKnexSeedArg = [tableName: string, fixture: object];

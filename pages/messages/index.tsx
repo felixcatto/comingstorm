@@ -239,6 +239,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                   </div>
                 </div>
               )}
+              dataTest="messagesUserSelect"
             />
           </div>
 
@@ -300,12 +301,13 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                   onChange={onNewMessageChange}
                   value={inputValue}
                   onHeightChange={height => setState({ messageInputHeight: height })}
+                  data-test="messagesInput"
                 />
               </div>
             )}
 
             {dialog.map(el => (
-              <div className="flex mb-2" key={el.id}>
+              <div className="flex mb-2" key={el.id} data-test="messagesMessage">
                 <div className="mr-1 flex items-end flex-none">
                   <Image src={el.sender!.avatar!.path} width={64} height={64} alt="" />
                 </div>
@@ -321,16 +323,18 @@ const Messages = ({ messages, users }: IMessagesProps) => {
                           className={cn('fa fa-edit fa_big fa_link', s.messageIcon)}
                           title="edit"
                           onClick={editMessage(el)}
+                          data-test="messagesEditMessage"
                         ></i>
                         <i
                           className={cn('fa fa-trash-alt fa_big fa_link ml-1', s.messageIcon)}
                           title="delete"
                           onClick={deleteMessage(el.id, el.receiver_id)}
+                          data-test="messagesDeleteMessage"
                         ></i>
                       </div>
                     )}
                   </div>
-                  <div>{el.text}</div>
+                  <div data-test="messagesMessageText">{el.text}</div>
                 </div>
               </div>
             ))}

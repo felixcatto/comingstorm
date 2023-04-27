@@ -6,7 +6,8 @@ start:
 	npx next dev
 
 start-test-server:
-	INODE_ENV=test NODE_ENV=test npx next dev -p 3002
+	NODE_ENV=test npx gulp startWsServer &
+	NODE_ENV=test npx next dev -p 3002
 
 start-prod-server:
 	npx next start
@@ -58,13 +59,18 @@ database-seed-new:
 	npx knex seed:make $(arg)
 
 test:
-	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch
+	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand
 
 test-file:
 	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch $(arg)
 
-test-once:
-	NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand
+test-e2e:
+	NODE_ENV=test make database-seed
+	NODE_ENV=test npx cypress open --e2e --browser /usr/bin/google-chrome
+
+test-e2e-headless:
+	NODE_ENV=test make database-seed
+	NODE_ENV=test npx cypress run
 
 lint:
 	npx eslint .

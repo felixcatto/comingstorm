@@ -46,7 +46,9 @@ const Layout = ({ children }: any) => {
                 <NavLink href={getUrl('tags')}>Tags</NavLink>
                 {isSignedIn && (
                   <div className={s.messagesWrap}>
-                    <NavLink href={getUrl('messages')}>Messages</NavLink>
+                    <NavLink href={getUrl('messages')} data-test="messagesNavLink">
+                      Messages
+                    </NavLink>
                     {!isEmpty(unreadMessages) && (
                       <div className={cn('msg-count', s.unreadMessageCount)}>
                         {unreadMessages.length}
@@ -60,7 +62,7 @@ const Layout = ({ children }: any) => {
               <div className="flex items-center">
                 <div className="flex items-center mr-1">
                   <i className={userIconClass(currentUser.role)}></i>
-                  <div>{currentUser.name}</div>
+                  <div data-test="userName">{currentUser.name}</div>
                   <div className="ml-1 flex-none">
                     <Image src={currentUser.avatar.path} width={48} height={48} alt="" />
                   </div>
@@ -69,10 +71,11 @@ const Layout = ({ children }: any) => {
                   className={cn('fa fa-sign-out-alt', s.signIcon)}
                   title="Sign out"
                   onClick={() => actions.signOut()}
+                  data-test="signOutLink"
                 ></i>
               </div>
             ) : (
-              <Link href={getUrl('newSession')} className={s.signIn}>
+              <Link href={getUrl('newSession')} className={s.signIn} data-test="signInLink">
                 <div className={s.signInText}>Sign In</div>
                 <i className={cn('fa fa-sign-in-alt', s.signIcon)} title="Sign in"></i>
               </Link>

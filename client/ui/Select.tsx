@@ -21,6 +21,7 @@ type ISelectProps = {
   nothingFound?: string | (() => JSX.Element);
   offset?: number;
   placement?: Placement;
+  dataTest?: string;
 };
 
 type IState = {
@@ -50,7 +51,10 @@ export const Select = (props: ISelectProps) => {
     inputClass = '',
     popupClass = '',
     optionClass: parentOptionClass = '',
+    dataTest = 'input',
   } = props;
+
+  const popupDataTest = dataTest === 'input' ? 'popup' : `${dataTest}Popup`;
 
   const [isOpen, setIsOpen] = React.useState(false);
   const [state, setState] = useMergeState<IState>(defaultState);
@@ -160,7 +164,6 @@ export const Select = (props: ISelectProps) => {
   return (
     <div className={className}>
       <input
-        data-test="input"
         type="text"
         className={cn(inputClass || 'input', { 'cursor-pointer': !searchable })}
         placeholder={placeholder}
@@ -170,16 +173,21 @@ export const Select = (props: ISelectProps) => {
         ref={refs.setReference}
         {...referenceProps}
         readOnly={!searchable}
+        data-test={dataTest}
       />
 
       <Popup {...popupProps} shouldSkipCloseAnimation={searchable}>
-        <div data-test="popup" className={popupClass || s.popup} onMouseDown={preventFocusLoosing}>
+        <div
+          className={popupClass || s.popup}
+          onMouseDown={preventFocusLoosing}
+          data-test={popupDataTest}
+        >
           {filteredOptions.map((el, i) => (
             <div
-              data-test="option"
               key={el.value}
               className={optionClass(el, i)}
               onClick={selectOption(el)}
+              data-test="option"
             >
               {optionComponent
                 ? React.createElement(optionComponent, {
