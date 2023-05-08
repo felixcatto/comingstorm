@@ -3,13 +3,13 @@ import cn from 'classnames';
 import { format, parseISO } from 'date-fns';
 import { useFormikContext } from 'formik';
 import produce from 'immer';
-import { get, isEmpty, isFunction, isNull, isNumber, omit, orderBy } from 'lodash-es';
+import { get, isEmpty, isFunction, isNull, isNumber, keyBy, omit, orderBy } from 'lodash-es';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { createPortal } from 'react-dom';
 import stringMath from 'string-math';
-import { filterTypes, roles, sortOrders } from '../../lib/sharedUtils.js';
+import { filterTypes, makeEnum, roles, sortOrders } from '../../lib/sharedUtils.js';
 import {
   IApiErrors,
   IContext,
@@ -19,6 +19,7 @@ import {
   ISelectedOption,
   ISortOrder,
   IUseMergeState,
+  IUseSelectedRows,
   IUseSubmit,
   IUseTable,
   IUseTableState,
@@ -253,7 +254,7 @@ export const useTable: IUseTable = props => {
   });
   const { page, size, sortBy, sortOrder, filters } = state;
 
-  const filtersList = React.useMemo(() => Object.values(filters), [filters]);
+  const filtersList = React.useMemo(() => (filters ? Object.values(filters) : []), [filters]);
 
   const onPageChange = newPage => setState({ page: newPage });
   const onSizeChange = newSize => setState({ size: newSize, page: 0 });
@@ -266,13 +267,15 @@ export const useTable: IUseTable = props => {
     setState({ sortBy, sortOrder: newSortOrder });
   };
 
-  const onFilterChange = (filter: IMixedFilter, filterBy) =>
+  const onFilterChange = (filter: IMixedFilter, filterBy) => {
+    if (!filters) return;
     setState({
       filters: produce(filters, draft => {
         draft[filterBy].filter = filter;
       }),
       page: 0,
     });
+  };
 
   const { rows, totalRows } = React.useMemo(() => {
     if (!originalRows) return { rows: [], totalRows: 0 };
@@ -318,12 +321,54 @@ export const useTable: IUseTable = props => {
   return {
     rows,
     totalRows,
-    page,
-    size,
-    sortBy,
-    sortOrder,
-    filters,
+    page: page as any,
+    size: size as any,
+    sortBy: sortBy as any,
+    sortOrder: sortOrder as any,
+    filters: filters as any,
     paginationProps,
     headerCellProps,
   };
 };
+
+export const useSelectedRows: IUseSelectedRows = props => {
+  const { rows, defaultSelectedRows = {}, rowKey = 'id' } = props;
+  const [selectedRows, setSelectedRows] = React.useState(defaultSelectedRows);
+
+  const selectedRowsState = React.useMemo(() => {
+    if (isEmpty(selectedRows)) return selectedRowsStates.none;
+    if (Object.keys(selectedRows).length === rows.length) return selectedRowsStates.all;
+    return selectedRowsStates.partially;
+  }, [rows, selectedRows]);
+
+  const isRowSelected = row => (selectedRows[row[rowKey]] ? true : false);
+
+  const onSelectAllRows = () => {
+    if (selectedRowsState === selectedRowsStates.all) {
+      setSelectedRows({});
+    } else {
+      setSelectedRows(keyBy(rows, rowKey));
+    }
+  };
+
+  const onSelectRow = row => () => {
+    const rowId = row[rowKey];
+    if (isRowSelected(row)) {
+      delete selectedRows[rowId];
+      setSelectedRows({ ...selectedRows });
+    } else {
+      selectedRows[rowId] = row;
+      setSelectedRows({ ...selectedRows });
+    }
+  };
+
+  const selectAllRowsCheckboxProps = {
+    onChange: onSelectAllRows,
+    checked: selectedRowsState === selectedRowsStates.all,
+    partiallyChecked: selectedRowsState === selectedRowsStates.partially,
+  };
+
+  return { selectedRows, setSelectedRows, isRowSelected, onSelectRow, selectAllRowsCheckboxProps };
+};
+
+export const selectedRowsStates = makeEnum('all', 'none', 'partially');

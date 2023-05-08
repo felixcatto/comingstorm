@@ -27,6 +27,7 @@
     ],
     "no-case-declarations": "off",
     "import/no-anonymous-default-export": "off",
-    "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }]
+    "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }],
+    "@next/next/no-img-element": "off"
   }
 }

@@ -5,12 +5,15 @@ import React from 'react';
 import Layout from '../../client/common/Layout.js';
 import {
   filterTypes,
+  fmtISO,
   getApiUrl,
   getUrl,
   useContext,
   useRefreshPage,
+  useSelectedRows,
   useTable,
 } from '../../client/lib/utils.js';
+import { Expandbox } from '../../client/ui/Checkbox.jsx';
 import { HeaderCell } from '../../client/ui/HeaderCell.jsx';
 import { Pagination } from '../../client/ui/Pagination.jsx';
 import { keygrip, orm } from '../../lib/init.js';
@@ -22,7 +25,9 @@ type IArticlesProps = {
 };
 
 export async function getServerSideProps(ctx) {
-  const articles = await orm.Article.query().withGraphFetched('[author, tags]').orderBy('id');
+  const articles = await orm.Article.query()
+    .withGraphFetched('[author, tags, comments.author.avatar]')
+    .orderBy('id');
   const props = await getGenericProps({ ctx, keygrip, orm }, { articles });
   return { props };
 }
@@ -73,6 +78,7 @@ const Articles = ({ articles }: IArticlesProps) => {
     };
   }, [articles]);
 
+  const tableColCount = 6;
   const { rows, totalRows, paginationProps, headerCellProps } = useTable({
     rows: articles,
     page: 0,
@@ -81,6 +87,8 @@ const Articles = ({ articles }: IArticlesProps) => {
     sortOrder: null,
     filters: defaultFilters,
   });
+
+  const { isRowSelected: isRowExpanded, onSelectRow: onExpandRow } = useSelectedRows({ rows });
 
   const deleteArticle = id => async () => {
     await axios.delete(getApiUrl('article', { id }));
@@ -107,10 +115,11 @@ const Articles = ({ articles }: IArticlesProps) => {
       <table className="table table-fixed">
         <thead>
           <tr>
+            <th className="w-10"></th>
             <HeaderCell {...headerCellProps} name="title" className="w-32" sortable>
               <div>Title</div>
             </HeaderCell>
-            <HeaderCell {...headerCellProps} name="text" sortable>
+            <HeaderCell {...headerCellProps} name="text" className="w-full" sortable>
               <div>Text</div>
             </HeaderCell>
             <HeaderCell {...headerCellProps} name="author.name" className="w-32" sortable>
@@ -124,38 +133,96 @@ const Articles = ({ articles }: IArticlesProps) => {
         </thead>
         <tbody>
           {rows.map(article => (
-            <tr key={article.id}>
-              <td>{article.title}</td>
-              <td className="text-justify">{article.text}</td>
-              <td>{article.author?.name}</td>
-              <td>{article.tags?.map(tag => tag.name).join(', ')}</td>
-              <td>
-                <div className="flex justify-end">
-                  <Link
-                    href={getUrl('article', { id: article.id })}
-                    className="btn-outline btn-outline_sm  mr-2"
-                  >
-                    Show Article
-                  </Link>
-                  {isBelongsToUser(article.author_id) && (
-                    <>
-                      <Link
-                        href={getUrl('editArticle', { id: article.id })}
-                        className="btn-outline btn-outline_sm mr-2"
-                      >
-                        Edit Article
-                      </Link>
-                      <div
-                        className="btn-outline btn-outline_sm"
-                        onClick={deleteArticle(article.id)}
-                      >
-                        Remove Article
-                      </div>
-                    </>
+            <React.Fragment key={article.id}>
+              <tr>
+                <td>
+                  {!isEmpty(article.comments) && (
+                    <Expandbox onClick={onExpandRow(article)} isExpanded={isRowExpanded(article)} />
                   )}
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td>{article.title}</td>
+                <td className="text-justify">{article.text}</td>
+                <td>{article.author?.name}</td>
+                <td>{article.tags?.map(tag => tag.name).join(', ')}</td>
+                <td>
+                  <div className="flex justify-end">
+                    <Link
+                      href={getUrl('article', { id: article.id })}
+                      className="btn-outline btn-outline_sm  mr-2"
+                    >
+                      Show Article
+                    </Link>
+                    {isBelongsToUser(article.author_id) && (
+                      <>
+                        <Link
+                          href={getUrl('editArticle', { id: article.id })}
+                          className="btn-outline btn-outline_sm mr-2"
+                        >
+                          Edit Article
+                        </Link>
+                        <div
+                          className="btn-outline btn-outline_sm"
+                          onClick={deleteArticle(article.id)}
+                        >
+                          Remove Article
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+              {isRowExpanded(article) && (
+                <tr>
+                  <td colSpan={tableColCount} className="p-0 border-none">
+                    <table className="table table_inner table-fixed">
+                      <thead>
+                        <tr>
+                          <th className="w-28">Comments []</th>
+                          <th className="w-48">Author</th>
+                          <th className="w-full">Text</th>
+                          <th className="w-44">Updated At</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {article.comments?.map(comment => (
+                          <tr key={comment.id}>
+                            <td></td>
+                            <td>
+                              {comment.author ? (
+                                <div className="flex items-center">
+                                  <img
+                                    src={comment.author.avatar?.path}
+                                    className="w-12 mr-2"
+                                    alt=""
+                                  />
+                                  <div>{comment.author.name}</div>
+                                </div>
+                              ) : (
+                                <div className="flex items-center">
+                                  <div className="w-12 mr-2 text-center">
+                                    <i className="fa fa-ghost text-xl"></i>
+                                  </div>
+                                  <div>{comment.guest_name}</div>
+                                </div>
+                              )}
+                            </td>
+                            <td>{comment.text}</td>
+                            <td>{fmtISO(comment.updated_at, 'dd MMM yyyy HH:mm')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colSpan={tableColCount} className="p-0 border-none">
+                            <div className="h-1.5 bg-gray-100"></div>
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
           ))}
         </tbody>
       </table>

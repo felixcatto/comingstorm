@@ -6,7 +6,7 @@ COPY package.json package-lock.json .
 RUN npm i
 COPY lib ./lib
 COPY services ./services
-COPY .env* gulpfile.js Makefile tsconfig.json webpack.config.js .
+COPY .env* gulpfile.js knexfile.js Makefile tsconfig.json webpack.config.js .
 RUN make build-wss
 
 EXPOSE 3001
