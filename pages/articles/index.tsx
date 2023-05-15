@@ -14,6 +14,7 @@ import {
   useTable,
 } from '../../client/lib/utils.js';
 import { Expandbox } from '../../client/ui/Checkbox.jsx';
+import { Collapse } from '../../client/ui/Collapse.jsx';
 import { HeaderCell } from '../../client/ui/HeaderCell.jsx';
 import { Pagination } from '../../client/ui/Pagination.jsx';
 import { keygrip, orm } from '../../lib/init.js';
@@ -137,7 +138,11 @@ const Articles = ({ articles }: IArticlesProps) => {
               <tr>
                 <td>
                   {!isEmpty(article.comments) && (
-                    <Expandbox onClick={onExpandRow(article)} isExpanded={isRowExpanded(article)} />
+                    <Expandbox
+                      onClick={onExpandRow(article)}
+                      isExpanded={isRowExpanded(article)}
+                      className="p-1"
+                    />
                   )}
                 </td>
                 <td>{article.title}</td>
@@ -171,9 +176,9 @@ const Articles = ({ articles }: IArticlesProps) => {
                   </div>
                 </td>
               </tr>
-              {isRowExpanded(article) && (
-                <tr>
-                  <td colSpan={tableColCount} className="p-0 border-none">
+              <tr>
+                <td colSpan={tableColCount} className="p-0 border-none">
+                  <Collapse isHidden={!isRowExpanded(article)} minimumElHeight={85}>
                     <table className="table table_inner table-fixed">
                       <thead>
                         <tr>
@@ -219,9 +224,9 @@ const Articles = ({ articles }: IArticlesProps) => {
                         </tr>
                       </tfoot>
                     </table>
-                  </td>
-                </tr>
-              )}
+                  </Collapse>
+                </td>
+              </tr>
             </React.Fragment>
           ))}
         </tbody>
