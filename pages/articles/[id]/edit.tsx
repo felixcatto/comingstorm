@@ -1,8 +1,8 @@
-import { useStore } from 'effector-react';
 import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../../client/common/Layout.js';
+import { session } from '../../../client/globalStore/store.js';
 import {
   getApiUrl,
   useContext,
@@ -27,9 +27,9 @@ export async function getServerSideProps(ctx) {
 
 const EditArticle = () => {
   const router = useRouter();
-  const { axios, $session } = useContext();
+  const { axios, useStore } = useContext();
   const { id } = router.query;
-  const { isBelongsToUser } = useStore($session);
+  const { isBelongsToUser } = useStore(session);
   const [{ article, tags }, setState] = useMergeState<IState>({ article: null, tags: [] });
 
   React.useEffect(() => {

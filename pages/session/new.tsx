@@ -2,19 +2,28 @@ import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../client/common/Layout.js';
-import { TContent, Tooltip, TTrigger } from '../../client/ui/Tooltip.js';
 import {
   ErrorMessage,
   Field,
+  SubmitBtn,
+  WithApiErrors,
+  getApiUrl,
   getUrl,
   roles,
-  SubmitBtn,
   useContext,
+  useSetGlobalState,
   useSubmit,
-  WithApiErrors,
+  wsEvents,
 } from '../../client/lib/utils.js';
+import { send } from '../../client/lib/wsActor.js';
+import { TContent, TTrigger, Tooltip } from '../../client/ui/Tooltip.js';
 import { keygrip, orm } from '../../lib/init.js';
-import { IUser } from '../../lib/types.js';
+import {
+  IGetSessionResponse,
+  IPostSessionResponse,
+  IUser,
+  IUserLoginCreds,
+} from '../../lib/types.js';
 import { getGenericProps } from '../../lib/utils.js';
 
 export async function getServerSideProps(ctx) {
@@ -25,12 +34,17 @@ export async function getServerSideProps(ctx) {
 
 const LoginForm = props => {
   const adminUser: IUser = props.adminUser;
-  const { actions } = useContext();
+  const { axios, wsActor } = useContext();
+  const setGlobalState = useSetGlobalState();
   const router = useRouter();
 
-  const onSubmit = useSubmit(async values => {
-    await actions.signIn(values);
+  const onSubmit = useSubmit(async (userCreds: IUserLoginCreds) => {
+    const user = await axios.post<IPostSessionResponse>(getApiUrl('session'), userCreds);
+    setGlobalState({ currentUser: user });
     router.push(getUrl('home'));
+
+    const data = await axios.get<IGetSessionResponse>(getApiUrl('session'));
+    send(wsActor, wsEvents.signIn, data);
   });
 
   return (
@@ -69,7 +83,9 @@ const LoginForm = props => {
           <Link href={getUrl('home')} className="mr-4">
             Cancel
           </Link>
-          <SubmitBtn className="btn" data-test="signInFormSubmit">Sign in</SubmitBtn>
+          <SubmitBtn className="btn" data-test="signInFormSubmit">
+            Sign in
+          </SubmitBtn>
         </Form>
       </Formik>
     </Layout>

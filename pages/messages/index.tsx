@@ -1,11 +1,11 @@
 import cn from 'classnames';
-import { useStore } from 'effector-react';
 import { isNull } from 'lodash-es';
 import Image from 'next/image';
 import { useRouter } from 'next/router.js';
 import React from 'react';
 import Textarea from 'react-textarea-autosize';
 import Layout from '../../client/common/Layout.js';
+import { session } from '../../client/globalStore/store.js';
 import {
   fmtISO,
   getApiUrl,
@@ -57,11 +57,12 @@ type IState = {
 };
 
 const Messages = ({ messages, users }: IMessagesProps) => {
-  const { $session, axios, $signedInUsersIds, wsActor, unreadMessages, actions } = useContext();
+  const { useStore, axios, wsActor, unreadMessages } = useContext();
   const refreshPage = useRefreshPage();
   const router = useRouter();
-  const { isSignedIn, currentUser } = useStore($session);
-  const signedInUsersIds = useStore($signedInUsersIds);
+  const { isSignedIn, currentUser } = useStore(session);
+  const signedInUsersIds = useStore(state => state.signedInUsersIds);
+  const addNotification = useStore(state => state.addNotification);
 
   const [state, setState] = useMergeState<IState>({
     usersNewlySelectedToChat: [],
@@ -206,7 +207,7 @@ const Messages = ({ messages, users }: IMessagesProps) => {
         await axios.delete(getApiUrl('unreadMessages', {}, data));
         setTimeout(refreshPage, 200);
       } else {
-        showMessageNotification(actions, router, sender);
+        showMessageNotification(addNotification, router, sender);
       }
     });
 

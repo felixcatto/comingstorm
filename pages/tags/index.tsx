@@ -1,6 +1,6 @@
-import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
+import { session } from '../../client/globalStore/store.js';
 import { getApiUrl, getUrl, useContext, useRefreshPage } from '../../client/lib/utils.js';
 import { keygrip, orm } from '../../lib/init.js';
 import { ITag } from '../../lib/types.js';
@@ -17,8 +17,8 @@ export async function getServerSideProps(ctx) {
 }
 
 const Tags = ({ tags }: ITagsProps) => {
-  const { $session, axios } = useContext();
-  const { isSignedIn } = useStore($session);
+  const { useStore, axios } = useContext();
+  const { isSignedIn } = useStore(session);
   const refreshPage = useRefreshPage();
 
   const deleteTag = id => async () => {

@@ -1,23 +1,39 @@
 import cn from 'classnames';
-import { useStore } from 'effector-react';
 import { isEmpty } from 'lodash-es';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import { IDeleteSessionResponse } from '../../lib/types.js';
+import { session } from '../globalStore/store.js';
 import {
-  getUrl,
   NavLink,
+  getApiUrl,
+  getUrl,
   popoverRootId,
   tooltipRootId,
   useContext,
+  useSetGlobalState,
   userRolesToIcons,
+  wsEvents,
 } from '../lib/utils.js';
+import { send } from '../lib/wsActor.js';
 import { Notifications } from '../ui/Notifications.jsx';
 import s from './Layout.module.css';
 
 const Layout = ({ children }: any) => {
-  const { $session, actions, unreadMessages } = useContext();
-  const { currentUser, isSignedIn } = useStore($session);
+  const { unreadMessages, useStore, axios, wsActor } = useContext();
+  const setGlobalState = useSetGlobalState();
+  const { currentUser, isSignedIn } = useStore(session);
+
+  const signOut = async () => {
+    const { currentUser, signOutUserId } = await axios.delete<IDeleteSessionResponse>(
+      getApiUrl('session')
+    );
+
+    setGlobalState({ currentUser });
+    send(wsActor, wsEvents.signOut, { id: signOutUserId });
+  };
+
   const userIconClass = role => cn(s.userRoleIcon, 'mr-1', userRolesToIcons[role]);
 
   return (
@@ -70,7 +86,7 @@ const Layout = ({ children }: any) => {
                 <i
                   className={cn('fa fa-sign-out-alt', s.signIcon)}
                   title="Sign out"
-                  onClick={() => actions.signOut()}
+                  onClick={signOut}
                   data-test="signOutLink"
                 ></i>
               </div>

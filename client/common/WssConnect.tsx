@@ -1,27 +1,25 @@
 import { useRouter } from 'next/router.js';
 import React from 'react';
-import { getApiUrl, getUrl, useContext, useRefreshPage, wsEvents } from '../lib/utils.js';
-import { onMessageEvent, send } from '../lib/wsActor.js';
+import {
+  getApiUrl,
+  getUrl,
+  useContext,
+  useRefreshPage,
+  useSetGlobalState,
+  wsEvents,
+} from '../lib/utils.js';
+import { onMessageEvent } from '../lib/wsActor.js';
 import { showMessageNotification } from '../ui/Notifications.jsx';
 
 const WssConnect = () => {
-  const { wsActor, actions, axios } = useContext();
+  const { wsActor, axios, useStore } = useContext();
   const refreshPage = useRefreshPage();
+  const setGlobalState = useSetGlobalState();
+  const addNotification = useStore(state => state.addNotification);
   const router = useRouter();
 
   React.useEffect(() => {
     wsActor.start();
-  }, []);
-
-  React.useEffect(() => {
-    actions.signIn.done.watch(async () => {
-      const data = await axios.get(getApiUrl('session'));
-      send(wsActor, wsEvents.signIn, data);
-    });
-
-    actions.signOut.done.watch(payload => {
-      send(wsActor, wsEvents.signOut, { id: payload.result.signOutUserId });
-    });
   }, []);
 
   React.useEffect(() => {
@@ -30,7 +28,7 @@ const WssConnect = () => {
     const onMessage = onMessageEvent(async ({ type, payload }) => {
       switch (type) {
         case wsEvents.signedInUsersIds:
-          actions.wssUpdateSignedUsers(payload);
+          setGlobalState({ signedInUsersIds: payload });
           break;
 
         case wsEvents.newMessagesArrived:
@@ -40,7 +38,7 @@ const WssConnect = () => {
 
           const { senderId } = payload;
           const sender = await axios.get(getApiUrl('user', { id: senderId }, { withAvatar: true }));
-          showMessageNotification(actions, router, sender);
+          showMessageNotification(addNotification, router, sender);
           break;
 
         default:

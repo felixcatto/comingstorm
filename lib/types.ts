@@ -1,31 +1,27 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { FormikHelpers } from 'formik';
+import { Draft } from 'immer';
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import wsWebSocket from 'ws';
 import { Interpreter } from 'xstate';
 import * as y from 'yup';
-import {
-  makeActions,
-  makeCurrentUser,
-  makeNotificationAnimationDuration,
-  makeNotifications,
-  makeSession,
-  makeSignedInUsersIds,
-} from '../client/lib/effectorStore.js';
+import { StoreApi, UseBoundStore } from 'zustand';
+import makeActions from '../client/globalStore/actions.js';
+import { storeSlice } from '../client/globalStore/store.js';
 import { selectedRowsStates } from '../client/lib/utils.jsx';
 import {
   Article,
-  Avatar,
-  Message,
-  Tag,
-  UnreadMessage,
-  User,
   articleSchema,
+  Avatar,
   commentsSchema,
   getUserQuerySchema,
+  Message,
   messageSchema,
+  Tag,
   tagSchema,
+  UnreadMessage,
   unreadMessageSchema,
+  User,
   userLoginSchema,
   userSchema,
 } from '../models/index.js';
@@ -186,24 +182,23 @@ export type IUserWithAvatar = IUser & { avatar: IAvatar };
 
 export type IWSActor = Interpreter<any, any, any>;
 
+type IRawStoreSlice = typeof storeSlice;
+export type IStoreSlice = {
+  [key in keyof IRawStoreSlice]: ReturnType<IRawStoreSlice[key]>;
+};
+
 export type IActions = ReturnType<typeof makeActions>;
-export type ICurrentUserStore = ReturnType<typeof makeCurrentUser>;
-export type ISignedInUsersIdsStore = ReturnType<typeof makeSignedInUsersIds>;
-export type IMakeNotificationAnimationDuration = ReturnType<
-  typeof makeNotificationAnimationDuration
->;
-export type IMakeNotifications = ReturnType<typeof makeNotifications>;
-export type ISession = ReturnType<typeof makeSession>;
+
+type ISetStateUpdateFn = (state: Draft<IStoreSlice>) => Partial<IStoreSlice> | void;
+export type ISetGlobalState = (arg: Partial<IStoreSlice> | ISetStateUpdateFn) => void;
+export type IGetGlobalState = () => IStoreSlice & IActions;
+
+export type IStore = IStoreSlice & IActions & { setGlobalState: ISetGlobalState };
 
 export type IContext = {
   axios: IAxiosInstance;
-  actions: IActions;
   wsActor: IWSActor;
-  [makeCurrentUser.key]: ICurrentUserStore;
-  [makeSignedInUsersIds.key]: ISignedInUsersIdsStore;
-  [makeNotificationAnimationDuration.key]: IMakeNotificationAnimationDuration;
-  [makeNotifications.key]: IMakeNotifications;
-  [makeSession.key]: ISession;
+  useStore: UseBoundStore<StoreApi<IStore>>;
   unreadMessages: IUnreadMessage[];
 };
 

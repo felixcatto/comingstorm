@@ -1,7 +1,7 @@
 import cn from 'classnames';
-import { useStore } from 'effector-react';
 import Link from 'next/link';
 import Layout from '../../client/common/Layout.js';
+import { session } from '../../client/globalStore/store.js';
 import {
   dedup,
   getApiUrl,
@@ -28,9 +28,9 @@ export async function getServerSideProps(ctx) {
 const userIconClass = role => cn('mr-1', userRolesToIcons[role]);
 
 const Users = ({ users }: IUsersProps) => {
-  const { $session, axios, $signedInUsersIds } = useContext();
-  const signedInUsersIds = useStore($signedInUsersIds);
-  const { isAdmin } = useStore($session);
+  const { useStore, axios } = useContext();
+  const signedInUsersIds = useStore(state => state.signedInUsersIds);
+  const { isAdmin } = useStore(session);
   const refreshPage = useRefreshPage();
 
   const deleteUser = id =>

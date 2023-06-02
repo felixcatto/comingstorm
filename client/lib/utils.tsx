@@ -372,3 +372,8 @@ export const useSelectedRows: IUseSelectedRows = props => {
 };
 
 export const selectedRowsStates = makeEnum('all', 'none', 'partially');
+
+export const useSetGlobalState = () => {
+  const { useStore } = useContext();
+  return useStore(state => state.setGlobalState);
+};

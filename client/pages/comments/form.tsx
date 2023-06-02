@@ -1,14 +1,14 @@
-import { useStore } from 'effector-react';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import React from 'react';
 import { IComment, IEmptyObject } from '../../../lib/types.js';
+import { session } from '../../globalStore/store.js';
 import {
+  emptyObject,
   ErrorMessage,
   Field,
-  SubmitBtn,
-  emptyObject,
   getUrl,
+  SubmitBtn,
   useContext,
 } from '../../lib/utils.js';
 
@@ -20,8 +20,8 @@ interface IForm {
 
 const CommentsForm = (props: IForm, ref) => {
   const { onSubmit, comment = emptyObject, type = 'add' } = props;
-  const { $session } = useContext();
-  const { isSignedIn } = useStore($session);
+  const { useStore } = useContext();
+  const { isSignedIn } = useStore(session);
   const isNewCommentForm = type === 'add';
   const canShowGuestName =
     (isNewCommentForm && !isSignedIn) || (!isNewCommentForm && !comment.author_id);

@@ -1,8 +1,8 @@
-import { useStore } from 'effector-react';
 import { isEmpty, isNull, uniqBy } from 'lodash-es';
 import Link from 'next/link';
 import React from 'react';
 import Layout from '../../client/common/Layout.js';
+import { session } from '../../client/globalStore/store.js';
 import {
   filterTypes,
   fmtISO,
@@ -34,8 +34,8 @@ export async function getServerSideProps(ctx) {
 }
 
 const Articles = ({ articles }: IArticlesProps) => {
-  const { $session, axios } = useContext();
-  const { isSignedIn, isBelongsToUser } = useStore($session);
+  const { axios, useStore } = useContext();
+  const { isSignedIn, isBelongsToUser } = useStore(session);
   const refreshPage = useRefreshPage();
 
   const defaultFilters: IFiltersMap = React.useMemo(() => {

@@ -3,16 +3,11 @@ import originalAxios from 'axios';
 import { AppProps } from 'next/app';
 import React from 'react';
 import { interpret } from 'xstate';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
 import WssConnect from '../client/common/WssConnect.js';
-import {
-  currentUserInitialState,
-  makeActions,
-  makeCurrentUser,
-  makeNotificationAnimationDuration,
-  makeNotifications,
-  makeSession,
-  makeSignedInUsersIds,
-} from '../client/lib/effectorStore.js';
+import makeActions from '../client/globalStore/actions.js';
+import { storeSlice } from '../client/globalStore/store.js';
 import { Context, guestUser, makeWssUrl } from '../client/lib/utils.js';
 import { makeSocketMachine, webSocketTypes } from '../client/lib/wsActor.js';
 import { IContext, IPageProps } from '../lib/types.js';
@@ -32,28 +27,31 @@ function App(appProps: AppProps<IPageProps>) {
       response => response.data,
       error => {
         console.log(error.response);
-        return Promise.reject(error.response.data);
+        return Promise.reject(error);
       }
     );
 
-    const actions = makeActions({ axios });
-    const $currentUser = makeCurrentUser(actions, {
-      ...currentUserInitialState,
-      data: currentUser,
-    });
-    const $notificationAnimationDuration = makeNotificationAnimationDuration(actions);
+    const store = Object.keys(storeSlice).reduce((acc, key) => {
+      const makeFn = storeSlice[key];
+      return { ...acc, [key]: makeFn() };
+    }, {});
+
+    const useStore = create<any>(
+      immer((set, get) => ({
+        setGlobalState: set,
+        ...makeActions(set, get),
+        ...store,
+        currentUser: storeSlice.currentUser(currentUser),
+      }))
+    );
+
     const connectToWss = () => new WebSocket(makeWssUrl(process.env.NEXT_PUBLIC_WSS_PORT!));
     const wsActor: any = interpret(makeSocketMachine(connectToWss, webSocketTypes.browser));
 
     return {
       axios,
-      actions,
       wsActor,
-      [makeCurrentUser.key]: $currentUser,
-      [makeSignedInUsersIds.key]: makeSignedInUsersIds(actions),
-      [makeNotificationAnimationDuration.key]: makeNotificationAnimationDuration(actions),
-      [makeNotifications.key]: makeNotifications(actions, $notificationAnimationDuration),
-      [makeSession.key]: makeSession($currentUser),
+      useStore,
     };
   }, []);
 

@@ -1,21 +1,22 @@
 import cn from 'classnames';
-import { useStore } from 'effector-react';
 import { uniqueId } from 'lodash-es';
 import Image from 'next/image.js';
 import React from 'react';
 import { IMakeNotification, IUserWithAvatar } from '../../lib/types.js';
-import { getCssValue, getUrl, isTabActive, useContext } from '../lib/utils.jsx';
+import { getCssValue, getUrl, isTabActive, useContext, useSetGlobalState } from '../lib/utils.jsx';
 import s from './Notifications.module.css';
 
 export const Notifications = () => {
-  const { $notifications, actions } = useContext();
-  const notifications = useStore($notifications);
+  const { useStore } = useContext();
+  const setGlobalState = useSetGlobalState();
+  const notifications = useStore(state => state.notifications);
+  const removeNotification = useStore(state => state.removeNotification);
 
   React.useEffect(() => {
     const rootStyles = getComputedStyle(document.querySelector(`.${s.root}`)!);
     const animationDuration =
       getCssValue(rootStyles.getPropertyValue('--animationDuration')) * 1000;
-    actions.setNotificationAnimationDuration(animationDuration);
+    setGlobalState({ notificationAnimationDuration: animationDuration });
   }, []);
 
   React.useEffect(() => {
@@ -42,7 +43,7 @@ export const Notifications = () => {
           </div>
           <i
             className="far fa-circle-xmark fa_big fa_link text-lg ml-2"
-            onClick={() => actions.removeNotification(el.id)}
+            onClick={() => removeNotification(el.id)}
           ></i>
         </div>
       ))}
@@ -89,9 +90,9 @@ export const showMessageBrowserNotification = (router, sender: IUserWithAvatar) 
   });
 };
 
-export const showMessageNotification = (actions, router, sender: IUserWithAvatar) => {
+export const showMessageNotification = (addNotification, router, sender: IUserWithAvatar) => {
   if (isTabActive()) {
-    actions.addNotification(
+    addNotification(
       makeNotification({
         title: 'New Message From',
         component: messageNotification(sender),

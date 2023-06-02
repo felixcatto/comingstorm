@@ -1,8 +1,8 @@
-import { useStore } from 'effector-react';
 import { isEmpty } from 'lodash-es';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../client/common/Layout.js';
+import { session } from '../../client/globalStore/store.js';
 import {
   fmtISO,
   FormWrapper,
@@ -125,8 +125,8 @@ const ShowArticle = ({ article }: IArticleProps) => {
   const router = useRouter();
   const { id: articleId } = router.query;
 
-  const { $session, axios } = useContext();
-  const { isBelongsToUser } = useStore($session);
+  const { axios, useStore } = useContext();
+  const { isBelongsToUser } = useStore(session);
   const refreshPage = useRefreshPage();
   const [{ editedCommentId }, setState] = useMergeState({ editedCommentId: null });
   const [apiErrorsForNewCommentForm, setApiErrorsForNewCommentForm] = React.useState({});
