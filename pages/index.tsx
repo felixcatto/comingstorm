@@ -12,7 +12,14 @@ export default function Home() {
   return (
     <Layout>
       <div className="splash-screen">
-        <Image src="/img/s3.png" className="splash-screen__img" quality={95} fill priority alt="" />
+        <Image
+          src="/img/s3.png"
+          className="splash-screen__img"
+          quality={100}
+          fill
+          priority
+          alt=""
+        />
       </div>
     </Layout>
   );

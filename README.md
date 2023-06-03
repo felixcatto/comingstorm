@@ -9,8 +9,7 @@ SPA app using NextJs + TypeScript + Postgress. Traditional CRUD blog with abilit
 - One button deploy \*. So you need only Docker and Git installed on server. Node, Postgress and Caddy will be handled via Docker
 - Database migrations
 - Backend API tests via Jest. Frontend unit / e2e tests via ReactTestingLibrary / Cypress
-- Prod error monitoring via Sentry
-- Notable techs - NextJs, TypeScript, ObjectionOrm, WebSockets, CSS Modules, Tailwind, Docker, Postgress, Caddy, Sentry
+- Notable techs - NextJs, TypeScript, ObjectionOrm, WebSockets, CSS Modules, Tailwind, Docker, Postgress, Caddy
 
 ### Commands
 
